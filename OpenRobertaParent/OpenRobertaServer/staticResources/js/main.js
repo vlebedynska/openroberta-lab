@@ -55,7 +55,16 @@ require.config({
         'cookieDisclaimer.controller' : '../app/roberta/controller/cookieDisclaimer.controller',
         'webview.controller' : '../app/roberta/controller/webview.controller',
         'wedo.model' : '../app/roberta/models/wedo.model',
-
+        'group.model' : '../app/roberta/models/group.model',
+        'groupList.model' : '../app/roberta/models/groupList.model',
+        'groupList.controller' : '../app/roberta/controller/groupList.controller',
+        'groupDelete.controller' : '../app/roberta/controller/groupDelete.controller',
+        'group.controller' : '../app/roberta/controller/group.controller',
+        'userGroup.model' : '../app/roberta/models/userGroup.model',
+        'userGroupList.model' : '../app/roberta/models/userGroupList.model',
+        'userGroupList.controller' : '../app/roberta/controller/userGroupList.controller',
+        'userGroupDelete.controller' : '../app/roberta/controller/userGroupDelete.controller',
+        'userGroup.controller' : '../app/roberta/controller/userGroup.controller', 
         'simulation.constants' : '../app/simulation/simulationLogic/constants',
         'simulation.math' : '../app/simulation/simulationLogic/math',
         'simulation.program.builder' : '../app/simulation/robertaLogic/program.builder',
@@ -129,9 +138,9 @@ require.config({
 require([ 'require', 'wrap', 'jquery', 'jquery-cookie', 'guiState.controller', 'progList.controller', 'logList.controller', 'confList.controller',
         'progDelete.controller', 'confDelete.controller', 'progShare.controller', 'cookieDisclaimer.controller', 'menu.controller', 'user.controller',
         'robot.controller', 'program.controller', 'progSim.controller', 'progCode.controller', 'progDelete.controller', 'progHelp.controller',
-        'progInfo.controller', 'progRun.controller', 'configuration.controller', 'language.controller', 'socket.controller', 'progTutorial.controller', 'volume-meter', 'user.model', 'webview.controller' ], function(
-        require) {
-
+        'progInfo.controller', 'progRun.controller', 'configuration.controller', 'language.controller', 'socket.controller', 'progTutorial.controller',
+        'volume-meter', 'user.model', 'group.controller', 'groupList.controller', 'groupDelete.controller', 'userGroup.controller', 'userGroupList.controller',
+        'userGroupDelete.controller' ], function(require) {
     $ = require('jquery', 'jquery-cookie');
     WRAP = require('wrap');
     COMM = require('comm');
@@ -152,6 +161,12 @@ require([ 'require', 'wrap', 'jquery', 'jquery-cookie', 'guiState.controller', '
     progCodeController = require('progCode.controller');
     progSimController = require('progSim.controller');
     progRunController = require('progRun.controller');
+    groupListController = require('groupList.controller');
+    groupDeleteController = require('groupDelete.controller');
+    groupController = require('group.controller');
+    userGroupListController = require('userGroupList.controller');
+    userGroupDeleteController = require('userGroupDelete.controller');
+    userGroupController = require('userGroup.controller');
     progShareController = require('progShare.controller');
     robotController = require('robot.controller');
     userController = require('user.controller');
@@ -179,7 +194,15 @@ function init() {
     }).then(function() {
         galleryListController.init();
         progListController.init();
+        groupListController.init();
+        groupDeleteController.init();
+        userGroupListController.init();
+        userGroupDeleteController.init();
         progDeleteController.init();
+        groupListController.init();
+        groupDeleteController.init();
+        userGroupListController.init();
+        userGroupDeleteController.init();
         confListController.init();
         confDeleteController.init();
         progShareController.init();

@@ -42,6 +42,8 @@ define([ 'exports', 'util', 'log', 'message', 'guiState.model', 'progHelp.contro
             GUISTATE.program.name = 'NEPOprog';
             GUISTATE.program.shared = false;
             GUISTATE.program.toolbox.level = 'beginner';
+            
+            GUISTATE.group.name;
 
             for (var i = 0; i < GUISTATE.server.tutorial.length; i++) {
                 var tutorialPath = '../tutorial/' + GUISTATE.server.tutorial[i];
@@ -753,6 +755,16 @@ define([ 'exports', 'util', 'log', 'message', 'guiState.model', 'progHelp.contro
         GUISTATE.program.name = name;
     }
     exports.setProgramName = setProgramName;
+    
+    function getGroupName() {
+        return GUISTATE.group.name;
+    }
+    exports.getGroupName = getGroupName;
+    
+    function setGroupName(name) {
+        GUISTATE.group.name = name;
+    }
+    exports.setGroupName = setGroupName;
 
     function getConfigurationName() {
         return GUISTATE.configuration.name;

@@ -11,7 +11,7 @@ import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.fhg.iais.roberta.persistence.bo.AccessRight;
+import de.fhg.iais.roberta.persistence.bo.UserProgramShare;
 import de.fhg.iais.roberta.persistence.bo.Program;
 import de.fhg.iais.roberta.persistence.bo.Relation;
 import de.fhg.iais.roberta.persistence.bo.Robot;
@@ -168,10 +168,10 @@ public class ProgramDao extends AbstractDao<Program> {
         hql.setEntity("user", user);
         hql.setEntity("robot", robot);
         @SuppressWarnings("unchecked")
-        List<AccessRight> il = hql.list();
+        List<UserProgramShare> il = hql.list();
         Assert.isTrue(il.size() <= 1);
         if ( il.size() == 1 ) {
-            AccessRight accessRight = il.get(0);
+            UserProgramShare accessRight = il.get(0);
             if ( accessRight.getRelation() == Relation.WRITE || accessRight.getRelation() == Relation.X_WRITE ) {
                 return accessRight.getProgram();
             }

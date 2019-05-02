@@ -39,7 +39,7 @@ public class AccessRightProcessor extends AbstractProcessor {
         UserDao userDao = new UserDao(this.dbSession);
         User owner = userDao.get(ownerId);
         User author = userDao.get(authorId);
-        User userToShare = userDao.loadUser(userToShareName);
+        User userToShare = userDao.loadUser(null, userToShareName);
         executeShare(owner, robotName, programName, author, userToShare, right);
     }
 
@@ -55,9 +55,9 @@ public class AccessRightProcessor extends AbstractProcessor {
      */
     public void shareDelete(String ownerName, String robotName, String programName, String authorName, int userToShareId) {
         UserDao userDao = new UserDao(this.dbSession);
-        User owner = userDao.loadUser(ownerName);
+        User owner = userDao.loadUser(null, ownerName);
         User userToShare = userDao.get(userToShareId);
-        User author = userDao.loadUser(authorName);
+        User author = userDao.loadUser(null, authorName);
         executeShare(owner, robotName, programName, author, userToShare, "NONE");
     }
 

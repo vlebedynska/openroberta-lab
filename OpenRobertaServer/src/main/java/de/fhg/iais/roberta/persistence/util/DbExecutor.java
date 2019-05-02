@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import de.fhg.iais.roberta.util.dbc.Assert;
 
 public class DbExecutor {
-    private static Logger LOG = LoggerFactory.getLogger(DbExecutor.class);
+    public static final Logger LOG = LoggerFactory.getLogger(DbExecutor.class);
 
     private final Session session;
 

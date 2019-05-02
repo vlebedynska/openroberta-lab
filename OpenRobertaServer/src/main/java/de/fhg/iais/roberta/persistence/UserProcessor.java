@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
+import de.fhg.iais.roberta.persistence.bo.Group;
 import de.fhg.iais.roberta.persistence.dao.UserDao;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.persistence.util.HttpSessionState;
@@ -20,7 +21,7 @@ public class UserProcessor extends AbstractProcessor {
 
     public User getUser(String account) {
         UserDao userDao = new UserDao(this.dbSession);
-        User user = userDao.loadUser(account);
+        User user = userDao.loadUser(null, account);
         if ( user != null ) {
             setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
             return user;
@@ -41,8 +42,8 @@ public class UserProcessor extends AbstractProcessor {
             return null;
         } else {
             UserDao userDao = new UserDao(this.dbSession);
-            User user = userDao.loadUser(account);
-            if ( user != null && user.isPasswordCorrect(password) ) {
+            User user = userDao.loadUser(null, account);
+            if ( user != null && user.isPasswordCorrect(password) && !account_check ) {
                 setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
                 return user;
             } else {
@@ -76,8 +77,15 @@ public class UserProcessor extends AbstractProcessor {
         }
     }
 
-    public void createUser(String account, String password, String userName, String role, String email, String tags, boolean youngerThen14) throws Exception //
-    {
+    public void createUser(
+        String account,
+        Group userGroup,
+        String password,
+        String userName,
+        String roleAsString,
+        String email,
+        String tags,
+        boolean youngerThen14) throws Exception {
         Pattern p = Pattern.compile("[^a-zA-Z0-9=+!?.,%#+&^@_\\- ]", Pattern.CASE_INSENSITIVE);
         Matcher acc_symbols = p.matcher(account);
         boolean account_check = acc_symbols.find();
@@ -96,7 +104,7 @@ public class UserProcessor extends AbstractProcessor {
             UserDao userDao = new UserDao(this.dbSession);
             userDao.lockTable();
             if ( !isMailUsed(userDao, account, email) ) {
-                User user = userDao.persistUser(account, password, role);
+                User user = userDao.persistUser(userGroup, account, password, roleAsString);
                 if ( user != null ) {
                     setStatus(ProcessorStatus.SUCCEEDED, Key.USER_CREATE_SUCCESS, new HashMap<>());
                     user.setUserName(userName);
@@ -182,7 +190,7 @@ public class UserProcessor extends AbstractProcessor {
         } else {
             UserDao userDao = new UserDao(this.dbSession);
             userDao.lockTable();
-            User user = userDao.loadUser(account);
+            User user = userDao.loadUser(null, account);
             if ( user != null && getIdOfLoggedInUser() == user.getId() ) {
                 if ( !isMailUsed(userDao, account, email) ) {
                     user.setUserName(userName);
@@ -201,7 +209,7 @@ public class UserProcessor extends AbstractProcessor {
     public void deleteUser(String account, String password) throws Exception {
         UserDao userDao = new UserDao(this.dbSession);
         userDao.lockTable();
-        User user = userDao.loadUser(account);
+        User user = userDao.loadUser(null, account);
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("ACCOUNT", account);
         if ( user != null && user.isPasswordCorrect(password) ) {

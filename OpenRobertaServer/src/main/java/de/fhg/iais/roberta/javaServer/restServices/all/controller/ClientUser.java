@@ -27,6 +27,7 @@ import de.fhg.iais.roberta.persistence.LostPasswordProcessor;
 import de.fhg.iais.roberta.persistence.PendingEmailConfirmationsProcessor;
 import de.fhg.iais.roberta.persistence.ProcessorStatus;
 import de.fhg.iais.roberta.persistence.UserProcessor;
+import de.fhg.iais.roberta.persistence.bo.Group;
 import de.fhg.iais.roberta.persistence.bo.LostPassword;
 import de.fhg.iais.roberta.persistence.bo.PendingEmailConfirmations;
 import de.fhg.iais.roberta.persistence.bo.User;
@@ -229,6 +230,8 @@ public class ClientUser {
             response.put("cmd", cmd);
             UserProcessor up = new UserProcessor(dbSession, httpSessionState);
 
+            //TODO: write something sensible
+            Group group = null;
             String account = request.getString("accountName");
             String password = request.getString("password");
             String email = request.getString("userEmail");
@@ -236,7 +239,7 @@ public class ClientUser {
             String role = request.getString("role");
             //String tag = request.getString("tag");
             boolean isYoungerThen14 = request.getString("isYoungerThen14").equals("1");
-            up.createUser(account, password, userName, role, email, null, isYoungerThen14);
+            up.createUser(account, group, password, userName, role, email, null, isYoungerThen14);
             if ( this.isPublicServer && !email.equals("") && up.succeeded() ) {
                 PendingEmailConfirmationsProcessor pendingConfirmationProcessor = new PendingEmailConfirmationsProcessor(dbSession, httpSessionState);
                 String lang = request.getString("language");

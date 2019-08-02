@@ -40,6 +40,7 @@ import de.fhg.iais.roberta.syntax.action.sound.VolumeAction;
 import de.fhg.iais.roberta.syntax.action.speech.SayTextAction;
 import de.fhg.iais.roberta.syntax.action.speech.SetLanguageAction;
 import de.fhg.iais.roberta.syntax.lang.expr.ColorConst;
+import de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.CompassSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.EncoderSensor;
@@ -517,5 +518,8 @@ public final class Ev3SimVisitor extends AbstractSimVisitor<Void> implements IEv
         this.sb.append("createConstant(CONST." + colorConst.getKind().getName() + ", CONST.COLOR_ENUM." + color + ")");
         return null;
     }
-
+    @Override
+    public Void visitPixySensor(PixySensor<Void> pixySensor) {
+        return null;
+    }
 }

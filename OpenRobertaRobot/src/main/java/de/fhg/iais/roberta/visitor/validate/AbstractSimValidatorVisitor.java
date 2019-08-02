@@ -68,6 +68,11 @@ public abstract class AbstractSimValidatorVisitor extends AbstractProgramValidat
                         sensor.addInfo(NepoInfo.warning("SIM_CONFIGURATION_WARNING_WRONG_SENSOR_PORT"));
                     }
                     break;
+                case "PIXY_SENSING":
+                    if ( !type.equals("PIXY_SENSING") ) {
+                        sensor.addInfo(NepoInfo.warning("SIM_CONFIGURATION_WARNING_WRONG_SENSOR_PORT"));
+                    }
+                    break;
                 default:
                     break;
             }

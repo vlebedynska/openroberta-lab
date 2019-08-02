@@ -214,7 +214,7 @@
     <block type="robSensors_sound_getSample"/>
     <block type="robSensors_compass_calibrate"/>
     <block type="robSensors_compass_getSample"/>
-    <block type="robSensors_irseeker_getSample"/>
+    <block type="robSensors_irseeker_getSample"/><block type="robSensors_pixy_getSample"></block>
   </category>
   <category name="TOOLBOX_CONTROL" svg="true">
     <category name="TOOLBOX_DECISION" svg="true">

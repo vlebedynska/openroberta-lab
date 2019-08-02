@@ -2,6 +2,7 @@ package de.fhg.iais.roberta.visitor.validate;
 
 import de.fhg.iais.roberta.components.Configuration;
 import de.fhg.iais.roberta.syntax.action.ev3.ShowPictureAction;
+import de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.CompassSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.IRSeekerSensor;
 import de.fhg.iais.roberta.typecheck.NepoInfo;
@@ -30,6 +31,11 @@ public final class Ev3SimValidatorVisitor extends AbstractSimValidatorVisitor im
     public Void visitShowPictureAction(ShowPictureAction<Void> showPictureAction) {
         showPictureAction.getX().visit(this);
         showPictureAction.getY().visit(this);
+        return null;
+    }
+    @Override
+    public Void visitPixySensor(PixySensor<Void> pixySensor) {
+        pixySensor.addInfo(NepoInfo.warning("SIM_BLOCK_NOT_SUPPORTED"));
         return null;
     }
 }

@@ -76,6 +76,12 @@ public abstract class AbstractBrickValidatorVisitor extends AbstractProgramValid
                         this.errorCount++;
                     }
                     break;
+                case "PIXY_SENSING":
+                    if ( !type.equals("PIXY") ) {
+                        sensor.addInfo(NepoInfo.error("CONFIGURATION_ERROR_SENSOR_WRONG"));
+                        this.errorCount++;
+                    }
+                    break;
                 default:
                     break;
             }

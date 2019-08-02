@@ -10,6 +10,7 @@ import de.fhg.iais.roberta.syntax.Phrase;
 import de.fhg.iais.roberta.syntax.SC;
 import de.fhg.iais.roberta.syntax.action.ev3.ShowPictureAction;
 import de.fhg.iais.roberta.syntax.action.speech.SayTextAction;
+import de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.GyroSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.InfraredSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.TemperatureSensor;
@@ -74,4 +75,9 @@ public final class Ev3UsedHardwareCollectorVisitor extends AbstractUsedHardwareC
         return null;
     }
 
+    @Override
+    public Void visitPixySensor(PixySensor<Void> pixySensor) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

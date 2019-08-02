@@ -4,3 +4,38 @@ block:
     category: ACTOR
     implementor: de.fhg.iais.roberta.syntax.action.ev3.ShowPictureAction
     type: [robActions_display_picture,robActions_display_picture_new]
+  PXIY_SENSING:
+    category: SENSOR
+    implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+    type: [robSensors_pixy_getSample]
+wait:
+  
+  PIXY_VALUE:
+     implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+     sensor: PIXY
+     mode: DEFAULT 
+  PIXY_ID:
+     implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+     sensor: PIXY
+     mode: ID 
+  PIXY_X:
+     implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+     sensor: PIXY
+     mode: X  
+  PIXY_Y:
+     implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+     sensor: PIXY
+     mode: Y  
+  PIXY_W:
+     implementor: de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor
+     sensor: PIXY
+     mode: W        
+  PIXY_H:
+     implementor: de.fhg.iais.roberta.syntax.sensor.generic.AccelerometerSensor
+     sensor: PIXY
+     mode: H  
+mode:
+  pixy: [ID,X,Y,W,H]
+  
+configuration:
+  PIXY: [robBrick_pixy]

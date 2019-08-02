@@ -74,6 +74,7 @@ import de.fhg.iais.roberta.syntax.lang.functions.MathRandomIntFunct;
 import de.fhg.iais.roberta.syntax.lang.functions.TextJoinFunct;
 import de.fhg.iais.roberta.syntax.lang.stmt.WaitStmt;
 import de.fhg.iais.roberta.syntax.lang.stmt.WaitTimeStmt;
+import de.fhg.iais.roberta.syntax.sensor.ev3.PixySensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.CompassSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.EncoderSensor;
@@ -1353,4 +1354,28 @@ public final class Ev3JavaVisitor extends AbstractJavaVisitor implements IEv3Vis
         return null;
     }
 
+    @Override
+    public Void visitPixySensor(PixySensor<Void> pixySensor) {
+        String pixySensorPort = "SensorPort.S" + pixySensor.getPort();
+        switch ( pixySensor.getMode() ) {
+            case SC.ID:
+                this.sb.append("hal.getPixyID(" + pixySensorPort + ")");
+                break;
+            case SC.X:
+                this.sb.append("hal.getPixyX(" + pixySensorPort + ")");
+                break;
+            case SC.Y:
+                this.sb.append("hal.getPixyY(" + pixySensorPort + ");");
+                break;
+            case SC.H:
+                this.sb.append("hal.getPixyH(" + pixySensorPort + ");");
+                break;
+            case SC.W:
+                this.sb.append("hal.getPixyW(" + pixySensorPort + ");");
+                break;
+            default:
+                throw new DbcException("Invalid PixySensorMode");
+        }
+        return null;
+    }
 }

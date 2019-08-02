@@ -111,4 +111,10 @@ public interface SC {
     String SENSEBOX_COMPASS = "SENSEBOX_COMPASS";
     String SENSEBOX_SDCARD = "SENSEBOX_SDCARD";
     String SENSEBOX_PLOTTING = "SENSEBOX_PLOTTING";
+    String PIXY = "PIXY";
+    String ID = "ID";
+    String X = "X";
+    String Y = "Y";
+    String H = "H";
+    String W = "W";
 }

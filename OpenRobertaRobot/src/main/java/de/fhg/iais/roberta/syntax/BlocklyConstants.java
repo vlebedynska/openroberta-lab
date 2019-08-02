@@ -127,6 +127,7 @@ public final class BlocklyConstants {
     public static final String ROB_SENSOR_GET_SAMPLE_ARDU = "robSensors_getSample_ardu";
     public static final String ROB_COLOUR_PICKER = "robColour_picker";
     public static final String CONNECTION_NXT = "robCommunication_connection";
+    public static final String ROB_SENSOR_PIXY_GET_SAMPLE = "robSensors_pixy_getSample";
 
     public static final String MBED_SENSOR_TEMPERATURE_GET_SAMPLE = "mbedSensors_temperature_getSample";
     public static final String ROB_SENSOR_TEMPERATURE_GET_SAMPLE = "makeblockSensors_temperature_getSample";
@@ -272,6 +273,7 @@ public final class BlocklyConstants {
     public static final String SIM_LED_OFF = "sim_LED_off";
     public static final String SENSOR_LIGHT_ON = "sensorLight_on";
     public static final String SENSOR_LIGHT_OFF = "sensorLight_off";
+    public static final String ROB_BRICK_PIXY = "robBrick_pixy";
 
     public static final String SIM_GET_SAMPLE = "sim_getSample";
     public static final String SIM_TOUCH_IS_PRESSED = "sim_touch_isPressed";

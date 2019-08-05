@@ -520,6 +520,7 @@ public final class Ev3SimVisitor extends AbstractSimVisitor<Void> implements IEv
     }
     @Override
     public Void visitPixySensor(PixySensor<Void> pixySensor) {
+        this.sb.append("null");
         return null;
     }
 }

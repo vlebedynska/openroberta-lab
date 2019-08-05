@@ -1256,6 +1256,8 @@ public final class Ev3JavaVisitor extends AbstractJavaVisitor implements IEv3Vis
                 return "CompassSensorMode." + sensorMode;
             case SC.IRSEEKER:
                 return "IRSeekerSensorMode." + sensorMode;
+            case SC.PIXY:
+                return "PixySensorMode." + sensorMode;
             default:
                 throw new DbcException("There is mapping missing for " + sensorType + " with the old enums!");
         }

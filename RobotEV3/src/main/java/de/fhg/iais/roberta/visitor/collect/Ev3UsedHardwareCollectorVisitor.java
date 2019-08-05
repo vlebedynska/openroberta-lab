@@ -77,7 +77,8 @@ public final class Ev3UsedHardwareCollectorVisitor extends AbstractUsedHardwareC
 
     @Override
     public Void visitPixySensor(PixySensor<Void> pixySensor) {
-        // TODO Auto-generated method stub
+        String mode = pixySensor.getMode();
+        this.usedSensors.add(new UsedSensor(pixySensor.getPort(), SC.INFRARED, mode));
         return null;
     }
 }

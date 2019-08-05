@@ -285,7 +285,7 @@ public abstract class AbstractProgramValidatorVisitor extends AbstractCollectorV
     public Void visitPinTouchSensor(PinTouchSensor<Void> pinTouchSensor) {
         return null;
     }
-
+    
     @Override
     public Void visitToneAction(ToneAction<Void> toneAction) {
         toneAction.getDuration().visit(this);

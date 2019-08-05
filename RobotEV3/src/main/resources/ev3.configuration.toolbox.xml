@@ -12,7 +12,6 @@
         <block type='robBrick_gyro'></block>
         <block type='robBrick_sound' />
         <block type='robBrick_compass' />
-        <block type='robBrick_irseeker' >
-        	</block>
-        <block type="robBrick_pixy"></block></category>
+        <block type='robBrick_irseeker' /><block type="robBrick_pixy"></block>
+    </category>
 </toolbox_set>

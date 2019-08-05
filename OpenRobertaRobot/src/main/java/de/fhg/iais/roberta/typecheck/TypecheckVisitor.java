@@ -426,7 +426,7 @@ public class TypecheckVisitor implements ILanguageVisitor<BlocklyType>, ISensorV
     public BlocklyType visitInfraredSensor(InfraredSensor<BlocklyType> infraredSensor) {
         return null;
     }
-
+	
     @Override
     public BlocklyType visitTimerSensor(TimerSensor<BlocklyType> timerSensor) {
         return null;
@@ -441,7 +441,7 @@ public class TypecheckVisitor implements ILanguageVisitor<BlocklyType>, ISensorV
     public BlocklyType visitUltrasonicSensor(UltrasonicSensor<BlocklyType> ultrasonicSensor) {
         return null;
     }
-
+    
     @Override
     public BlocklyType visitMainTask(MainTask<BlocklyType> mainTask) {
         return null;

@@ -66,7 +66,7 @@ public abstract class AbstractCollectorVisitor implements ILanguageVisitor<Void>
     protected final List<String> declaredVariables = new ArrayList<>();
     protected ArrayList<VarDeclaration<Void>> visitedVars = new ArrayList<>();
     private final List<Method<Void>> userDefinedMethods = new ArrayList<>();
-    private final Set<String> markedVariablesAsGlobal = new HashSet<>();
+    protected final Set<String> markedVariablesAsGlobal = new HashSet<>();
 
     private boolean isProgramEmpty = false;
     private boolean isListsUsed = false;

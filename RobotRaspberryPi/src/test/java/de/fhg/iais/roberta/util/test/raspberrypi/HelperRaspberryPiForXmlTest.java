@@ -2,7 +2,7 @@ package de.fhg.iais.roberta.util.test.raspberrypi;
 
 import org.junit.Assert;
 
-import de.fhg.iais.roberta.components.raspberrypi.RaspberryPiConfiguration;
+import de.fhg.iais.roberta.components.Configuration;
 import de.fhg.iais.roberta.factory.RaspberryPiFactory;
 import de.fhg.iais.roberta.mode.action.Language;
 import de.fhg.iais.roberta.transformer.Jaxb2ProgramAst;
@@ -16,7 +16,7 @@ public class HelperRaspberryPiForXmlTest extends AbstractHelperForXmlTest {
     public HelperRaspberryPiForXmlTest() {
         super(
             new RaspberryPiFactory(new PluginProperties("raspberrypi", "", "", Util1.loadProperties("classpath:/raspberrypi.properties"))),
-            new RaspberryPiConfiguration.Builder().build());
+            new Configuration.Builder().build());
     }
 
     /**
@@ -31,7 +31,7 @@ public class HelperRaspberryPiForXmlTest extends AbstractHelperForXmlTest {
         String javaCode =
             RaspberryPiPythonVisitor
                 .generate(
-                    (RaspberryPiConfiguration) getRobotConfiguration(),
+                    (Configuration) getRobotConfiguration(),
                     transformer.getTree(),
                     false,
                     Language.ENGLISH,
@@ -58,7 +58,7 @@ public class HelperRaspberryPiForXmlTest extends AbstractHelperForXmlTest {
      * @return the code as string
      * @throws Exception
      */
-    public String generatePython(String pathToProgramXml, RaspberryPiConfiguration brickConfiguration) throws Exception {
+    public String generatePython(String pathToProgramXml, Configuration brickConfiguration) throws Exception {
         Jaxb2ProgramAst<Void> transformer = generateTransformer(pathToProgramXml);
         String code =
             RaspberryPiPythonVisitor.generate(brickConfiguration, transformer.getTree(), true, Language.ENGLISH, getRobotFactory().getHelperMethodGenerator());

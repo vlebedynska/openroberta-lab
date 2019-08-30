@@ -36,7 +36,7 @@ define([ 'exports', 'comm', 'message', 'log', 'util', 'guiState.controller', 'ro
                 minScale : .25,
                 scaleSpeed : 1.1
             },
-            checkInTask : [ 'start', '_def', 'event' ],
+            checkInTask : [ 'start', '_def', 'intent' ],
             variableDeclaration : true,
             robControls : true,
             theme : GUISTATE_C.getTheme()

@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fhg.iais.roberta.components.raspberrypi.RaspberryPiConfiguration;
+import de.fhg.iais.roberta.components.Configuration;
 import de.fhg.iais.roberta.util.test.raspberrypi.HelperRaspberryPiForXmlTest;
 
 @Ignore
@@ -35,11 +35,11 @@ public class PythonVisitorTest {
             + "        print(e)\n"
             + "if __name__ == \"__main__\":\n"
             + "    main()";
-    private static RaspberryPiConfiguration brickConfiguration;
+    private static Configuration brickConfiguration;
 
     @BeforeClass
     public static void setupConfigurationForAllTests() {
-        RaspberryPiConfiguration.Builder builder = new RaspberryPiConfiguration.Builder();
+        Configuration.Builder builder = new Configuration.Builder();
         brickConfiguration = builder.build();
     }
 

@@ -561,6 +561,9 @@
 .typcn-message-typing:before {
   content: "\e9b0";
 }
+.typcn-raspberrypi:before {
+  content: "\e9b0";
+}
 .typcn-media-stop:before {
   content: "\e9b1";
 }

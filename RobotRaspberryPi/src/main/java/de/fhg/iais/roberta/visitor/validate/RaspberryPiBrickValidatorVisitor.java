@@ -6,7 +6,9 @@ import de.fhg.iais.roberta.syntax.action.raspberrypi.LedDimAction;
 import de.fhg.iais.roberta.syntax.action.raspberrypi.LedGetAction;
 import de.fhg.iais.roberta.syntax.action.raspberrypi.LedSetAction;
 import de.fhg.iais.roberta.syntax.lang.expr.ColorHexString;
+import de.fhg.iais.roberta.syntax.lang.stmt.IntentStmt;
 import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
+import de.fhg.iais.roberta.syntax.sensors.raspberrypi.SlotSensor;
 import de.fhg.iais.roberta.visitor.hardware.IRaspberryPiVisitor;
 
 public final class RaspberryPiBrickValidatorVisitor extends AbstractBrickValidatorVisitor implements IRaspberryPiVisitor<Void> {
@@ -42,5 +44,17 @@ public final class RaspberryPiBrickValidatorVisitor extends AbstractBrickValidat
 
     @Override
     protected void checkSensorPort(ExternalSensor<Void> sensor) {
+    }
+
+    @Override
+    public Void visitIntentStmt(IntentStmt<Void> intentStmt) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visitSlotSensor(SlotSensor<Void> slotSensor) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

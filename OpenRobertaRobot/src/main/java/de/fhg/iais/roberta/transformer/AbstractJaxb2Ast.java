@@ -197,9 +197,11 @@ abstract public class AbstractJaxb2Ast<V> {
             statements = extractStatements(block, (short) 1);
         }
 
-        for ( int i = 0; i < (_elseIf + _else + 1); i++ ) {
-            if ( (_else != 0) && (i == (_elseIf + _else)) ) {
+        for ( int i = 0; i < (_elseIf + _else); i++ ) {
+            if ( (_else != 0) && (i == 0) ) {
                 elseList = extractStatement(statements, BlocklyConstants.ELSE);
+            } else if ( _else == 0 && _elseIf == 0 ) {
+                thenList.add(extractStatement(statements, BlocklyConstants.DO + i));
             } else {
                 Phrase<V> p = extractValue(values, new ExprParam(BlocklyConstants.IF + i, BlocklyType.BOOLEAN));
                 exprsList.add(convertPhraseToExpr(p));
@@ -277,13 +279,7 @@ abstract public class AbstractJaxb2Ast<V> {
     public ExprList<V> argumentsToExprList(List<Arg> arguments) {
         ExprList<V> parameters = ExprList.make();
         for ( Arg arg : arguments ) {
-            Var<V> parametar =
-                Var
-                    .make(
-                        BlocklyType.get(arg.getType()),
-                        arg.getName(),
-                        BlocklyBlockProperties.make("1", "1"),
-                        null);
+            Var<V> parametar = Var.make(BlocklyType.get(arg.getType()), arg.getName(), BlocklyBlockProperties.make("1", "1"), null);
             parameters.addExpr(parametar);
         }
         parameters.setReadOnly();

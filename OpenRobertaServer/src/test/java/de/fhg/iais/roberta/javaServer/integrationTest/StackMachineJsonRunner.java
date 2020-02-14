@@ -72,6 +72,9 @@ public class StackMachineJsonRunner {
 
     private static List<String> runCommand(String... command) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
         int returnCode = process.waitFor();
         LOG.info("node call returned error code " + returnCode);

@@ -99,8 +99,8 @@ public class C4Ev3SourceCompiler {
     private ProcessBuilder getProcessBuilder(String[] compilerArguments) {
         ProcessBuilder processBuilder = new ProcessBuilder(compilerArguments);
         processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        processBuilder.redirectErrorStream(true);
         return processBuilder;
     }
 }

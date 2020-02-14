@@ -1,9 +1,18 @@
-language: java
-jdk:
-  - openjdk8
+services:
+  - docker
+
+before_install:
+  - docker pull openroberta/it:12
+
+script:
+  - docker run --detach --name openroberta --entrypoint "/opt/runIT.sh" openroberta/it:12 ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} 3.8.3
+  - docker logs --follow openroberta
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - docker commit openroberta openroberta-built
+  - ci_env=`bash <(curl -s https://codecov.io/env)`
+  - docker run --detach --name openroberta-built $ci_env --entrypoint "/bin/bash" openroberta-built -c "cd openroberta-lab && bash <(curl -s https://codecov.io/bash)"
+  - docker logs --follow openroberta-built
 
 notifications:
   irc: "chat.freenode.net#open-roberta"

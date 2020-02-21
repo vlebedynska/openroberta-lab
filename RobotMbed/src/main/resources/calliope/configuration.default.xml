@@ -1,5 +1,14 @@
 <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="calliope" xmlversion="">
-    <instance x="138" y="88">
-        <block id="1" type="mbedBrick_Calliope-Brick" />
+    <instance x="483" y="-130">
+        <block type="robConf_key" id="Kbp:=x@gw@n.b~NH|1|e" intask="true">
+            <field name="NAME">A</field>
+            <field name="PIN1">A</field>
+        </block>
+    </instance>
+    <instance x="574" y="-130">
+        <block type="robConf_key" id="~wk*JZQvB.fj=I`N#NWp" intask="true">
+            <field name="NAME">B</field>
+            <field name="PIN1">B</field>
+        </block>
     </instance>
 </block_set>

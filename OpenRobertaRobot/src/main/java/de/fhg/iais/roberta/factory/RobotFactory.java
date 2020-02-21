@@ -242,4 +242,9 @@ public class RobotFactory implements IRobotFactory {
     public Set<String> getWorkflows() {
         return Collections.unmodifiableSet(this.workflows.keySet());
     }
+
+    @Override
+    public boolean hasWorkflow(String workflow) {
+        return this.workflows.get(workflow) != null;
+    }
 }

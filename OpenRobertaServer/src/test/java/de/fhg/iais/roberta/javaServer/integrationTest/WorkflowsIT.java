@@ -115,9 +115,9 @@ public class WorkflowsIT {
 
     @Test
     public void testSingleWorkflow() throws Exception {
-        final String robotName = "nxt";
-        String workflowName = "compile";
-        String programFileName = "sensors_default";
+        final String robotName = "calliope2017NoBlue";
+        String workflowName = "generateconfiguration";
+        String programFileName = "sensors";
         String robotDir = robots.getJSONObject(robotName).getString("dir");
         String fullResource = resourceBase + robotDir + "/allBlocks/" + programFileName + ".xml";
         String xmlText = Util.readResourceContent(fullResource);
@@ -192,7 +192,7 @@ public class WorkflowsIT {
             Project showSourceProject = builder.build();
 
             // Every robot needs at least a show source workflow
-            ProjectService.executeWorkflow("showsource", pluginMap.get(robotName), showSourceProject);
+            ProjectService.executeWorkflow("showsource", showSourceProject);
             sourceCode = showSourceProject.getSourceCode().toString();
             result = showSourceProject.hasSucceeded() ? (program.contains(PARTIAL_SUCCESS_DEF) ? Result.PARTIAL_SUCCESS : Result.SUCCESS) : Result.FAILURE;
             reason = String.valueOf(showSourceProject.getResult());
@@ -229,7 +229,7 @@ public class WorkflowsIT {
             builder.setLanguage(Language.ENGLISH);
             Project project = builder.build();
 
-            ProjectService.executeWorkflow(workflow, factory, project);
+            ProjectService.executeWorkflow(workflow, project);
             if ( !project.hasSucceeded()
                 && workflow.contains("run")
                 && StringUtils.containsIgnoreCase(pluginMap.get(robotName).getConnectionType(), ("token")) ) {

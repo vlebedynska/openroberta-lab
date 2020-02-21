@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 import de.fhg.iais.roberta.blockly.generated.Export;
+import de.fhg.iais.roberta.components.Project;
 import de.fhg.iais.roberta.factory.IRobotFactory;
 import de.fhg.iais.roberta.javaServer.provider.OraData;
+import de.fhg.iais.roberta.javaServer.restServices.all.service.ProjectService;
 import de.fhg.iais.roberta.persistence.AccessRightProcessor;
 import de.fhg.iais.roberta.persistence.ConfigurationProcessor;
 import de.fhg.iais.roberta.persistence.LikeProcessor;
@@ -171,7 +173,11 @@ public class ClientProgramController {
                 Program program = programProcessor.getProgram(programName, ownerName, robot, author);
                 if ( program != null ) {
                     response.put("programText", program.getProgramText());
-                    String configText = programProcessor.getProgramsConfig(program);
+                    String configText =
+                        generateConfigurationIfNeeded(
+                            httpSessionState.getRobotFactory(),
+                            program.getProgramText(),
+                            programProcessor.getProgramsConfig(program));
                     response.put("configName", program.getConfigName()); // may be null, if an anonymous configuration is used
                     response.put("configText", configText); // may be null, if the default configuration is used
                     response.put("lastChanged", program.getLastChanged().getTime());
@@ -332,7 +338,6 @@ public class ClientProgramController {
             if ( !Util.isValidJavaIdentifier(programName) ) {
                 programName = "NEPOprog";
             }
-
             Export jaxbImportExport;
             try {
                 jaxbImportExport = JaxbHelper.xml2Element(xmlText, Export.class);
@@ -344,8 +349,14 @@ public class ClientProgramController {
                 String robotType2 = jaxbImportExport.getConfig().getBlockSet().getRobottype();
                 if ( robotType1.equals(robot) && robotType2.equals(robot) ) {
                     response.put("programName", programName);
-                    response.put("programText", JaxbHelper.blockSet2xml(jaxbImportExport.getProgram().getBlockSet()));
-                    response.put("configText", JaxbHelper.blockSet2xml(jaxbImportExport.getConfig().getBlockSet()));
+                    String programText = JaxbHelper.blockSet2xml(jaxbImportExport.getProgram().getBlockSet());
+                    String configText =
+                        generateConfigurationIfNeeded(
+                            httpSessionState.getRobotFactory(),
+                            programText,
+                            JaxbHelper.blockSet2xml(jaxbImportExport.getConfig().getBlockSet()));
+                    response.put("programText", programText);
+                    response.put("configText", configText);
                     UtilForREST.addSuccessInfo(response, Key.PROGRAM_IMPORT_SUCCESS);
                     Statistics.info("ProgramImport", "success", true);
                 } else {
@@ -680,5 +691,16 @@ public class ClientProgramController {
             }
         }
         return Response.ok(response).build();
+    }
+
+    // Workaround for old robot programs which do not have a configuration yet
+    private static String generateConfigurationIfNeeded(IRobotFactory robotFactory, String programText, String configText) {
+        if ( robotFactory.hasWorkflow("generateconfiguration") ) {
+            Project project = new Project.Builder().setFactory(robotFactory).setProgramXml(programText).setConfigurationXml(configText).build();
+            ProjectService.executeWorkflow("generateconfiguration", project);
+            return project.getAnnotatedConfigurationAsXml();
+        } else {
+            return configText;
+        }
     }
 }

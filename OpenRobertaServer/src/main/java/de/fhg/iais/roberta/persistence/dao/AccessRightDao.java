@@ -40,8 +40,8 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
         Assert.notNull(program);
         Assert.notNull(relation);
 
-        lockTable();
-        UserProgramShare accessRight = loadAccessRight(user, program);
+        this.lockTable();
+        UserProgramShare accessRight = this.loadAccessRight(user, program);
         if ( accessRight == null ) {
             accessRight = new UserProgramShare(user, program, relation);
             this.session.save(accessRight);
@@ -58,8 +58,8 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
      * @param program the program affected
      */
     public void deleteAccessRight(User user, Program program) {
-        lockTable();
-        UserProgramShare toBeDeleted = loadAccessRight(user, program);
+        this.lockTable();
+        UserProgramShare toBeDeleted = this.loadAccessRight(user, program);
         if ( toBeDeleted != null ) {
             this.session.delete(toBeDeleted);
         }
@@ -77,7 +77,7 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
         Assert.notNull(user);
         Assert.notNull(program);
 
-        Query hql = this.session.createQuery("from AccessRight where user=:user and program=:program");
+        Query hql = this.session.createQuery("from UserProgramShare where user=:user and program=:program");
         hql.setEntity("user", user);
         hql.setEntity("program", program);
         @SuppressWarnings("unchecked")
@@ -94,7 +94,7 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
     public List<UserProgramShare> loadAccessRightsByProgram(Program program) {
         Assert.notNull(program);
 
-        Query hql = this.session.createQuery("from AccessRight where program=:program");
+        Query hql = this.session.createQuery("from UserProgramShare where program=:program");
 
         hql.setEntity("program", program);
         @SuppressWarnings("unchecked")
@@ -113,7 +113,7 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
 
         int robotId = robot.getId();
 
-        Query hql = this.session.createQuery("from AccessRight where user=:user and program.robot.id=:robotId");
+        Query hql = this.session.createQuery("from UserProgramShare where user=:user and program.robot.id=:robotId");
 
         hql.setEntity("user", user);
         hql.setInteger("robotId", robotId);
@@ -129,7 +129,7 @@ public class AccessRightDao extends AbstractDao<UserProgramShare> {
         Query hql =
             this.session
                 .createQuery(
-                    "from AccessRight where user.id=:userId and program.name=:programName and program.owner.id=:ownerId and program.author.account=:authorName");
+                    "from UserProgramShare where user.id=:userId and program.name=:programName and program.owner.id=:ownerId and program.author.account=:authorName");
 
         hql.setInteger("userId", userId);
         hql.setString("programName", programName);

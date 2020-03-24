@@ -163,7 +163,7 @@ public class ProgramDao extends AbstractDao<Program> {
      */
     private Program loadSharedForUpdate(String name, User user, Robot robot, User author) {
         checkProgramValidity(name, user, robot, author, null);
-        Query hql = this.session.createQuery("from AccessRight where user=:user and program.name=:name and program.robot=:robot");
+        Query hql = this.session.createQuery("from UserProgramShare where user=:user and program.name=:name and program.robot=:robot");
         hql.setString("name", name);
         hql.setEntity("user", user);
         hql.setEntity("robot", robot);

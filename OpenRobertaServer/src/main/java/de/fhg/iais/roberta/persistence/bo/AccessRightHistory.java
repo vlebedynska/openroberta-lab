@@ -26,7 +26,7 @@ public class AccessRightHistory implements WithSurrogateId {
 
     @ManyToOne
     @JoinColumn(name = "USERGROUP_ID")
-    private Group group;
+    private UserGroup group;
 
     @Column(name = "CREATED")
     private Timestamp created;
@@ -44,7 +44,7 @@ public class AccessRightHistory implements WithSurrogateId {
      *
      * @param group the group whose access rights we consider
      */
-    public AccessRightHistory(Group group, AccessRight accessRightToSave) {
+    public AccessRightHistory(UserGroup group, AccessRight accessRightToSave) {
         Assert.notNull(group);
         this.group = group;
         this.oldAccessRight = accessRightToSave;
@@ -71,7 +71,7 @@ public class AccessRightHistory implements WithSurrogateId {
      *
      * @return the owner, never <code>null</code>
      */
-    public Group getGroup() {
+    public UserGroup getGroup() {
         return this.group;
     }
 

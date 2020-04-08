@@ -175,6 +175,7 @@ limitations under the License.
                         <ul class="dropdown-menu" id="head-navigation-user-dropdown">
                             <li class="logout"><a href="#" id="menuLogin" class="typcn typcn-user" lkey="Blockly.Msg.MENU_LOG_IN">anmelden ...</a></li>
                             <li class="login"><a href="#" id="menuLogout" class="typcn typcn-user-outline" lkey="Blockly.Msg.MENU_LOG_OUT">abmelden</a></li>
+                            <li class="login"><a href="#" id="menuGroupPanel" class="typcn typcn-group" lkey="Blockly.Msg.MENU_USERGROUP_SHOW_PANEL">Gruppen verwalten</a></li>
                             <!-- <li><a href="#" id="menuNewUser" class="typcn typcn-user-add" lkey="Blockly.Msg.MENU_NEW">neu ...</a></li> -->
                             <li class="login"><a href="#" id="menuChangeUser" class="typcn typcn-lock-closed" lkey="Blockly.Msg.MENU_CHANGE">ändern ...</a></li>
                             <li class="login"><a href="#" id="menuDeleteUser" class="typcn typcn-user-delete" lkey="Blockly.Msg.MENU_DELETE_USER">Benutzer
@@ -284,6 +285,7 @@ limitations under the License.
                 <li class="hidden"><a data-toggle="tab" id="tabSourceCodeEditor" href="#sourceCodeEditorPane">Source code editor</a></li>
                 <li class="hidden"><a data-toggle="tab" id="tabGalleryList" href="#galleryList">Galery</a></li>
                 <li class="hidden"><a data-toggle="tab" id="tabTutorialList" href="#tutorialList">Tutorial</a></li>
+                <li class="hidden"><a data-toggle="tab" id="tabUserGroupList" href="#userGroupList">UserGroup List</a></li>
             </ul>
         </div>
     </nav>
@@ -495,6 +497,15 @@ limitations under the License.
                 </button>
             </div>
             <table id="tutorialTable" class="galleryTable">
+            </table>
+        </div>
+        <div id="userGroupList" class="tab-pane fade">
+            <div id="userGroupListToolbar">
+                <button id="backUserGroupList" class="btn backList" lkey="Blockly.Msg.LIST_BACK_TOOLTIP" rel="tooltip" data-original-title="Back to previous view.">
+                    <i class="typcn typcn-arrow-left"></i>
+                </button>
+            </div>
+            <table id="userGroupTable">
             </table>
         </div>
         <div id="configuration" class="tab-pane fade">

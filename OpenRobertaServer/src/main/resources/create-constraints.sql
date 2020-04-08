@@ -33,7 +33,7 @@ commit;
 alter table USERGROUP add foreign key (OWNER_ID) references USER(ID) ON DELETE CASCADE;
 commit;
 
-create unique index usergroupOwnerNameIdx on USERGROUP(OWNER_ID, NAME);
+create unique index usergroupNameIdx on USERGROUP(OWNER_ID, NAME);
 commit;
 
 alter table ACCESSRIGHT_HISTORY add foreign key (USERGROUP_ID) references USERGROUP(ID) ON DELETE CASCADE;

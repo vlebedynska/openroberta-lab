@@ -23,7 +23,7 @@ import de.fhg.iais.roberta.util.dbc.Assert;
 
 @Entity
 @Table(name = "USERGROUP")
-public class Group implements WithSurrogateId {
+public class UserGroup implements WithSurrogateId {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,7 @@ public class Group implements WithSurrogateId {
     @JoinTable(name = "USERGROUP_ROBOTS", joinColumns = @JoinColumn(name = "USERGROUP_ID"), inverseJoinColumns = @JoinColumn(name = "ROBOT_ID"))
     private Set<Robot> robots;
 
-    protected Group() {
+    protected UserGroup() {
         // Hibernate
     }
 
@@ -57,9 +57,10 @@ public class Group implements WithSurrogateId {
      * @param name the name of the group, not null
      * @param owner the user who created and thus owns the group
      */
-    public Group(String name, User owner) {
+    public UserGroup(String name, User owner) {
         Assert.notNull(name);
         Assert.notNull(owner);
+
         this.name = name;
         this.owner = owner;
         this.accessRight = AccessRight.ALL_READ;
@@ -96,6 +97,8 @@ public class Group implements WithSurrogateId {
      */
 
     public void setAccessRight(AccessRight accessRight) {
+        //TODO: Discuss to set default AccessRight in case of null
+        Assert.notNull(accessRight);
         this.accessRight = accessRight;
     }
 
@@ -122,8 +125,9 @@ public class Group implements WithSurrogateId {
     public void removeRobot(Robot robot) {
         if ( this.robots == null ) {
             this.robots = new HashSet<>();
+        } else {
+            this.robots.remove(robot);
         }
-        this.robots.remove(robot);
     }
 
     public Set<Robot> getRobots() {
@@ -135,7 +139,7 @@ public class Group implements WithSurrogateId {
 
     @Override
     public String toString() {
-        return "Group [id="
+        return "UserGroup [id="
             + this.id
             + ", name="
             + this.name

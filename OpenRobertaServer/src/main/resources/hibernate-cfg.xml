@@ -32,7 +32,7 @@
 		<mapping class="de.fhg.iais.roberta.persistence.bo.LostPassword" />
 		<mapping class="de.fhg.iais.roberta.persistence.bo.PendingEmailConfirmations" />
 		<mapping class="de.fhg.iais.roberta.persistence.bo.Like" />
-		<mapping class="de.fhg.iais.roberta.persistence.bo.Group" />
+		<mapping class="de.fhg.iais.roberta.persistence.bo.UserGroup" />
 		<mapping class="de.fhg.iais.roberta.persistence.bo.AccessRightHistory" />
 	</session-factory>
 </hibernate-configuration>

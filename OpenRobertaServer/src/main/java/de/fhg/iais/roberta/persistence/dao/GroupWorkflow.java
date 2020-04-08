@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import de.fhg.iais.roberta.persistence.bo.AccessRight;
 import de.fhg.iais.roberta.persistence.bo.AccessRightHistory;
-import de.fhg.iais.roberta.persistence.bo.Group;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
 import de.fhg.iais.roberta.persistence.util.DbSession;
@@ -34,10 +34,10 @@ public class GroupWorkflow {
      */
     public Key changeGroupAccessRight(String userName, String groupName, AccessRight newAccessRight) {
         UserDao userDao = new UserDao(this.session);
-        GroupDao groupDao = new GroupDao(this.session);
+        UserGroupDao groupDao = new UserGroupDao(this.session);
         User groupOwner = userDao.loadUser(null, userName);
         Assert.notNull(groupOwner);
-        Group group = groupDao.load(groupName, groupOwner);
+        UserGroup group = groupDao.load(groupName, groupOwner);
         Assert.notNull(group);
         AccessRight accessRightOld = group.getAccessRight();
         if ( accessRightOld == newAccessRight ) {
@@ -61,16 +61,17 @@ public class GroupWorkflow {
      */
     public Key addAccounts(String userName, String groupName, String accountPrefix, int startNumber, int numberOfAccounts) {
         UserDao userDao = new UserDao(this.session);
-        GroupDao groupDao = new GroupDao(this.session);
+        UserGroupDao groupDao = new UserGroupDao(this.session);
         User groupOwner = userDao.loadUser(null, userName);
         Assert.notNull(groupOwner);
-        Group group = groupDao.load(groupName, groupOwner);
+        UserGroup group = groupDao.load(groupName, groupOwner);
         Assert.notNull(group);
         Assert.nonEmptyString(accountPrefix);
         Assert.isTrue(startNumber >= 0);
-        Assert.isTrue(numberOfAccounts >= 0 && numberOfAccounts <= 100);
+        Assert.isTrue(numberOfAccounts >= 0 && (startNumber + numberOfAccounts) <= 99);
         for ( int i = startNumber; i < startNumber + numberOfAccounts; i++ ) {
             if ( userDao.loadUser(group, accountPrefix + i) != null ) {
+                //TODO: Also check if the given user is part of the group. If not, its not the fault of the group admin fault and we need to simply skip it.
                 return Key.GROUP_USER_ALREADY_EXISTS;
             }
         }
@@ -95,10 +96,10 @@ public class GroupWorkflow {
      */
     public Key deleteAccount(String groupOwnerName, String groupName, String accountToDeleteName) {
         UserDao userDao = new UserDao(this.session);
-        GroupDao groupDao = new GroupDao(this.session);
+        UserGroupDao groupDao = new UserGroupDao(this.session);
         User groupOwner = userDao.loadUser(null, groupOwnerName);
         Assert.notNull(groupOwner);
-        Group group = groupDao.load(groupName, groupOwner);
+        UserGroup group = groupDao.load(groupName, groupOwner);
         Assert.notNull(group);
         Assert.nonEmptyString(accountToDeleteName);
         User userToBeDeleted = userDao.loadUser(group, accountToDeleteName);

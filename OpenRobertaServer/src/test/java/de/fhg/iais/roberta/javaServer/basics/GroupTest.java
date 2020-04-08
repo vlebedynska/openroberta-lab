@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import de.fhg.iais.roberta.persistence.bo.AccessRight;
-import de.fhg.iais.roberta.persistence.bo.Group;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.bo.Robot;
 import de.fhg.iais.roberta.persistence.bo.User;
-import de.fhg.iais.roberta.persistence.dao.GroupDao;
+import de.fhg.iais.roberta.persistence.dao.UserGroupDao;
 import de.fhg.iais.roberta.persistence.dao.GroupWorkflow;
 import de.fhg.iais.roberta.persistence.dao.RobotDao;
 import de.fhg.iais.roberta.persistence.dao.UserDao;
@@ -84,7 +84,7 @@ public class GroupTest {
             assertNotNull(testUser);
             testUser.setActivated(false);
             session.commit();
-            GroupDao groupDao = new GroupDao(session);
+            UserGroupDao groupDao = new UserGroupDao(session);
             groupDao.persistGroup("minscha", testUser, null);
             fail();
         } catch ( Exception e ) {
@@ -113,14 +113,14 @@ public class GroupTest {
             UserDao userDao = new UserDao(session);
             User testUser = userDao.loadUser(null, "testUser");
             assertNotNull(testUser);
-            GroupDao groupDao = new GroupDao(session);
+            UserGroupDao groupDao = new UserGroupDao(session);
             int number = 0;
             while ( true ) {
-                Pair<Key, Group> result = groupDao.persistGroup("minscha" + number++, testUser, null);
+                Pair<Key, UserGroup> result = groupDao.persistGroup("minscha" + number++, testUser, null);
                 Key resultKey = result.getFirst();
                 if ( resultKey == Key.GROUP_CREATE_SUCCESS ) {
                     break;
-                } else if ( resultKey == Key.GROUP_ALREADY_EXISTS ) {
+                } else if ( resultKey == Key.GROUP_CREATE_ERROR_ALREADY_EXISTS ) {
                     // expected!
                 } else {
                     fail();
@@ -165,9 +165,9 @@ public class GroupTest {
             UserDao userDao = new UserDao(session);
             User testUser = userDao.loadUser(null, "testUser");
             assertNotNull(testUser);
-            GroupDao groupDao = new GroupDao(session);
-            List<Group> groups = groupDao.loadAll(testUser);
-            Group group = groups.get(0);
+            UserGroupDao groupDao = new UserGroupDao(session);
+            List<UserGroup> groups = groupDao.loadAll(testUser);
+            UserGroup group = groups.get(0);
             String newName = group.getName() + getAlphaNumericString(6);
             group.rename(newName);
             session.commit();
@@ -176,8 +176,8 @@ public class GroupTest {
         {
             LOG.info("***** step 10: add robots to group with ID = 93");
             final DbSession session = sessionFactoryWrapper.getSession();
-            GroupDao groupDao = new GroupDao(session);
-            Group minscha = groupDao.get(93);
+            UserGroupDao groupDao = new UserGroupDao(session);
+            UserGroup minscha = groupDao.get(93);
             RobotDao robotDao = new RobotDao(session);
             Robot r1 = robotDao.load(49);
             Robot r2 = robotDao.load(51);

@@ -78,6 +78,7 @@ public class UserProgramShare implements WithSurrogateId {
         this.relation = relation;
     }
 
+    //TODO: Change from AccessRight to UserProgramShare, or give class a proper name instead
     @Override
     public String toString() {
         return "AccessRight [id=" + this.id + ", user=" + this.user + ", relation=" + this.relation + "]";

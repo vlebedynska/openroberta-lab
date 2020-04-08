@@ -51,6 +51,8 @@ require.config({
         'robot.controller' : '../app/roberta/controller/robot.controller',
         'robot.model' : '../app/roberta/models/robot.model',
         'tour.controller' : '../app/roberta/controller/tour.controller',
+        'userGroup.controller' : '../app/roberta/controller/userGroup.controller',
+        'userGroup.model' : '../app/roberta/models/userGroup.model',
         'user.controller' : '../app/roberta/controller/user.controller',
         'user.model' : '../app/roberta/models/user.model',
         'rest.robot' : '../app/roberta/rest/robot',

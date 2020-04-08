@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
-import de.fhg.iais.roberta.persistence.bo.Group;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.dao.UserDao;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.persistence.util.HttpSessionState;
@@ -23,10 +23,10 @@ public class UserProcessor extends AbstractProcessor {
         UserDao userDao = new UserDao(this.dbSession);
         User user = userDao.loadUser(null, account);
         if ( user != null ) {
-            setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
+            this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
             return user;
         } else {
-            setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
             return null;
         }
     }
@@ -38,16 +38,16 @@ public class UserProcessor extends AbstractProcessor {
         if ( account_check ) {
             Map<String, String> processorParameters = new HashMap<>();
             processorParameters.put("ACCOUNT", account);
-            setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_CONTAINS_SPECIAL_CHARACTERS, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_CONTAINS_SPECIAL_CHARACTERS, processorParameters);
             return null;
         } else {
             UserDao userDao = new UserDao(this.dbSession);
             User user = userDao.loadUser(null, account);
             if ( user != null && user.isPasswordCorrect(password) && !account_check ) {
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
                 return user;
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
                 return null;
             }
         }
@@ -57,10 +57,10 @@ public class UserProcessor extends AbstractProcessor {
         UserDao userDao = new UserDao(this.dbSession);
         User user = userDao.loadUserByEmail(email);
         if ( user != null ) {
-            setStatus(ProcessorStatus.SUCCEEDED, Key.USER_EMAIL_ONE_SUCCESS, new HashMap<>());
+            this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_EMAIL_ONE_SUCCESS, new HashMap<>());
             return user;
         } else {
-            setStatus(ProcessorStatus.FAILED, Key.USER_EMAIL_ONE_ERROR_USER_NOT_EXISTS_WITH_THIS_EMAIL, new HashMap<>());
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_EMAIL_ONE_ERROR_USER_NOT_EXISTS_WITH_THIS_EMAIL, new HashMap<>());
             return null;
         }
     }
@@ -69,23 +69,24 @@ public class UserProcessor extends AbstractProcessor {
         UserDao userDao = new UserDao(this.dbSession);
         User user = userDao.loadUser(id);
         if ( user != null ) {
-            setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
+            this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_GET_ONE_SUCCESS, new HashMap<>());
             return user;
         } else {
-            setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_GET_ONE_ERROR_ID_OR_PASSWORD_WRONG, new HashMap<>());
             return null;
         }
     }
 
     public void createUser(
         String account,
-        Group userGroup,
+        UserGroup userGroup,
         String password,
         String userName,
         String roleAsString,
         String email,
         String tags,
-        boolean youngerThen14) throws Exception {
+        boolean youngerThen14)
+        throws Exception {
         Pattern p = Pattern.compile("[^a-zA-Z0-9=+!?.,%#+&^@_\\- ]", Pattern.CASE_INSENSITIVE);
         Matcher acc_symbols = p.matcher(account);
         boolean account_check = acc_symbols.find();
@@ -95,24 +96,24 @@ public class UserProcessor extends AbstractProcessor {
         processorParameters.put("ACCOUNT", account);
         processorParameters.put("USER_NAME", userName);
         if ( account == null || account.equals("") || password == null || password.equals("") ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_MISSING_REQ_FIELDS, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_MISSING_REQ_FIELDS, processorParameters);
         } else if ( account_check || userName_check ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_CONTAINS_SPECIAL_CHARACTERS, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_CONTAINS_SPECIAL_CHARACTERS, processorParameters);
         } else if ( account.length() > 25 || userName.length() > 25 ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_ACCOUNT_LENGTH, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_ACCOUNT_LENGTH, processorParameters);
         } else {
             UserDao userDao = new UserDao(this.dbSession);
             userDao.lockTable();
-            if ( !isMailUsed(userDao, account, email) ) {
+            if ( !this.isMailUsed(userDao, account, email) ) {
                 User user = userDao.persistUser(userGroup, account, password, roleAsString);
                 if ( user != null ) {
-                    setStatus(ProcessorStatus.SUCCEEDED, Key.USER_CREATE_SUCCESS, new HashMap<>());
+                    this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_CREATE_SUCCESS, new HashMap<>());
                     user.setUserName(userName);
                     user.setEmail(email);
                     user.setTags(tags);
                     user.setYoungerThen14(youngerThen14);
                 } else {
-                    setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                    this.setStatus(ProcessorStatus.FAILED, Key.USER_CREATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
                 }
             }
         }
@@ -122,14 +123,14 @@ public class UserProcessor extends AbstractProcessor {
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("ACCOUNT", account);
         if ( account == null || account.equals("") ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
         } else {
-            User user = getUser(account, oldPassword);
-            if ( user != null && getIdOfLoggedInUser() == user.getId() ) {
+            User user = this.getUser(account, oldPassword);
+            if ( user != null && this.getIdOfLoggedInUser() == user.getId() ) {
                 user.setPassword(newPassword);
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
             }
         }
     }
@@ -138,14 +139,14 @@ public class UserProcessor extends AbstractProcessor {
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("USER_ID", String.valueOf(userID));
         if ( userID <= 0 ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
         } else {
-            User user = getUser(userID);
+            User user = this.getUser(userID);
             if ( user != null ) {
                 user.setPassword(newPassword);
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
             }
         }
     }
@@ -154,14 +155,14 @@ public class UserProcessor extends AbstractProcessor {
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("USER_ID", String.valueOf(userID));
         if ( userID <= 0 ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_ACTIVATION_WRONG_ACCOUNT, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_ACTIVATION_WRONG_ACCOUNT, processorParameters);
         } else {
-            User user = getUser(userID);
+            User user = this.getUser(userID);
             if ( user != null ) {
                 user.setActivated(true);
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_ACTIVATION_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_ACTIVATION_SUCCESS, new HashMap<>());
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
             }
         }
     }
@@ -170,14 +171,14 @@ public class UserProcessor extends AbstractProcessor {
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("USER_ID", String.valueOf(userID));
         if ( userID <= 0 ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_ACTIVATION_WRONG_ACCOUNT, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_ACTIVATION_WRONG_ACCOUNT, processorParameters);
         } else {
-            User user = getUser(userID);
+            User user = this.getUser(userID);
             if ( user != null ) {
                 user.setActivated(false);
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_DEACTIVATION_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_DEACTIVATION_SUCCESS, new HashMap<>());
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
             }
         }
     }
@@ -186,22 +187,22 @@ public class UserProcessor extends AbstractProcessor {
         Map<String, String> processorParameters = new HashMap<>();
         processorParameters.put("ACCOUNT", account);
         if ( account == null || account.equals("") ) {
-            setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, processorParameters);
         } else {
             UserDao userDao = new UserDao(this.dbSession);
             userDao.lockTable();
             User user = userDao.loadUser(null, account);
-            if ( user != null && getIdOfLoggedInUser() == user.getId() ) {
-                if ( !isMailUsed(userDao, account, email) ) {
+            if ( user != null && this.getIdOfLoggedInUser() == user.getId() ) {
+                if ( !this.isMailUsed(userDao, account, email) ) {
                     user.setUserName(userName);
                     user.setRole(Role.valueOf(roleAsString));
                     user.setEmail(email);
                     user.setTags(tags);
                     user.setYoungerThen14(youngerThen14);
-                    setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
+                    this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_UPDATE_SUCCESS, new HashMap<>());
                 }
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_UPDATE_ERROR_NOT_SAVED_TO_DB, processorParameters);
             }
         }
     }
@@ -215,12 +216,12 @@ public class UserProcessor extends AbstractProcessor {
         if ( user != null && user.isPasswordCorrect(password) ) {
             int rowCount = userDao.deleteUser(user);
             if ( rowCount > 0 ) {
-                setStatus(ProcessorStatus.SUCCEEDED, Key.USER_DELETE_SUCCESS, new HashMap<>());
+                this.setStatus(ProcessorStatus.SUCCEEDED, Key.USER_DELETE_SUCCESS, new HashMap<>());
             } else {
-                setStatus(ProcessorStatus.FAILED, Key.USER_DELETE_ERROR_NOT_DELETED_IN_DB, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_DELETE_ERROR_NOT_DELETED_IN_DB, processorParameters);
             }
         } else {
-            setStatus(ProcessorStatus.FAILED, Key.USER_DELETE_ERROR_ID_NOT_FOUND, processorParameters);
+            this.setStatus(ProcessorStatus.FAILED, Key.USER_DELETE_ERROR_ID_NOT_FOUND, processorParameters);
         }
     }
 
@@ -238,7 +239,7 @@ public class UserProcessor extends AbstractProcessor {
             if ( user != null && !user.getAccount().equals(account) ) {
                 Map<String, String> processorParameters = new HashMap<>();
                 processorParameters.put("ACCOUNT", account);
-                setStatus(ProcessorStatus.FAILED, Key.USER_ERROR_EMAIL_USED, processorParameters);
+                this.setStatus(ProcessorStatus.FAILED, Key.USER_ERROR_EMAIL_USED, processorParameters);
                 return true;
             }
         }

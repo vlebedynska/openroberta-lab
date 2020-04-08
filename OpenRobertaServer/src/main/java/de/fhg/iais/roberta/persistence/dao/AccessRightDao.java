@@ -16,6 +16,8 @@ import de.fhg.iais.roberta.util.dbc.Assert;
 /**
  * DAO class to load and store access rights. A DAO object is always bound to a session. This session defines the transactional context, in which the database
  * access takes place.
+ * 
+ * TODO: Rename "AccessRight" to "UserProgramShare" or give class a proper name
  */
 public class AccessRightDao extends AbstractDao<UserProgramShare> {
     /**

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Query;
 
-import de.fhg.iais.roberta.persistence.bo.Group;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
 import de.fhg.iais.roberta.persistence.util.DbSession;
@@ -30,7 +30,7 @@ public class UserDao extends AbstractDao<User> {
      * @return the created user object; returns <code>null</code> if creation is unsuccessful (e.g. user already exists)
      * @throws Exception
      */
-    public User persistUser(Group userGroup, String account, String password, String roleAsString) throws Exception {
+    public User persistUser(UserGroup userGroup, String account, String password, String roleAsString) throws Exception {
         Assert.notNull(account);
         Assert.notNull(password);
         Role role = Role.valueOf(roleAsString);
@@ -47,7 +47,7 @@ public class UserDao extends AbstractDao<User> {
         }
     }
 
-    public User loadUser(Group group, String account) {
+    public User loadUser(UserGroup group, String account) {
         Assert.notNull(account);
         Query hql;
         if ( group == null ) {
@@ -62,7 +62,7 @@ public class UserDao extends AbstractDao<User> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<User> loadUsersOfGroup(Group group) {
+    public List<User> loadUsersOfGroup(UserGroup group) {
         Assert.notNull(group);
         Query hql = this.session.createQuery("from User where group=:group");
         hql.setEntity("group", group);

@@ -57,7 +57,7 @@ public class UtilForREST {
     public static HttpSessionState handleRequestInit(Logger loggerForRequest, JSONObject fullRequest) {
         AliveData.rememberClientCall();
         String initToken = fullRequest.optString("initToken");
-        HttpSessionState httpSessionState = validateInitToken(initToken);
+        HttpSessionState httpSessionState = UtilForREST.validateInitToken(initToken);
         MDC.put("sessionId", String.valueOf(httpSessionState.getSessionNumber()));
         MDC.put("userId", String.valueOf(httpSessionState.getUserId()));
         MDC.put("robotName", String.valueOf(httpSessionState.getRobotName()));
@@ -78,17 +78,22 @@ public class UtilForREST {
     private static HttpSessionState validateInitToken(String initToken) {
         if ( initToken == null ) {
             String errorMsgIfError = "frontend request has no initToken";
-            LOG.error(errorMsgIfError);
+            UtilForREST.LOG.error(errorMsgIfError);
             throw new DbcKeyException(errorMsgIfError, Key.INIT_FAIL_INVALID_INIT_TOKEN, null);
         } else {
             HttpSessionState httpSessionState = HttpSessionState.get(initToken);
             if ( httpSessionState == null ) {
-                long invalidCounter = invalidInitTokenCounter.incrementAndGet();
-                if ( invalidCounter > INVALID_INIT_TOKEN_REPORT_LIMIT ) {
-                    invalidTokenThatAccess.add(initToken);
-                    LOG.info("got " + INVALID_INIT_TOKEN_REPORT_LIMIT + " many invalid init calls with tokens " + invalidTokenThatAccess.toString());
-                    invalidInitTokenCounter.set(0);
-                    invalidTokenThatAccess.clear();
+                long invalidCounter = UtilForREST.invalidInitTokenCounter.incrementAndGet();
+                if ( invalidCounter > UtilForREST.INVALID_INIT_TOKEN_REPORT_LIMIT ) {
+                    UtilForREST.invalidTokenThatAccess.add(initToken);
+                    UtilForREST.LOG
+                        .info(
+                            "got "
+                                + UtilForREST.INVALID_INIT_TOKEN_REPORT_LIMIT
+                                + " many invalid init calls with tokens "
+                                + UtilForREST.invalidTokenThatAccess.toString());
+                    UtilForREST.invalidInitTokenCounter.set(0);
+                    UtilForREST.invalidTokenThatAccess.clear();
                 }
                 throw new DbcKeyException("invalid init token", Key.INIT_FAIL_INVALID_INIT_TOKEN, null);
             }

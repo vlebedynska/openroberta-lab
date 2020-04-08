@@ -27,7 +27,7 @@ import de.fhg.iais.roberta.persistence.LostPasswordProcessor;
 import de.fhg.iais.roberta.persistence.PendingEmailConfirmationsProcessor;
 import de.fhg.iais.roberta.persistence.ProcessorStatus;
 import de.fhg.iais.roberta.persistence.UserProcessor;
-import de.fhg.iais.roberta.persistence.bo.Group;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.bo.LostPassword;
 import de.fhg.iais.roberta.persistence.bo.PendingEmailConfirmations;
 import de.fhg.iais.roberta.persistence.bo.User;
@@ -231,7 +231,7 @@ public class ClientUser {
             UserProcessor up = new UserProcessor(dbSession, httpSessionState);
 
             //TODO: write something sensible
-            Group group = null;
+            UserGroup group = null;
             String account = request.getString("accountName");
             String password = request.getString("password");
             String email = request.getString("userEmail");

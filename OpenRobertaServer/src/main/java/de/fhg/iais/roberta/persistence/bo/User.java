@@ -26,7 +26,7 @@ public class User implements WithSurrogateId {
 
     @ManyToOne
     @JoinColumn(name = "USERGROUP_ID")
-    private Group group;
+    private UserGroup group;
 
     @Column(name = "ACCOUNT")
     private String account;
@@ -69,7 +69,7 @@ public class User implements WithSurrogateId {
      * @param group the group the (new) user belongs to. May be null.
      * @param account the account of a (new) user
      */
-    public User(Group group, String account) {
+    public User(UserGroup group, String account) {
         this.group = group;
         this.account = account;
         this.created = Util.getNow();
@@ -101,7 +101,7 @@ public class User implements WithSurrogateId {
     /**
      * @return the group this user belongs to (this is not a group, which this user can own)
      */
-    public Group getGroup() {
+    public UserGroup getGroup() {
         return this.group;
     }
 

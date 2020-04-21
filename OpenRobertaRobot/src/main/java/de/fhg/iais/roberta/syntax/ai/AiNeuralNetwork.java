@@ -42,7 +42,7 @@ public class AiNeuralNetwork<V> extends Phrase<V> {
 
     @Override
     public String toString() {
-        return super.toString();
+        return this.getClass().getSimpleName() + " [" + "TODO" + "]";
     }
     /**
      TODO Doku

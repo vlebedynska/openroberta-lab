@@ -2,14 +2,8 @@ package de.fhg.iais.roberta.syntax.ai;
 
 import de.fhg.iais.roberta.blockly.generated.Block;
 import de.fhg.iais.roberta.syntax.*;
-import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
-import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
-
 import de.fhg.iais.roberta.visitor.IVisitor;
-import de.fhg.iais.roberta.visitor.hardware.sensor.ISensorVisitor;
-
-import static de.fhg.iais.roberta.syntax.sensor.ExternalSensor.extractPortAndModeAndSlot;
 
 /**
     TODO Doku

@@ -1,4 +1,16 @@
 block:
+  AI_SENSOR:
+      category: SENSOR
+      implementor: de.fhg.iais.roberta.syntax.ai.AiInput
+      type: [ai_sensor]
+  AI_ACTOR:
+    category: ACTOR
+    implementor: de.fhg.iais.roberta.syntax.ai.AiOutput
+    type: [ai_actor]
+  AI_NEURAL_NETWORK:
+    category: ACTOR
+    implementor: de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork
+    type: [ai_neural_network]
   COLOR_SENSING:
       category: SENSOR
       implementor: de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor

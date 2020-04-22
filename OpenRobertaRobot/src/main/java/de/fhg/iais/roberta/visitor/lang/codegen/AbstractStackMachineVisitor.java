@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.fhg.iais.roberta.syntax.ai.AiInput;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -89,7 +91,7 @@ import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.lang.ILanguageVisitor;
 
-public abstract class AbstractStackMachineVisitor<V> implements ILanguageVisitor<V> {
+public abstract class AbstractStackMachineVisitor<V> implements ILanguageVisitor<V>, IAiVisitor<V>{
     private JSONObject fctDecls = new JSONObject();
     private List<JSONObject> opArray = new ArrayList<>();
     private final List<List<JSONObject>> opArrayStack = new ArrayList<>();
@@ -99,12 +101,20 @@ public abstract class AbstractStackMachineVisitor<V> implements ILanguageVisitor
         this.configuration = configuration;
     }
 
+    @Override public V visitAiInputNode(AiInput<V> aiInputNode) {
+        if (aiInputNode.getExternalSensor() != null) {
+            aiInputNode.getExternalSensor().accept(this);
+        }
+        int threshold = aiInputNode.getThreshold();
+        JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUMBER).put(C.VALUE, threshold);
+        return app(o);
+    }
+
     @Override
     public V visitNumConst(NumConst<V> numConst) {
         JSONObject o = mk(C.EXPR).put(C.EXPR, numConst.getKind().getName()).put(C.VALUE, numConst.getValue());
         return app(o);
     }
-
     @Override
     public V visitMathConst(MathConst<V> mathConst) {
         JSONObject o = mk(C.EXPR).put(C.EXPR, C.MATH_CONST).put(C.VALUE, mathConst.getMathConst());

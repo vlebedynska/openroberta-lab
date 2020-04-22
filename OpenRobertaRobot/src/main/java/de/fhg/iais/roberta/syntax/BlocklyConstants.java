@@ -8,6 +8,8 @@ public final class BlocklyConstants {
         // no objects :-)
     }
 
+    public static final String THRESHOLD = "THRESHOLD";
+
     public static final String ADD = "ADD";
     public static final String ELSE = "ELSE";
     public static final String THEN = "THEN";

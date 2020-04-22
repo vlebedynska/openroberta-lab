@@ -10,8 +10,7 @@ public class NeuralNetworkComponentsAstTest extends AstTest {
     @Test
     public void validateInputNode() throws Exception {
         String a =
-            "BlockAST[project=[[Location[x=-1187,y=-462],AiInput[TODO]]]]";
-
+            "BlockAST[project=[[Location[x=-1187,y=-462],AiInput[UltrasonicSensor[1,DISTANCE,NO_SLOT],Threshold=0]]]]";
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/input_node.xml");
     }
 

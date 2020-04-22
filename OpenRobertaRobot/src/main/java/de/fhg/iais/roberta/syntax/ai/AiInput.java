@@ -1,14 +1,26 @@
 package de.fhg.iais.roberta.syntax.ai;
 
 import de.fhg.iais.roberta.blockly.generated.Block;
+import de.fhg.iais.roberta.blockly.generated.Field;
+import de.fhg.iais.roberta.factory.BlocklyDropdownFactory;
 import de.fhg.iais.roberta.syntax.*;
+import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
+import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
+import de.fhg.iais.roberta.syntax.sensor.generic.UltrasonicSensor;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
+
+import java.util.List;
 
 /**
     TODO Doku
  */
 public class AiInput<V> extends AiNode<V> {
+
+
+    private final ExternalSensor<V> externalSensor;
+    private final int threshold;
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -17,20 +29,22 @@ public class AiInput<V> extends AiNode<V> {
      * @param property
      * @param comment  that the user added to the block
      */
-    public AiInput(BlockType kind, BlocklyBlockProperties property, BlocklyComment comment) {
+    private AiInput(BlockType kind, ExternalSensor<V> externalSensor, int threshold, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, property, comment);
+        this.externalSensor = externalSensor;
+        this.threshold = threshold;
     }
 
     /**
     TODO Doku
      */
-    public static <V> AiInput<V> make(Block block, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiInput<V>(BlockTypeContainer.getByName("AI_SENSOR"), properties, comment);
+    public static <V> AiInput<V> make(ExternalSensor<V> externalSensor, int threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new AiInput<V>(BlockTypeContainer.getByName("AI_SENSOR"), externalSensor, threshold, properties, comment);
     }
 
     @Override
     protected V acceptImpl(IVisitor<V> visitor) {
-        return null; //TODO
+        return ((IAiVisitor<V>) visitor).visitAiInputNode(this);
     }
 
     @Override public Block astToBlock() {
@@ -39,14 +53,53 @@ public class AiInput<V> extends AiNode<V> {
 
     @Override
     public String toString() {
-        return super.toString();
+        return this.getClass().getSimpleName() + " [" + this.externalSensor + ", " + "Threshold = " + this.threshold  + "]";
     }
 
     /**
      TODO Doku
      */
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
-        return AiInput.make(block, helper.extractBlockProperties(block), helper.extractComment(block));
+        List<Field> fields = helper.extractFields(block, (short) 2);
+
+        String sensorInfo = helper.extractField(fields, BlocklyConstants.SENSOR, "");
+        ExternalSensor<V> externalSensor = createSensorAst(sensorInfo, block, helper);
+
+        String thresholdInfo = helper.extractField(fields, BlocklyConstants.THRESHOLD, "");
+        int threshold = getThresholdValue(thresholdInfo);
+
+        return AiInput.make(externalSensor, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 
+    private static <V> ExternalSensor<V> createSensorAst(String sensorInfo, Block block, AbstractJaxb2Ast<V> helper) {
+        BlocklyDropdownFactory factory = helper.getDropdownFactory();
+        String[] sensorInfoList = sensorInfo.toLowerCase().split("_");
+        String sensorType = sensorInfoList[0];
+        String portName = sensorInfoList[2];
+        String modeName = BlocklyConstants.DISTANCE;
+        String slotName = BlocklyConstants.NO_SLOT;
+        boolean isPortInMutation = false;
+        SensorMetaDataBean sensorMetaDataBean = new SensorMetaDataBean(factory.sanitizePort(portName), factory.getMode(modeName), factory.sanitizeSlot(slotName), isPortInMutation);
+        switch ( sensorType ) {
+            case "ultrasonic":
+                return UltrasonicSensor.make(sensorMetaDataBean, helper.extractBlockProperties(block), helper.extractComment(block));
+        } throw new RuntimeException("Kein Input-Sensor gefunden!");
+    }
+
+    private static int getThresholdValue(String thresholdInfo) {
+        try {
+            return Integer.parseInt(thresholdInfo);
+        } catch ( NumberFormatException e ) {
+            //TODO add log warn entry
+            return 0;
+        }
+    }
+
+    public ExternalSensor<V> getExternalSensor() {
+        return externalSensor;
+    }
+
+    public int getThreshold() {
+        return threshold;
+    }
 }

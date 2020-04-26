@@ -39,7 +39,7 @@ public class AiInput<V> extends AiNode<V> {
     TODO Doku
      */
     public static <V> AiInput<V> make(ExternalSensor<V> externalSensor, int threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiInput<V>(BlockTypeContainer.getByName("AI_SENSOR"), externalSensor, threshold, properties, comment);
+        return new AiInput<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE"), externalSensor, threshold, properties, comment);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AiInput<V> extends AiNode<V> {
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
         List<Field> fields = helper.extractFields(block, (short) 2);
 
-        String sensorInfo = helper.extractField(fields, BlocklyConstants.SENSOR, "");
+        String sensorInfo = helper.extractField(fields, BlocklyConstants.INPUTNODE, "");
         ExternalSensor<V> externalSensor = createSensorAst(sensorInfo, block, helper);
 
         String thresholdInfo = helper.extractField(fields, BlocklyConstants.THRESHOLD, "");

@@ -1,7 +1,7 @@
 {
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
-		"lastupdated": "2020-03-18 07:31:41.921129",
+		"lastupdated": "2020-04-25 20:21:26.219081",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},
@@ -369,6 +369,17 @@
 	"PROCEDURES_IFRETURN_TOOLTIP": "If a value is true, then return a second value.",
 	"PROCEDURES_IFRETURN_HELPURL": "http://c2.com/cgi/wiki?GuardClause",
 	"PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition.",
+	"TOOLBOX_AI": "AI",
+	"TOOLBOX_NEURAL_NETWORKS": "Neural Networks",
+	"TOOLBOX_REINFORCEMENT_LEARNING": "Reinforcement Learning",
+	"TOOLBOX_CLUSTERING": "Clustering",
+	"VARIABLES_TYPE_ARRAY_ACTOR": "Actor",
+	"VARIABLES_TYPE_ARRAY_SENSOR": "Sensor",
+	"PORT": "Port",
+	"THRESHOLD": "Threshold",
+	"ARRAY_ACTOR_TOOLTIP": "The Output-Layer of the network",
+	"ARRAY_SENSOR_TOOLTIP": "The Input-Layer of the network",
+	"NEURAL_NETWORK_TOOLTIP": "This is the neural network",
 	"MOTOR_ON_TOOLTIP": "Turns motor on with specific power.",
 	"MOTOR_ON_TOOLTIP_CALLIOPE": "Turns motor A, B or A+B on with a specific power.",
 	"MOTORS_ON_TOOLTIP_CALLIOPE": "Turns motor A and B on with a specific power.",

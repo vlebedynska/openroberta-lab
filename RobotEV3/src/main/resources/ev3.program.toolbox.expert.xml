@@ -1,4 +1,15 @@
 <toolbox_set id="toolbox" style="display: none">
+  <category name="TOOLBOX_AI" svg="true">
+    <category name="TOOLBOX_NEURAL_NETWORKS" svg="true">
+      <block type="ai_neural_network"/>
+      <block type="ai_nn_input_node"/>
+      <block type="ai_nn_output_node"/>
+    </category>
+    <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">
+    </category>
+    <category name="TOOLBOX_CLUSTERING" svg="true">
+    </category>
+  </category>
   <category name="TOOLBOX_ACTION" svg="true">
     <category name="TOOLBOX_MOVE" svg="true">
       <block type="robActions_motor_on">

@@ -9,6 +9,8 @@ public final class BlocklyConstants {
     }
 
     public static final String THRESHOLD = "THRESHOLD";
+    public static final String ACTOR = "ACTOR";
+    public static final String INPUTNODE = "INPUTNODE";
 
     public static final String ADD = "ADD";
     public static final String ELSE = "ELSE";

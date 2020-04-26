@@ -1,7 +1,7 @@
 <block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="ev3" xmlversion="" description="" tags="undefined">
-  <instance x="-1187" y="-462">
-    <block type="ai_sensor" id="2^,i:k@mXk{Y/huKP(JG" intask="false">
-      <field name="SENSOR">ULTRASONIC_PORT_1</field>
+  <instance x="188" y="337">
+    <block type="ai_nn_input_node" id="k}pC:T=,MKSL-.`Et)f:" intask="false">
+      <field name="INPUTNODE">ULTRASONIC_PORT_1</field>
       <field name="THRESHOLD"></field>
     </block>
   </instance>

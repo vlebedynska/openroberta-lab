@@ -41,7 +41,8 @@ public class VarDeclaration<V> extends Expr<V> {
         boolean next,
         boolean global,
         BlocklyBlockProperties properties,
-        BlocklyComment comment) {
+        BlocklyComment comment)
+    {
         super(BlockTypeContainer.getByName("VAR_DECLARATION"), properties, comment);
         Assert.isTrue(!name.equals("") && typeVar != null && value.isReadOnly());
         this.name = name;

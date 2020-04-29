@@ -8,7 +8,9 @@ import de.fhg.iais.roberta.factory.BlocklyDropdownFactory;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.action.Action;
 import de.fhg.iais.roberta.syntax.action.motor.MotorGetPowerAction;
+import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 
 /**
@@ -26,6 +28,7 @@ public class AiOutput<V> extends AiNode<V> {
     public AiOutput(BlockType kind, MotorGetPowerAction<V> aiOutputAction, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, property, comment);
         this.aiOutputAction = aiOutputAction;
+        setReadOnly();
     }
 
     /**
@@ -73,4 +76,15 @@ public class AiOutput<V> extends AiNode<V> {
         }
     }
 
+    @Override public int getPrecedence() {
+        return 0;
+    }
+
+    @Override public Assoc getAssoc() {
+        return null;
+    }
+
+    @Override public BlocklyType getVarType() {
+        return null;
+    }
 }

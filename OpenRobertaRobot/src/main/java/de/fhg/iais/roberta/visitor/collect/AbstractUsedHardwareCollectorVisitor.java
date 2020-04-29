@@ -34,6 +34,7 @@ import de.fhg.iais.roberta.syntax.action.sound.VolumeAction;
 import de.fhg.iais.roberta.syntax.action.sound.VolumeAction.Mode;
 import de.fhg.iais.roberta.syntax.action.speech.SayTextAction;
 import de.fhg.iais.roberta.syntax.action.speech.SetLanguageAction;
+import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
 import de.fhg.iais.roberta.syntax.sensor.generic.AccelerometerSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.CompassSensor;
@@ -55,11 +56,12 @@ import de.fhg.iais.roberta.syntax.sensor.generic.TimerSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.TouchSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.UltrasonicSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.VoltageSensor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import de.fhg.iais.roberta.visitor.hardware.actor.IAllActorsVisitor;
 import de.fhg.iais.roberta.visitor.hardware.sensor.ISensorVisitor;
 import de.fhg.iais.roberta.visitor.validate.AbstractCollectorVisitor;
 
-public abstract class AbstractUsedHardwareCollectorVisitor extends AbstractCollectorVisitor implements ISensorVisitor<Void>, IAllActorsVisitor<Void> {
+public abstract class AbstractUsedHardwareCollectorVisitor extends AbstractCollectorVisitor implements ISensorVisitor<Void>, IAllActorsVisitor<Void>{
 
     protected final ConfigurationAst robotConfiguration;
 

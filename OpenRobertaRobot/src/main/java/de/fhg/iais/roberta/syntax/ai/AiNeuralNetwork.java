@@ -1,17 +1,24 @@
 package de.fhg.iais.roberta.syntax.ai;
 
-import static de.fhg.iais.roberta.syntax.sensor.ExternalSensor.extractPortAndModeAndSlot;
+import java.util.List;
 
 import de.fhg.iais.roberta.blockly.generated.Block;
+import de.fhg.iais.roberta.blockly.generated.Value;
 import de.fhg.iais.roberta.syntax.*;
-import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
+import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.ExprParam;
+import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 /**
     TODO Doku
  */
 public class AiNeuralNetwork<V> extends Phrase<V> {
+
+    private final ListCreate<AiInput<V>> listNNInput;
+    private final ListCreate<AiOutput<V>> listNNOutput;
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -20,20 +27,22 @@ public class AiNeuralNetwork<V> extends Phrase<V> {
      * @param property
      * @param comment  that the user added to the block
      */
-    public AiNeuralNetwork(BlockType kind, BlocklyBlockProperties property, BlocklyComment comment) {
+    private AiNeuralNetwork(BlockType kind, ListCreate<AiInput<V>> listNNInput, ListCreate<AiOutput<V>> listNNOutput, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, property, comment);
+        this.listNNInput = listNNInput;
+        this.listNNOutput = listNNOutput;
     }
 
     /**
     TODO Doku
      */
-    public static <V> AiNeuralNetwork<V> make(Block block, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiNeuralNetwork<V>(BlockTypeContainer.getByName("AI_NEURAL_NETWORK"), properties, comment);
+    public static <V> AiNeuralNetwork<V> make(ListCreate<AiInput<V>> listNNInput, ListCreate<AiOutput<V>> listNNOutput, BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new AiNeuralNetwork<V>(BlockTypeContainer.getByName("AI_NEURAL_NETWORK"), listNNInput, listNNOutput, properties, comment);
     }
 
     @Override
     protected V acceptImpl(IVisitor<V> visitor) {
-        return null; //TODO
+        return ((IAiVisitor<V>) visitor).visitAiNeuralNetwork(this);
     }
 
     @Override public Block astToBlock() {
@@ -42,13 +51,19 @@ public class AiNeuralNetwork<V> extends Phrase<V> {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + " [" + "TODO" + "]";
+        return this.getClass().getSimpleName() + " [" + " Input-Layer: "+ listNNInput+ " Output-Layer: " + listNNOutput+ " ]";
     }
     /**
      TODO Doku
      */
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
-        return AiNeuralNetwork.make(block, helper.extractBlockProperties(block), helper.extractComment(block));
+        List<Value> values = helper.extractValues(block, (short) 2);
+        ListCreate<AiInput<V>> inputLayer =
+            (ListCreate<AiInput<V>>) helper.extractValue(values, new ExprParam(BlocklyConstants.INPUT_LAYER, BlocklyType.STRING));
+        ListCreate<AiOutput<V>> outputLayer =
+            (ListCreate<AiOutput<V>>) helper.extractValue(values, new ExprParam(BlocklyConstants.OUTPUT_LAYER, BlocklyType.STRING));
+        return AiNeuralNetwork
+            .make(inputLayer, outputLayer, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 }
 

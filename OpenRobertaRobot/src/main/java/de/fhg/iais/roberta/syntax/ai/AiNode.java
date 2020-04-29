@@ -3,12 +3,12 @@ package de.fhg.iais.roberta.syntax.ai;
 import de.fhg.iais.roberta.syntax.BlockType;
 import de.fhg.iais.roberta.syntax.BlocklyBlockProperties;
 import de.fhg.iais.roberta.syntax.BlocklyComment;
-import de.fhg.iais.roberta.syntax.Phrase;
+import de.fhg.iais.roberta.syntax.lang.expr.Expr;
 
 /**
     TODO Doku
  */
-public abstract class AiNode<V> extends Phrase<V> {
+public abstract class AiNode<V> extends Expr<V> {
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.

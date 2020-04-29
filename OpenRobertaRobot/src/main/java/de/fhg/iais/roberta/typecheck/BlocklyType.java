@@ -63,6 +63,8 @@ public enum BlocklyType {
     NULL("", false,STRING, COLOR),
     REF("", false,NULL),
     PRIM("",false, NUMBER, BOOLEAN),
+    INPUTNODE("InputNode", false, ANY),
+    OUTPUTNODE("OutputNode", false, ANY),
     NOTHING("", false, REF, PRIM),
     VOID("",false),
     CONNECTION("Connection",false, ANY),

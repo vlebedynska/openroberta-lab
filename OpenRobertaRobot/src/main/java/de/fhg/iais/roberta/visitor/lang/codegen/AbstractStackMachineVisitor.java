@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.fhg.iais.roberta.syntax.ai.AiInput;
+import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -108,6 +109,10 @@ public abstract class AbstractStackMachineVisitor<V> implements ILanguageVisitor
         int threshold = aiInputNode.getThreshold();
         JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUMBER).put(C.VALUE, threshold);
         return app(o);
+    }
+
+    @Override public V visitAiNeuralNetwork(AiNeuralNetwork<V> vAiNeuralNetwork) {
+        return null;
     }
 
     @Override

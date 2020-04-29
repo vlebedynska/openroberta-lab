@@ -13,6 +13,7 @@ import de.fhg.iais.roberta.syntax.SC;
 import de.fhg.iais.roberta.syntax.action.ev3.ShowPictureAction;
 import de.fhg.iais.roberta.syntax.action.motor.MotorOnAction;
 import de.fhg.iais.roberta.syntax.action.speech.SayTextAction;
+import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
 import de.fhg.iais.roberta.syntax.lang.expr.Expr;
 import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
 import de.fhg.iais.roberta.syntax.lang.functions.ListRepeat;
@@ -122,6 +123,10 @@ public class Ev3BrickValidatorVisitor extends AbstractBrickValidatorVisitor impl
         checkSensorPort(htColorSensor);
         String mode = htColorSensor.getMode();
         this.getBuilder(UsedHardwareBean.Builder.class).addUsedSensor(new UsedSensor(htColorSensor.getPort(), SC.HT_COLOR, mode));
+        return null;
+    }
+
+    @Override public Void visitAiNeuralNetwork(AiNeuralNetwork<Void> voidAiNeuralNetwork) {
         return null;
     }
 }

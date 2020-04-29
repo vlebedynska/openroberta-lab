@@ -1,17 +1,19 @@
 package de.fhg.iais.roberta.syntax.ai;
 
+import java.util.List;
+
 import de.fhg.iais.roberta.blockly.generated.Block;
 import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.factory.BlocklyDropdownFactory;
 import de.fhg.iais.roberta.syntax.*;
+import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
 import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
 import de.fhg.iais.roberta.syntax.sensor.generic.UltrasonicSensor;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
-
-import java.util.List;
 
 /**
     TODO Doku
@@ -33,6 +35,7 @@ public class AiInput<V> extends AiNode<V> {
         super(kind, property, comment);
         this.externalSensor = externalSensor;
         this.threshold = threshold;
+        setReadOnly();
     }
 
     /**
@@ -101,5 +104,17 @@ public class AiInput<V> extends AiNode<V> {
 
     public int getThreshold() {
         return threshold;
+    }
+
+    @Override public int getPrecedence() {
+        return 0;
+    }
+
+    @Override public Assoc getAssoc() {
+        return null;
+    }
+
+    @Override public BlocklyType getVarType() {
+        return null;
     }
 }

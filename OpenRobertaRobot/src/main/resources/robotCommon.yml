@@ -1,14 +1,14 @@
 block:
   AI_NN_INPUT_NODE:
-      category: SENSOR
+      category: EXPR
       implementor: de.fhg.iais.roberta.syntax.ai.AiInput
       type: [ai_nn_input_node]
   AI_NN_OUTPUT_NODE:
-    category: ACTOR
+    category: EXPR
     implementor: de.fhg.iais.roberta.syntax.ai.AiOutput
     type: [ai_nn_output_node]
   AI_NEURAL_NETWORK:
-    category: ACTOR
+    category: STMT
     implementor: de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork
     type: [ai_neural_network]
   COLOR_SENSING:

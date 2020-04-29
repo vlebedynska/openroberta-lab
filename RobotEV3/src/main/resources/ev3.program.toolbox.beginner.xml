@@ -4,6 +4,43 @@
         <block type="ai_neural_network"/>
         <block type="ai_nn_input_node"/>
         <block type="ai_nn_output_node"/>
+
+      <block type="ai_neural_network" id="t7O%8CcmaaB?sPK+P5gG" intask="false">
+        <value name="INPUT_LAYER">
+          <block type="robLists_create_with" id="iCpsk8JS./trDZ|*D5Zm" intask="false">
+            <mutation items="2" list_type="InputNode"></mutation>
+            <field name="LIST_TYPE">InputNode</field>
+            <value name="ADD0">
+              <block type="ai_nn_input_node" id="yzBcLOrk1!Vt)+X)43Be" intask="false">
+                <field name="INPUTNODE">ULTRASONIC_PORT_1</field>
+                <field name="THRESHOLD"></field>
+              </block>
+            </value>
+            <value name="ADD1">
+              <block type="ai_nn_input_node" id="TDnGp#dfZ++v}F772rA[" intask="false">
+                <field name="INPUTNODE">ULTRASONIC_PORT_2</field>
+                <field name="THRESHOLD"></field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value name="OUTPUT_LAYER">
+          <block type="robLists_create_with" id="/7k.oYW/uP1ix#eDQgCN" intask="false">
+            <mutation items="2" list_type="OutputNode"></mutation>
+            <field name="LIST_TYPE">OutputNode</field>
+            <value name="ADD0">
+              <block type="ai_nn_output_node" id="o3!(37Tcu]BV.!V:/uR}" intask="false">
+                <field name="OUTPUTNODE">MOTORPORT_A</field>
+              </block>
+            </value>
+            <value name="ADD1">
+              <block type="ai_nn_output_node" id="0!7Jr~|n)rLx`YEV_rgw" intask="false">
+                <field name="OUTPUTNODE">MOTORPORT_B</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
     </category>
     <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">
     </category>

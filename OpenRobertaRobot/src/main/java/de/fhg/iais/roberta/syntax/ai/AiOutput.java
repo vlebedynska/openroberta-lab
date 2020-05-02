@@ -12,12 +12,18 @@ import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 /**
  * TODO Doku
  */
 public class AiOutput<V> extends AiNode<V> {
     private final Action<V> aiOutputAction;
+
+    public Action<V> getAiOutputAction() {
+        return aiOutputAction;
+    }
+
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
      *
@@ -40,7 +46,7 @@ public class AiOutput<V> extends AiNode<V> {
 
     @Override
     protected V acceptImpl(IVisitor<V> visitor) {
-        return null; //TODO
+        return ((IAiVisitor<V>) visitor).visitAiOutputNode(this);
     }
 
     @Override

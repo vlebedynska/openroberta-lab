@@ -8,7 +8,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	constructor() {
 		super();
 		this.hardwareState.motors = {};
-		U.loggingEnabled(false, false);
+		U.loggingEnabled(true, true);
 	}
 
 
@@ -409,6 +409,24 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	public assertAction(_msg: string, _left: any, _op: string, _right: any, value: boolean): void {
 		U.debug('***** assert action "' + value + ' ' + _msg + ' ' + _left + ' ' + _op + ' ' + _right + '" *****');
 		console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
+	}
+
+	public processNeuralNetwork (inputLayer: any, outputLayer: any) {
+
+		/*var links = [];
+		for (var inputNode in inputLayer) {
+			for (var outputNode in outputLayer) {
+				var link = [inputNode, outputNode, 0];
+				links.push(link);
+			}
+		}
+		for (var outputNode in outputLayer) {
+			for (var linkx in links) {
+				if (outputNode == link[0]) {
+					outputNode = outputNode * (inputLayer[0] * linkx[2])
+				}
+			}
+		}*/
 	}
 
 	public close() {

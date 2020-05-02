@@ -418,11 +418,30 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             n.debugAction(value);
                             break;
                         }
+                        case C.PROCESS_NEURAL_NETWORK: {
+                            var inputLayer = s.pop();
+                            var outputLayer = n.pop();
+                            return processNeuralNetwork(inputLayer, outputLayer);
+                            break;
+                        }
                         case C.ASSERT_ACTION: {
                             var right = s.pop();
                             var left = s.pop();
                             var value = s.pop();
                             n.assertAction(stmt[C.MSG], left, stmt[C.OP], right, value);
+                            break;
+                        }
+                        case C.CREATE_INPUT_NODE: {
+                            var node = {};
+                            node.threshold = s.pop();
+                            node.externalSensor = s.pop();
+                            s.push(node);
+                            break;
+                        }
+                        case C.CREATE_OUTPUT_NODE: {
+                            var node = {};
+                            node["aiOutputAction"] = s.pop();
+                            s.push(node);
                             break;
                         }
                         case C.COMMENT:

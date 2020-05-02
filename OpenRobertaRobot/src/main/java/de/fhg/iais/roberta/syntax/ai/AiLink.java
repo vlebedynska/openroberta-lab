@@ -1,24 +1,34 @@
 package de.fhg.iais.roberta.syntax.ai;
 
 import de.fhg.iais.roberta.syntax.BlockType;
-import de.fhg.iais.roberta.syntax.BlocklyBlockProperties;
-import de.fhg.iais.roberta.syntax.BlocklyComment;
-import de.fhg.iais.roberta.syntax.Phrase;
+import de.fhg.iais.roberta.syntax.lang.expr.Expr;
+import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
 
 /**
     TODO Doku
  */
-public abstract class AiLink<V> extends Phrase<V> {
+public class AiLink<V> {
 
-    /**
-     * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
-     *
-     * @param kind     of the the object used in AST,
-     * @param property
-     * @param comment  that the user added to the block
-     */
-    public AiLink(BlockType kind, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, property, comment);
+    private int weight;
+    private final Expr<V> node1;
+    private final Expr<V> node2;
+
+    public Expr<V> getNode1() {
+        return node1;
+    }
+
+    public Expr<V> getNode2() {
+        return node2;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public AiLink(Expr<V> node1,  Expr<V> node2, int weight) {
+        this.weight = weight;
+        this.node1 = node1;
+        this.node2 = node2;
     }
 
     @Override

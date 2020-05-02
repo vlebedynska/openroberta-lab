@@ -38,6 +38,8 @@ public class C {
     public static final String COMPASS = "compass";
     public static final String CONTINUE = "continue";
     public static final String CREATE_DEBUG_ACTION = "CreateDebugAction";
+    public static final String CREATE_INPUT_NODE = "createInputNode";
+    public static final String CREATE_OUTPUT_NODE = "createOutputNode";
     public static final String CREATE_LIST = "createList";
     public static final String CREATE_LIST_REPEAT = "createListREPEAT";
     public static final String CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
@@ -209,6 +211,7 @@ public class C {
     public static final String POSITION = "position";
     public static final String POWER = "POWER";
     public static final String PRESENCE = "presence";
+    public static final String PROCESS_NEURAL_NETWORK = "processNeuralNetwork";
     public static final String RANDOM = "random";
     public static final String RANDOM_DOUBLE = "randDouble";
     public static final String RANDOM_INT = "randInt";

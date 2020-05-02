@@ -1,8 +1,12 @@
 package de.fhg.iais.roberta.visitor.codegen;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
+import de.fhg.iais.roberta.syntax.ai.*;
+import de.fhg.iais.roberta.syntax.lang.expr.Expr;
+import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
+import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
 import org.json.JSONObject;
 
 import de.fhg.iais.roberta.components.ConfigurationAst;
@@ -66,6 +70,8 @@ import de.fhg.iais.roberta.util.dbc.DbcException;
 import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.hardware.IEv3Visitor;
 import de.fhg.iais.roberta.visitor.lang.codegen.AbstractStackMachineVisitor;
+
+import javax.json.Json;
 
 public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> implements IEv3Visitor<V> {
 
@@ -222,27 +228,49 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         }
     }
 
-    @Override
-    public V visitAiNeuralNetwork(AiNeuralNetwork<V> AiNeuralNetwork) {
-        //AiNeuralNetwork.getParam().getSpeed().accept(this);
-        //boolean speedOnly = !processOptionalDuration(driveAction.getParam().getDuration());
-        boolean speedOnly = false;
-        ConfigurationComponent leftMotor = this.configuration.getFirstMotor(SC.LEFT);
-        IDriveDirection leftMotorRotationDirection = DriveDirection.get(leftMotor.getProperty(SC.MOTOR_REVERSE));
-        //DriveDirection driveDirection = "FORWARD";
-       /* if ( leftMotorRotationDirection != DriveDirection.FOREWARD ) {
-            driveDirection = getDriveDirection(driveAction.getDirection() == DriveDirection.FOREWARD);
-        }*/
-       // {"ops":[{"opc":"expr","expr":"NUM_CONST","value":"30"},{"opc":"expr","expr":"NUM_CONST","value":"20"},{"opc":"DriveAction","speedOnly":false,"name":"ev3","driveDirection":"FOREWARD"},{"opc":"stopDrive","name":"ev3"}],"functionDeclaration":{}}
-        JSONObject o = mk(C.EXPR).put(C.EXPR, "NUM_CONST").put(C.VALUE, 30);
-        JSONObject o3 = mk(C.EXPR).put(C.EXPR, "NUM_CONST").put(C.VALUE, 40);
 
-        JSONObject o2 = mk(C.DRIVE_ACTION).put(C.SPEED_ONLY, speedOnly).put(C.DRIVE_DIRECTION, "FOREWARD").put(C.NAME, "ev3");
-        //(C.DRIVE_ACTION).put(C.DRIVE_DIRECTION, "FORWARD").put(C.NAME, "ev3").put(C.SPEED_ONLY, speedOnly);
-       //JSONObject o = mk(C.DRIVE_ACTION).put(C.DRIVE_DIRECTION, "FORWARD").put(C.NAME, "ev3").put(C.SPEED_ONLY, speedOnly);
+    @Override
+    public V visitAiInputNode(AiInput<V> aiInputNode) {
+        if (aiInputNode.getExternalSensor() != null) {
+            aiInputNode.getExternalSensor().accept(this);
+        }
+        int threshold = aiInputNode.getThreshold();
+        JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUM_CONST).put(C.VALUE, threshold);
         app(o);
-        app(o3);
-        return app(o2);
+        return app(mk(C.CREATE_INPUT_NODE));
+    }
+
+    @Override
+    public V visitAiOutputNode(AiOutput<V> aiOutputNode) {
+        aiOutputNode.getAiOutputAction().accept(this);
+        return app(mk(C.CREATE_OUTPUT_NODE));
+    }
+
+    @Override
+    public V visitAiNeuralNetwork(AiNeuralNetwork<V> aiNeuralNetwork) {
+        aiNeuralNetwork.getListNNInput().accept(this);
+        aiNeuralNetwork.getListNNOutput().accept(this);
+        // aiNeuralNetwork.getListNNLinks(); //TODO
+
+        JSONObject o = mk(C.PROCESS_NEURAL_NETWORK);
+
+   /*     int outputNodeValue = 0;
+        for ( Expr<AiOutput<V>> outputNode : outputLayer.getExprList().getEl() ) {
+            for ( AiLink<V> link : listOfLinks ) {
+                if ( outputNode == link.getNode2()) {
+                    int sensorValue = 0;
+                    AiInput<V> inputNode = (AiInput<V>)link.getNode1();
+                    ExternalSensor<V> externalSensor = inputNode.getExternalSensor();
+                    if (externalSensor instanceof UltrasonicSensor) {
+                        sensorValue = ((UltrasonicSensor)externalSensor).
+                    }
+                    outputNodeValue += link.getWeight() * link.getNode1();
+                    tempNode.sensorWert = tempNode.sensorWert + (kante.nodeInput.sensorWert * kante.gewicht);
+                }
+            }
+            //nehme alle Kanten und schaue, ob sie zum temNode passen
+        }*/
+        return app(o);
     }
 
     @Override

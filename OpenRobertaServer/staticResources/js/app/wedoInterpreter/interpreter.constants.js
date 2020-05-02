@@ -41,6 +41,8 @@ define(["require", "exports"], function (require, exports) {
     exports.CREATE_LIST = "createList";
     exports.CREATE_LIST_REPEAT = "createListREPEAT";
     exports.CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
+    exports.CREATE_INPUT_NODE = "createInputNode";
+    exports.CREATE_OUTPUT_NODE = "createOutputNode"
     exports.CURVE_ACTION = "CurveAction";
     exports.DEBUG_ACTION = "DebugAction";
     exports.DEGREE = "degree";
@@ -207,6 +209,7 @@ define(["require", "exports"], function (require, exports) {
     exports.POSITION = "position";
     exports.POWER = "POWER";
     exports.PRESENCE = "presence";
+    exports.PROCESS_NEURAL_NETWORK = "processNeuralNetwork";
     exports.RANDOM = "random";
     exports.RANDOM_DOUBLE = "randDouble";
     exports.RANDOM_INT = "randInt";

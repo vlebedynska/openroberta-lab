@@ -108,6 +108,12 @@ export class Interpreter {
             } else {
                 const opCode = stmt[C.OPCODE];
                 switch ( opCode ) {
+                    case C.PROCESS_NEURAL_NETWORK: {
+                        var inputLayer = s.pop();
+                        var outputLayer = s.pop();
+                        return n.processNeuralNetwork(inputLayer, outputLayer);
+                        break;
+                    }
                     case C.ASSIGN_STMT: {
                         const name = stmt[C.NAME];
                         s.setVar( name, s.pop() );
@@ -473,6 +479,19 @@ export class Interpreter {
                     arr[n - i - 1] = e;
                 }
                 s.push( arr );
+                break;
+            }
+            case C.CREATE_INPUT_NODE: {
+                var node = {};
+                node["threshold"] = s.pop();
+                node["externalSensor"] = s.pop();
+                s.push(node);
+                break;
+            }
+            case C.CREATE_OUTPUT_NODE: {
+                var node = {};
+                node["aiOutputAction"] = s.pop();
+                s.push(node);
                 break;
             }
             case C.CREATE_LIST_REPEAT: {

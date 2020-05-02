@@ -15,7 +15,7 @@ public interface ICompilerWorkflow {
      *
      * @param token the credential supplied by the user. Needed to provide a unique directory name for crosscompilation
      * @param programName name of the program
-     * @param transformer holding program and configuration. Require, that <code>transformer.getErrorMessage() == null</code>
+     * @param transformer holding program and configuration. Require, that <code>transformer.throwErrorMessage() == null</code>
      * @param language locale to be used for messages
      * @return the generated source code; null in case of an error
      */
@@ -28,7 +28,7 @@ public interface ICompilerWorkflow {
      *
      * @param token the credential supplied by the user. Needed to provide a unique directory name for crosscompilation
      * @param programName name of the program
-     * @param transformer holding program and configuration. Require, that <code>transformer.getErrorMessage() == null</code>
+     * @param transformer holding program and configuration. Require, that <code>transformer.throwErrorMessage() == null</code>
      * @param SSID - WLAN SSID for WiFi enabled robots
      * @param password - WLAN password
      * @param language locale to be used for messages

@@ -19,7 +19,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         function RobotMbedBehaviour() {
             var _this = _super.call(this) || this;
             _this.hardwareState.motors = {};
-            U.loggingEnabled(false, false);
+            U.loggingEnabled(true, true);
             return _this;
         }
         RobotMbedBehaviour.prototype.getSample = function (s, name, sensor, port, mode) {
@@ -391,6 +391,24 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         };
         RobotMbedBehaviour.prototype.close = function () {
         };
+
+        RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+            var links = [];
+            for (var inputNode in inputLayer) {
+                for (var outputNode in outputLayer) {
+                    var link = [inputNode, outputNode, 0];
+                    links.add(link);
+                }
+            }
+            for (var node in outputLayer) {
+                for (var link in links) {
+                    if (node == link[0]) {
+                        node = node * (inputLayer[0] * link[2])
+                    }
+                }
+            }
+        }
+
         return RobotMbedBehaviour;
     }(interpreter_aRobotBehaviour_1.ARobotBehaviour));
     exports.RobotMbedBehaviour = RobotMbedBehaviour;

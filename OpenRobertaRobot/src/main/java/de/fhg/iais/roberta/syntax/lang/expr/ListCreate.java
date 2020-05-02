@@ -28,6 +28,10 @@ public class ListCreate<V> extends Expr<V> {
     private final BlocklyType typeVar;
     private final ExprList<V> exprList;
 
+    public ExprList<V> getExprList() {
+        return exprList;
+    }
+
     private ListCreate(BlocklyType typeVar, ExprList<V> exprList, BlocklyBlockProperties properties, BlocklyComment comment) {
         super(BlockTypeContainer.getByName("LIST_CREATE"), properties, comment);
         Assert.isTrue(exprList != null && exprList.isReadOnly() && typeVar != null);

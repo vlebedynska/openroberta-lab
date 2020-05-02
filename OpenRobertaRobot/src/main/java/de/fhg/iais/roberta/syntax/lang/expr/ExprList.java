@@ -20,6 +20,10 @@ import de.fhg.iais.roberta.visitor.lang.ILanguageVisitor;
 public class ExprList<V> extends Expr<V> {
     private final List<Expr<V>> el = new ArrayList<Expr<V>>();
 
+    public List<Expr<V>> getEl() {
+        return el;
+    }
+
     private ExprList() {
         super(BlockTypeContainer.getByName("EXPR_LIST"), BlocklyBlockProperties.make("1", "1", false, false, false, false, false, null, false, false), null);
     }

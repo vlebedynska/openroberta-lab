@@ -1,12 +1,8 @@
 package de.fhg.iais.roberta.visitor.codegen;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.fhg.iais.roberta.syntax.ai.*;
-import de.fhg.iais.roberta.syntax.lang.expr.Expr;
-import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
-import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
 import org.json.JSONObject;
 
 import de.fhg.iais.roberta.components.ConfigurationAst;
@@ -70,8 +66,6 @@ import de.fhg.iais.roberta.util.dbc.DbcException;
 import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.hardware.IEv3Visitor;
 import de.fhg.iais.roberta.visitor.lang.codegen.AbstractStackMachineVisitor;
-
-import javax.json.Json;
 
 public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> implements IEv3Visitor<V> {
 
@@ -242,8 +236,8 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
 
     @Override
     public V visitAiOutputNode(AiOutput<V> aiOutputNode) {
-        aiOutputNode.getAiOutputAction().accept(this);
-        return app(mk(C.CREATE_OUTPUT_NODE));
+        JSONObject a = aiOutputNode.getAiOutputNodeData();
+        return app(mk(C.CREATE_OUTPUT_NODE).put("data", a));
     }
 
     @Override

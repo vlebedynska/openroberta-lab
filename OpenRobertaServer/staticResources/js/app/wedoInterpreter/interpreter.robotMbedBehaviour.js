@@ -394,16 +394,32 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
 
         RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
             var links = [];
-            for (var inputNode in inputLayer) {
-                for (var outputNode in outputLayer) {
-                    var link = [inputNode, outputNode, 0];
-                    links.add(link);
+            var speed = 0;
+            for (var inputNodePosition in inputLayer) {
+                var inputNode = inputLayer[inputNodePosition];
+                for (var outputNodePosition in outputLayer) {
+                    var outputNode = outputLayer[outputNodePosition];
+                    var link = [inputNode, outputNode, 1];
+                    links.push(link);
                 }
             }
-            for (var node in outputLayer) {
+            for (var outputNodePosition2 in outputLayer) {
+                var outputNode2 = outputLayer[outputNodePosition2];
+                var port = outputNode2["port"];
                 for (var link in links) {
-                    if (node == link[0]) {
-                        node = node * (inputLayer[0] * link[2])
+                    var linkElement = links[link];
+                    var outputNodeinLinkFirstValue = linkElement[0];
+                    var outputNodeinLinkSecondValue = linkElement[1];
+                    var outputNodeinLinkThirdValue = linkElement[2];
+                    var portInOutputNodeInLink = outputNodeinLinkSecondValue["port"];
+                    var sensorInOutputNodeInLink = outputNodeinLinkFirstValue["externalSensor"];
+                    if (port == portInOutputNodeInLink) {
+                        speed = speed + (sensorInOutputNodeInLink * outputNodeinLinkThirdValue);
+                        if (speed >= 100) {
+                            speed=100;
+                        }
+                        var name_7 = "ev3";
+                        this.setMotorSpeed(name_7, port, speed);
                     }
                 }
             }

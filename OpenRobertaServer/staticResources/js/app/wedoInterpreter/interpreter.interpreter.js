@@ -419,9 +419,9 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.PROCESS_NEURAL_NETWORK: {
+                            var outputLayer = s.pop();
                             var inputLayer = s.pop();
-                            var outputLayer = n.pop();
-                            return processNeuralNetwork(inputLayer, outputLayer);
+                            n.processNeuralNetwork(inputLayer, outputLayer);
                             break;
                         }
                         case C.ASSERT_ACTION: {
@@ -439,9 +439,8 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.CREATE_OUTPUT_NODE: {
-                            var node = {};
-                            node["aiOutputAction"] = s.pop();
-                            s.push(node);
+                            var outputNodeData = stmt["data"];
+                            s.push(outputNodeData);
                             break;
                         }
                         case C.COMMENT:

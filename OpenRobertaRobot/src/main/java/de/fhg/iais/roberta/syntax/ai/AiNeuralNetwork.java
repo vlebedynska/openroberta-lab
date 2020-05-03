@@ -8,6 +8,7 @@ import de.fhg.iais.roberta.blockly.generated.Value;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.expr.Expr;
 import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
+import de.fhg.iais.roberta.syntax.lang.stmt.Stmt;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.ExprParam;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
@@ -17,7 +18,7 @@ import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 /**
  * TODO Doku
  */
-public class AiNeuralNetwork<V> extends Phrase<V> {
+public class AiNeuralNetwork<V> extends Stmt<V> {
 
     private final ListCreate<V> listNNInput;
     private final ListCreate<V> listNNOutput;
@@ -53,6 +54,7 @@ public class AiNeuralNetwork<V> extends Phrase<V> {
         this.listNNInput = listNNInput;
         this.listNNOutput = listNNOutput;
         this.listNNLinks = listNNLinks;
+        setReadOnly();
     }
 
     /**

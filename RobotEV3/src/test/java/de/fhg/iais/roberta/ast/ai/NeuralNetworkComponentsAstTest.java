@@ -14,9 +14,9 @@ public class NeuralNetworkComponentsAstTest extends AstTest {
             "BlockAST[project=[[Location[x=188,y=337],AiInput[UltrasonicSensor[1,DISTANCE,NO_SLOT],Threshold=0]]]]";
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/input_node.xml");
     }
-
+    @Ignore
     @Test
-    public void validateOutputNode() throws Exception {
+    public void validateOutputNode() throws Exception{
         String a =
             "BlockAST[project=[[Location[x=112,y=112],AiOutput[MotorGetPower[port=A]]]]]";
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/output_node.xml");

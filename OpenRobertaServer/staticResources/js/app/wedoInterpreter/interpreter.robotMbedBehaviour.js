@@ -1,38 +1,46 @@
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            ({__proto__: []} instanceof Array && function (d, b) {
+                d.__proto__ = b;
+            }) ||
+            function (d, b) {
+                for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+            };
         return extendStatics(d, b);
     };
     return function (d, b) {
         extendStatics(d, b);
-        function __() { this.constructor = d; }
+
+        function __() {
+            this.constructor = d;
+        }
+
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util"], function (require, exports, interpreter_aRobotBehaviour_1, C, U) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    Object.defineProperty(exports, "__esModule", {value: true});
     var RobotMbedBehaviour = /** @class */ (function (_super) {
         __extends(RobotMbedBehaviour, _super);
+
         function RobotMbedBehaviour() {
             var _this = _super.call(this) || this;
             _this.hardwareState.motors = {};
             U.loggingEnabled(true, true);
             return _this;
         }
+
         RobotMbedBehaviour.prototype.getSample = function (s, name, sensor, port, mode) {
             var robotText = 'robot: ' + name + ', port: ' + port + ', mode: ' + mode;
             U.debug(robotText + ' getsample from ' + sensor);
             var sensorName = sensor;
             if (sensorName == C.TIMER) {
                 s.push(this.timerGet(port));
-            }
-            else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
+            } else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
                 s.push(this.getEncoderValue(mode, port));
-            }
-            else {
+            } else {
                 s.push(this.getSensorValue(sensorName, port, mode));
             }
         };
@@ -43,8 +51,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 var v = sensor[port];
                 if (v === undefined) {
                     return "undefined";
-                }
-                else {
+                } else {
                     return this.rotation2Unit(v, mode);
                 }
             }
@@ -71,23 +78,19 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             if (mode != undefined) {
                 if (port != undefined) {
                     v = sensor[port][mode];
-                }
-                else {
+                } else {
                     v = sensor[mode];
                 }
-            }
-            else if (port != undefined) {
+            } else if (port != undefined) {
                 if (mode === undefined) {
                     v = sensor[port];
                 }
-            }
-            else {
+            } else {
                 return sensor;
             }
             if (v === undefined) {
                 return false;
-            }
-            else {
+            } else {
                 return v;
             }
         };
@@ -96,8 +99,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.encoder = {};
             if (port == C.MOTOR_LEFT) {
                 this.hardwareState.actions.encoder.leftReset = true;
-            }
-            else {
+            } else {
                 this.hardwareState.actions.encoder.rightReset = true;
             }
         };
@@ -213,8 +215,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -244,8 +245,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * avgSpeed / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -269,8 +269,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || angle === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 var rotations = C.TURN_RATIO * (Math.abs(angle) / 720.);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -279,8 +278,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             if (direction == C.LEFT) {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = -speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speed;
-            }
-            else {
+            } else {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = -speed;
             }
@@ -392,36 +390,38 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         RobotMbedBehaviour.prototype.close = function () {
         };
 
-        RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+        RobotMbedBehaviour.prototype.createLinks = function (inputLayer, outputLayer) {
             var links = [];
-            var speed = 0;
+            var weight = 0;
             for (var inputNodePosition in inputLayer) {
                 var inputNode = inputLayer[inputNodePosition];
                 for (var outputNodePosition in outputLayer) {
                     var outputNode = outputLayer[outputNodePosition];
-                    var link = [inputNode, outputNode, 1];
+                    weight = inputNodePosition == outputNodePosition ? 1 : 0;
+                    var link = {
+                        "inputNode": inputNode,
+                        "outputNode": outputNode,
+                        "weight": weight};
                     links.push(link);
                 }
             }
-            for (var outputNodePosition2 in outputLayer) {
-                var outputNode2 = outputLayer[outputNodePosition2];
-                var port = outputNode2["port"];
-                for (var link in links) {
-                    var linkElement = links[link];
-                    var outputNodeinLinkFirstValue = linkElement[0];
-                    var outputNodeinLinkSecondValue = linkElement[1];
-                    var outputNodeinLinkThirdValue = linkElement[2];
-                    var portInOutputNodeInLink = outputNodeinLinkSecondValue["port"];
-                    var sensorInOutputNodeInLink = outputNodeinLinkFirstValue["externalSensor"];
-                    if (port == portInOutputNodeInLink) {
-                        speed = speed + (sensorInOutputNodeInLink * outputNodeinLinkThirdValue);
-                        if (speed >= 100) {
-                            speed=100;
-                        }
-                        var name_7 = "ev3";
-                        this.setMotorSpeed(name_7, port, speed);
+            return links;
+        }
+        RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+            var links = this.createLinks(inputLayer, outputLayer);
+            for (var outputNodePosition in outputLayer) {
+                var outputNode = outputLayer[outputNodePosition];
+                var speed = 0;
+                for (var linkPosition in links) {
+                    var link = links[linkPosition];
+                    if (outputNode == link.outputNode) {
+                        speed = speed + (link.inputNode.externalSensor * link.weight);
                     }
                 }
+                if (speed > 100) {
+                    speed = 100;
+                }
+                this.setMotorSpeed("ev3", outputNode.port, speed);
             }
         }
 

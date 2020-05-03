@@ -7,6 +7,7 @@ import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
@@ -47,10 +48,7 @@ public class AiOutput<V> extends AiNode<V> {
         return ((IAiVisitor<V>) visitor).visitAiOutputNode(this);
     }
 
-    @Override
-    public Block astToBlock() {
-        return null; //TODO
-    }
+
 
     @Override
     public String toString() {
@@ -82,6 +80,20 @@ public class AiOutput<V> extends AiNode<V> {
         }
     }
 
+    @Override
+    public Block astToBlock() {
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        String type = getAiOutputNodeData().getString("type");
+        switch ( type.toLowerCase() ){
+            case "motorport":
+            String port = getAiOutputNodeData().getString("port");
+            String actorInfo = (type + "_"+ port).toUpperCase();
+            Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
+        }
+        return  jaxbDestination;
+    }
+
     @Override public int getPrecedence() {
         return 0;
     }
@@ -93,4 +105,6 @@ public class AiOutput<V> extends AiNode<V> {
     @Override public BlocklyType getVarType() {
         return null;
     }
+
+
 }

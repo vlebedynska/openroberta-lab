@@ -11,6 +11,7 @@ import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
 import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
 import de.fhg.iais.roberta.syntax.sensor.generic.UltrasonicSensor;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
@@ -50,10 +51,6 @@ public class AiInput<V> extends AiNode<V> {
         return ((IAiVisitor<V>) visitor).visitAiInputNode(this);
     }
 
-    @Override public Block astToBlock() {
-        return null; //TODO
-    }
-
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + " [" + this.externalSensor + ", " + "Threshold = " + this.threshold  + "]";
@@ -73,6 +70,19 @@ public class AiInput<V> extends AiNode<V> {
 
         return AiInput.make(externalSensor, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
     }
+
+    @Override public Block astToBlock() {
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        switch ( sensortype ) {
+            case "ultrasonic":
+                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.INPUTNODE, sensorInfo);
+                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.THRESHOLD, threshold);
+
+        }
+        return  jaxbDestination;
+    }
+
 
     private static <V> ExternalSensor<V> createSensorAst(String sensorInfo, Block block, AbstractJaxb2Ast<V> helper) {
         BlocklyDropdownFactory factory = helper.getDropdownFactory();

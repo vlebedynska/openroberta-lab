@@ -27,6 +27,9 @@
 .typcn-section:before {
   content: "\e900";
 }
+.typcn-neural-network:before {
+  content: "\ea97";
+}
 .typcn-menu_dots:before {
   content: "\e600";
 }

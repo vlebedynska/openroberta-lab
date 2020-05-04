@@ -10,6 +10,7 @@ import de.fhg.iais.roberta.syntax.lang.expr.Expr;
 import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
 import de.fhg.iais.roberta.syntax.lang.stmt.Stmt;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.transformer.ExprParam;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
@@ -75,11 +76,6 @@ public class AiNeuralNetwork<V> extends Stmt<V> {
     }
 
     @Override
-    public Block astToBlock() {
-        return null; //TODO
-    }
-
-    @Override
     public String toString() {
         return this.getClass().getSimpleName() + " [" + " Input-Layer: " + listNNInput + " Output-Layer: " + listNNOutput + " ]";
     }
@@ -102,6 +98,15 @@ public class AiNeuralNetwork<V> extends Stmt<V> {
             }
         }
         return AiNeuralNetwork.make(inputLayer, outputLayer, listNNLinks, helper.extractBlockProperties(block), helper.extractComment(block));
+    }
+
+    @Override
+    public Block astToBlock() {
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        Ast2JaxbHelper.addValue(jaxbDestination, BlocklyConstants.INPUT_LAYER, getListNNInput());
+        Ast2JaxbHelper.addValue(jaxbDestination, BlocklyConstants.OUTPUT_LAYER, getListNNOutput());
+        return  jaxbDestination;
     }
 
 }

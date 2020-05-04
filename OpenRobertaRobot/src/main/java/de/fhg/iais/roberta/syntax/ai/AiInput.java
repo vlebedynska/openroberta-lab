@@ -23,7 +23,12 @@ public class AiInput<V> extends AiNode<V> {
 
 
     private final ExternalSensor<V> externalSensor;
+    private final String sensorInfo;
     private final int threshold;
+
+    public String getSensorInfo() {
+        return sensorInfo;
+    }
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -32,18 +37,19 @@ public class AiInput<V> extends AiNode<V> {
      * @param property
      * @param comment  that the user added to the block
      */
-    private AiInput(BlockType kind, ExternalSensor<V> externalSensor, int threshold, BlocklyBlockProperties property, BlocklyComment comment) {
+    private AiInput(BlockType kind, ExternalSensor<V> externalSensor, int threshold, String sensorInfo, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, property, comment);
         this.externalSensor = externalSensor;
         this.threshold = threshold;
+        this.sensorInfo = sensorInfo;
         setReadOnly();
     }
 
     /**
     TODO Doku
      */
-    public static <V> AiInput<V> make(ExternalSensor<V> externalSensor, int threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiInput<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE"), externalSensor, threshold, properties, comment);
+    public static <V> AiInput<V> make(ExternalSensor<V> externalSensor, int threshold, String sensorInfo, BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new AiInput<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE"), externalSensor, threshold, sensorInfo, properties, comment);
     }
 
     @Override
@@ -68,20 +74,9 @@ public class AiInput<V> extends AiNode<V> {
         String thresholdInfo = helper.extractField(fields, BlocklyConstants.THRESHOLD, "");
         int threshold = getThresholdValue(thresholdInfo);
 
-        return AiInput.make(externalSensor, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
+        return AiInput.make(externalSensor, threshold, sensorInfo, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 
-    @Override public Block astToBlock() {
-        Block jaxbDestination = new Block();
-        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
-        switch ( sensortype ) {
-            case "ultrasonic":
-                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.INPUTNODE, sensorInfo);
-                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.THRESHOLD, threshold);
-
-        }
-        return  jaxbDestination;
-    }
 
 
     private static <V> ExternalSensor<V> createSensorAst(String sensorInfo, Block block, AbstractJaxb2Ast<V> helper) {
@@ -98,6 +93,17 @@ public class AiInput<V> extends AiNode<V> {
                 return UltrasonicSensor.make(sensorMetaDataBean, helper.extractBlockProperties(block), helper.extractComment(block));
         } throw new RuntimeException("Kein Input-Sensor gefunden!");
     }
+
+    @Override public Block astToBlock() {
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.INPUTNODE, getSensorInfo());
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.THRESHOLD, String.valueOf(getThreshold())); //TODO Schwelenwert kommt nun als String an?
+
+
+        return  jaxbDestination;
+    }
+
 
     private static int getThresholdValue(String thresholdInfo) {
         try {

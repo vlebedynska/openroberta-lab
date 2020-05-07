@@ -1187,6 +1187,10 @@ define([ 'exports', 'util', 'log', 'message', 'guiState.model', 'progHelp.contro
     }
     exports.updateTutorialMenu = updateTutorialMenu;
 
+    function getNeuralNetwork() {
+        GUISTATE.program.neuralNetworks = createNeuralNetwork()
+    }
+
     function getLegalTextsMap() {
         return GUISTATE.server.legalTexts;
     }

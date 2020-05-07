@@ -375,6 +375,10 @@ define(['simulation.simulation', 'interpreter.constants', 'simulation.robot', 'g
         this.tone.duration = 0;
         this.tone.frequency = 0;
         this.webAudio.volume = 0.5;
+
+        // load neural Network
+        //var neuralNetwork = this.robotBehaviour.neuralNetwork;
+        //this.changeWeight(neuralNetwork);
     };
 
     /**
@@ -616,6 +620,30 @@ define(['simulation.simulation', 'interpreter.constants', 'simulation.robot', 'g
         point.ry = this.pose.y - point.y * sin - point.x * cos;
         return point;
     };
+
+    Ev3.prototype.changeWeight = function (neuralNetwork) {
+        $('#simConfigNeuralNetworkContent').html("");
+        for (var linkId in neuralNetwork.links){
+            var link = neuralNetwork.links[linkId];
+            var div = $('<div style="margin:8px 0; "></div>');
+            var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+            div.append(range);
+            $('#simConfigNeuralNetworkContent').append(div);
+            range.change(function(e) {
+                e.preventDefault();
+                //$('#range').html(this.val());
+                link.weight = $(this).val();
+                e.stopPropagation();
+            });
+
+        }
+
+
+
+
+
+    }
+
 
     return Ev3;
 });

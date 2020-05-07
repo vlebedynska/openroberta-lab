@@ -28,6 +28,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         function RobotMbedBehaviour() {
             var _this = _super.call(this) || this;
             _this.hardwareState.motors = {};
+            this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             U.loggingEnabled(true, true);
             return _this;
         }
@@ -401,14 +402,25 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     var link = {
                         "inputNode": inputNode,
                         "outputNode": outputNode,
-                        "weight": weight};
+                        "weight": weight
+                    };
                     links.push(link);
                 }
             }
             return links;
         }
         RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
-            var links = this.createLinks(inputLayer, outputLayer);
+            if ($.isEmptyObject(this.neuralNetwork)) {
+                var links = this.createLinks(inputLayer, outputLayer);
+                this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
+                this.changeWeight(this.neuralNetwork);
+            } else {
+                var links = this.neuralNetwork.links;
+                for (var inputNodeID in inputLayer) {
+                    var inputNode = inputLayer[inputNodeID];
+                    this.neuralNetwork.inputLayer[inputNodeID].externalSensor = inputNode.externalSensor;
+                }
+            }
             for (var outputNodePosition in outputLayer) {
                 var outputNode = outputLayer[outputNodePosition];
                 var speed = 0;
@@ -423,6 +435,36 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 }
                 this.setMotorSpeed("ev3", outputNode.port, speed);
             }
+        }
+
+        RobotMbedBehaviour.prototype.createNeuralNetwork = function (inputLayer, outputLayer, links) {
+            return {
+                "inputLayer": inputLayer,
+                "outputLayer": outputLayer,
+                "links": links
+            }
+        }
+
+        RobotMbedBehaviour.prototype.changeWeight = function (neuralNetwork) {
+            $('#simConfigNeuralNetworkContent').html("");
+            for (var linkId in neuralNetwork.links) {
+                this.setHandler(neuralNetwork.links[linkId]);
+            }
+
+        }
+        RobotMbedBehaviour.prototype.setHandler = function (link){
+            //var link = neuralNetwork.links[linkId];
+            var div = $('<div style="margin:8px 0; "></div>');
+            var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+            div.append(range);
+            $('#simConfigNeuralNetworkContent').append(div);
+            range.change(function (e) {
+                e.preventDefault();
+                //$('#range').html(this.val());
+                link.weight = $(this).val();
+                e.stopPropagation();
+            });
+
         }
 
         return RobotMbedBehaviour;

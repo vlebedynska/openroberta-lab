@@ -60,6 +60,7 @@ define([ 'exports', 'message', 'comm' ], function(exports, MSG, COMM) {
         exports.program.toolbox = {};
         exports.program.toolbox.level = '';
         exports.program.toolbox.xml = '';
+        exports.program.neuralNetworks = {};
 
         exports.configuration = {};
         exports.configuration.name = '';

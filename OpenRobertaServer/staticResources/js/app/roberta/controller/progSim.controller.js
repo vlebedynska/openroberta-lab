@@ -109,6 +109,13 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
             $("#simButtonsCollapse").collapse('hide');
         });
 
+        $('#simConfigNeuralNetwork').on('click', function (event) {
+            $('#simConfigNeuralNetworkModal').modal("toggle");
+
+            $('#simRobotModal').draggable();
+            $("#simButtonsCollapse").collapse('hide');
+        });
+
         $('#simValues').onWrap('click', function(event) {
             $("#simValuesModal").modal("toggle");
             var position = $("#simDiv").position();

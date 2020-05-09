@@ -623,6 +623,7 @@ define(['simulation.simulation', 'interpreter.constants', 'simulation.robot', 'g
 
     Ev3.prototype.changeWeight = function (neuralNetwork) {
         $('#simConfigNeuralNetworkContent').html("");
+        $('#simConfigNeuralNetworkContent').append(divH1);
         for (var linkId in neuralNetwork.links){
             var link = neuralNetwork.links[linkId];
             var div = $('<div style="margin:8px 0; "></div>');

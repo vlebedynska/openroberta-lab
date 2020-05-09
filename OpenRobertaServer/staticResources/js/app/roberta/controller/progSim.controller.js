@@ -110,11 +110,19 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
         });
 
         $('#simConfigNeuralNetwork').on('click', function (event) {
+            var position = $("#simDiv").position();
+            position.top += 12;
             $('#simConfigNeuralNetworkModal').modal("toggle");
-
-            $('#simRobotModal').draggable();
+            $("#simConfigNeuralNetworkModal").css({
+                top : position.top,
+                right : 12,
+                left : 'initial',
+                bottom : 'inherit'
+            });
+            $('#simConfigNeuralNetwork').draggable();
             $("#simButtonsCollapse").collapse('hide');
         });
+
 
         $('#simValues').onWrap('click', function(event) {
             $("#simValuesModal").modal("toggle");

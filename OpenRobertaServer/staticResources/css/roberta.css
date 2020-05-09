@@ -926,7 +926,7 @@ div.rightMenuButton:hover,
 }
 .simRobotModal .modal-header {
     position: fixed;
-    right: 16;
+    right: 16px;
 }
 .simRobotModal .modal-dialog {
     width: inherit;
@@ -2306,4 +2306,20 @@ pre code {
 
 #confirm, #confirmCancel {
     text-transform: capitalize;
+}
+
+
+#simConfigNeuralNetworkContent {
+    width: 200px;
+    padding: 15px;
+}
+
+#test{
+    width: 200px;
+    padding: 15px;
+}
+
+#simConfigNeuralNetworkModal .modal-dialog{
+    width: inherit;
+    background: #f9f9f9;
 }

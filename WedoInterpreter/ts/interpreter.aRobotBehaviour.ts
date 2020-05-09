@@ -3,6 +3,7 @@ import { State } from "interpreter.state";
 export abstract class ARobotBehaviour {
     protected hardwareState;
     private blocking
+    protected neuralNetwork;
 
     constructor() {
         this.hardwareState = {};
@@ -10,6 +11,7 @@ export abstract class ARobotBehaviour {
         this.hardwareState.timers['start'] = Date.now();
         this.hardwareState.actions = {};
         this.hardwareState.sensors = {};
+        this.neuralNetwork = {};
         this.blocking = false;
     }
 

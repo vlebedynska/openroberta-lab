@@ -1,4 +1,12 @@
-define(["require", "exports"], function (require, exports) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ADD = "ADD";
@@ -38,11 +46,11 @@ define(["require", "exports"], function (require, exports) {
     exports.COMPASS = "compass";
     exports.CONTINUE = "continue";
     exports.CREATE_DEBUG_ACTION = "CreateDebugAction";
+    exports.CREATE_INPUT_NODE = "createInputNode";
+    exports.CREATE_OUTPUT_NODE = "createOutputNode";
     exports.CREATE_LIST = "createList";
     exports.CREATE_LIST_REPEAT = "createListREPEAT";
     exports.CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
-    exports.CREATE_INPUT_NODE = "createInputNode";
-    exports.CREATE_OUTPUT_NODE = "createOutputNode"
     exports.CURVE_ACTION = "CurveAction";
     exports.DEBUG_ACTION = "DebugAction";
     exports.DEGREE = "degree";

@@ -1,6 +1,17 @@
-define(["require", "exports", "interpreter.state", "interpreter.constants", "interpreter.util"], function (require, exports, interpreter_state_1, C, U) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "interpreter.state", "interpreter.constants", "interpreter.util"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var interpreter_state_1 = require("interpreter.state");
+    var C = require("interpreter.constants");
+    var U = require("interpreter.util");
     var Interpreter = /** @class */ (function () {
         /*
          *
@@ -95,6 +106,12 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                 else {
                     var opCode = stmt[C.OPCODE];
                     switch (opCode) {
+                        case C.PROCESS_NEURAL_NETWORK: {
+                            var outputLayer = s.pop();
+                            var inputLayer = s.pop();
+                            n.processNeuralNetwork(inputLayer, outputLayer);
+                            break;
+                        }
                         case C.ASSIGN_STMT: {
                             var name_1 = stmt[C.NAME];
                             s.setVar(name_1, s.pop());
@@ -418,12 +435,6 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             n.debugAction(value);
                             break;
                         }
-                        case C.PROCESS_NEURAL_NETWORK: {
-                            var outputLayer = s.pop();
-                            var inputLayer = s.pop();
-                            n.processNeuralNetwork(inputLayer, outputLayer);
-                            break;
-                        }
                         case C.ASSERT_ACTION: {
                             var right = s.pop();
                             var left = s.pop();
@@ -432,9 +443,10 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.CREATE_INPUT_NODE: {
-                            var node = {};
-                            node.threshold = s.pop();
-                            node.externalSensor = s.pop();
+                            var node = {
+                                threshold: s.pop(),
+                                externalSensor: s.pop()
+                            };
                             s.push(node);
                             break;
                         }

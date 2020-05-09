@@ -1,6 +1,16 @@
-define(["require", "exports", "interpreter.constants", "interpreter.util"], function (require, exports, C, U) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "interpreter.constants", "interpreter.util"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var C = require("interpreter.constants");
+    var U = require("interpreter.util");
     var State = /** @class */ (function () {
         /**
          * initialization of the state.

@@ -11,9 +11,20 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util"], function (require, exports, interpreter_aRobotBehaviour_1, C, U) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var interpreter_aRobotBehaviour_1 = require("interpreter.aRobotBehaviour");
+    var C = require("interpreter.constants");
+    var U = require("interpreter.util");
     var RobotWeDoBehaviour = /** @class */ (function (_super) {
         __extends(RobotWeDoBehaviour, _super);
         function RobotWeDoBehaviour(btInterfaceFct, toDisplayFct) {
@@ -33,6 +44,10 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             U.loggingEnabled(true, true);
             return _this;
         }
+        // @ts-ignore
+        RobotWeDoBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+            throw new Error("Method not implemented.");
+        };
         RobotWeDoBehaviour.prototype.update = function (data) {
             U.info('update type:' + data.type + ' state:' + data.state + ' sensor:' + data.sensor + ' actor:' + data.actuator);
             if (data.target !== "wedo") {

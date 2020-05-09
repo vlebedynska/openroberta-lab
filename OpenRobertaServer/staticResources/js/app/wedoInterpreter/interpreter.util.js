@@ -1,6 +1,15 @@
-define(["require", "exports", "interpreter.constants"], function (require, exports, C) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "interpreter.constants"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var C = require("interpreter.constants");
     function dbc(expected, actual) {
         if (expected !== actual) {
             var msg = 'DBC. Expected: ' + expected + ' but got: ' + actual;

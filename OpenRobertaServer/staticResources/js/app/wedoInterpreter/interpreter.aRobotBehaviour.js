@@ -1,4 +1,12 @@
-define(["require", "exports"], function (require, exports) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports"], factory);
+    }
+})(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ARobotBehaviour = /** @class */ (function () {
@@ -8,6 +16,7 @@ define(["require", "exports"], function (require, exports) {
             this.hardwareState.timers['start'] = Date.now();
             this.hardwareState.actions = {};
             this.hardwareState.sensors = {};
+            this.neuralNetwork = {};
             this.blocking = false;
         }
         ARobotBehaviour.prototype.getActionState = function (actionType, resetState) {

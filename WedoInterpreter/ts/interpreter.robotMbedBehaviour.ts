@@ -2,12 +2,14 @@ import { ARobotBehaviour } from "interpreter.aRobotBehaviour";
 import { State } from "interpreter.state";
 import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
+import * as $ from "jquery";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	constructor() {
 		super();
 		this.hardwareState.motors = {};
+		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
 		U.loggingEnabled(true, true);
 	}
 
@@ -411,22 +413,81 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
 	}
 
-	public processNeuralNetwork (inputLayer: any, outputLayer: any) {
-
-		/*var links = [];
-		for (var inputNode in inputLayer) {
-			for (var outputNode in outputLayer) {
-				var link = [inputNode, outputNode, 0];
+	public createLinks(inputLayer, outputLayer) {
+		var links = [];
+		var weight = 0;
+		for (var inputNodePosition in inputLayer) {
+			var inputNode = inputLayer[inputNodePosition];
+			for (var outputNodePosition in outputLayer) {
+				var outputNode = outputLayer[outputNodePosition];
+				weight = inputNodePosition == outputNodePosition ? 1 : 0;
+				var link = {
+					"inputNode": inputNode,
+					"outputNode": outputNode,
+					"weight": weight
+				};
 				links.push(link);
 			}
 		}
-		for (var outputNode in outputLayer) {
-			for (var linkx in links) {
-				if (outputNode == link[0]) {
-					outputNode = outputNode * (inputLayer[0] * linkx[2])
+		return links;
+	}
+	public processNeuralNetwork(inputLayer, outputLayer) {
+		var links;
+		if ($.isEmptyObject(this.neuralNetwork)) {
+			links = this.createLinks(inputLayer, outputLayer);
+			this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
+			this.changeWeight(this.neuralNetwork);
+		} else {
+			links = this.neuralNetwork.links;
+			for (var inputNodeID in inputLayer) {
+				var inputNode = inputLayer[inputNodeID];
+				this.neuralNetwork.inputLayer[inputNodeID].externalSensor = inputNode.externalSensor;
+			}
+		}
+		for (var outputNodePosition in outputLayer) {
+			var outputNode = outputLayer[outputNodePosition];
+			var speed = 0;
+			for (var linkPosition in links) {
+				var link = links[linkPosition];
+				if (outputNode == link.outputNode) {
+					speed = speed + (link.inputNode.externalSensor * link.weight);
 				}
 			}
-		}*/
+			if (speed > 100) {
+				speed = 100;
+			}
+			this.setMotorSpeed("ev3", outputNode.port, speed);
+		}
+	}
+
+	public createNeuralNetwork(inputLayer, outputLayer, links) {
+		return {
+			"inputLayer": inputLayer,
+			"outputLayer": outputLayer,
+			"links": links
+		}
+	}
+
+	public changeWeight(neuralNetwork) {
+		$('#simConfigNeuralNetworkContent').html("");
+		for (var linkId in neuralNetwork.links) {
+			this.setHandler(neuralNetwork.links[linkId]);
+		}
+
+	}
+	public setHandler(link){
+		//var link = neuralNetwork.links[linkId];
+		var div = $('<div style="margin:8px 0; "></div>');
+		var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+		div.append(range);
+		$('#simConfigNeuralNetworkContent').append(div);
+		range.change(function (e) {
+			e.preventDefault();
+			//$('#range').html(this.val());
+			link.weight = $(this).val();
+			e.stopPropagation();
+		});
+
 	}
 
 	public close() {

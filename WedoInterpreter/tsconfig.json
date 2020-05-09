@@ -7,8 +7,8 @@
 		"module": "umd",
 		"moduleResolution": "node",
 		"baseUrl": "./ts",
-		"noUnusedLocals": true,
-		"noUnusedParameters": true
+		"noUnusedLocals": false,
+		"noUnusedParameters": false
 	},
 	"files": [
 		"./ts/interpreter.aRobotBehaviour.ts",

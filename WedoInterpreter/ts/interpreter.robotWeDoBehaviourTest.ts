@@ -4,6 +4,9 @@ import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 
 export class RobotWeDoBehaviourTest extends ARobotBehaviour {
+    processNeuralNetwork(inputLayer: any, outputLayer: any): void {
+        throw new Error("Method not implemented.");
+    }
     private timers;
 
     constructor( opLog, debug ) {

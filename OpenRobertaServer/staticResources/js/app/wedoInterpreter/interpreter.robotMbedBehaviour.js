@@ -1,47 +1,51 @@
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
-            ({__proto__: []} instanceof Array && function (d, b) {
-                d.__proto__ = b;
-            }) ||
-            function (d, b) {
-                for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-            };
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
         extendStatics(d, b);
-
-        function __() {
-            this.constructor = d;
-        }
-
+        function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util"], function (require, exports, interpreter_aRobotBehaviour_1, C, U) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery"], factory);
+    }
+})(function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", {value: true});
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var interpreter_aRobotBehaviour_1 = require("interpreter.aRobotBehaviour");
+    var C = require("interpreter.constants");
+    var U = require("interpreter.util");
+    var $ = require("jquery");
     var RobotMbedBehaviour = /** @class */ (function (_super) {
         __extends(RobotMbedBehaviour, _super);
-
         function RobotMbedBehaviour() {
             var _this = _super.call(this) || this;
             _this.hardwareState.motors = {};
-            this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
+            _this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             U.loggingEnabled(true, true);
             return _this;
         }
-
         RobotMbedBehaviour.prototype.getSample = function (s, name, sensor, port, mode) {
             var robotText = 'robot: ' + name + ', port: ' + port + ', mode: ' + mode;
             U.debug(robotText + ' getsample from ' + sensor);
             var sensorName = sensor;
             if (sensorName == C.TIMER) {
                 s.push(this.timerGet(port));
-            } else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
+            }
+            else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
                 s.push(this.getEncoderValue(mode, port));
-            } else {
+            }
+            else {
                 s.push(this.getSensorValue(sensorName, port, mode));
             }
         };
@@ -52,7 +56,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 var v = sensor[port];
                 if (v === undefined) {
                     return "undefined";
-                } else {
+                }
+                else {
                     return this.rotation2Unit(v, mode);
                 }
             }
@@ -79,19 +84,23 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             if (mode != undefined) {
                 if (port != undefined) {
                     v = sensor[port][mode];
-                } else {
+                }
+                else {
                     v = sensor[mode];
                 }
-            } else if (port != undefined) {
+            }
+            else if (port != undefined) {
                 if (mode === undefined) {
                     v = sensor[port];
                 }
-            } else {
+            }
+            else {
                 return sensor;
             }
             if (v === undefined) {
                 return false;
-            } else {
+            }
+            else {
                 return v;
             }
         };
@@ -100,7 +109,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.encoder = {};
             if (port == C.MOTOR_LEFT) {
                 this.hardwareState.actions.encoder.leftReset = true;
-            } else {
+            }
+            else {
                 this.hardwareState.actions.encoder.rightReset = true;
             }
         };
@@ -216,7 +226,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            } else {
+            }
+            else {
                 var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -246,7 +257,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * avgSpeed / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            } else {
+            }
+            else {
                 var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -270,7 +282,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || angle === undefined) {
                 return 0;
-            } else {
+            }
+            else {
                 var rotations = C.TURN_RATIO * (Math.abs(angle) / 720.);
                 return rotations / rotationPerSecond * 1000;
             }
@@ -279,7 +292,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             if (direction == C.LEFT) {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = -speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speed;
-            } else {
+            }
+            else {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = -speed;
             }
@@ -388,9 +402,6 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             U.debug('***** assert action "' + value + ' ' + _msg + ' ' + _left + ' ' + _op + ' ' + _right + '" *****');
             console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
         };
-        RobotMbedBehaviour.prototype.close = function () {
-        };
-
         RobotMbedBehaviour.prototype.createLinks = function (inputLayer, outputLayer) {
             var links = [];
             var weight = 0;
@@ -408,14 +419,16 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 }
             }
             return links;
-        }
+        };
         RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+            var links;
             if ($.isEmptyObject(this.neuralNetwork)) {
-                var links = this.createLinks(inputLayer, outputLayer);
+                links = this.createLinks(inputLayer, outputLayer);
                 this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
                 this.changeWeight(this.neuralNetwork);
-            } else {
-                var links = this.neuralNetwork.links;
+            }
+            else {
+                links = this.neuralNetwork.links;
                 for (var inputNodeID in inputLayer) {
                     var inputNode = inputLayer[inputNodeID];
                     this.neuralNetwork.inputLayer[inputNodeID].externalSensor = inputNode.externalSensor;
@@ -435,24 +448,21 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 }
                 this.setMotorSpeed("ev3", outputNode.port, speed);
             }
-        }
-
+        };
         RobotMbedBehaviour.prototype.createNeuralNetwork = function (inputLayer, outputLayer, links) {
             return {
                 "inputLayer": inputLayer,
                 "outputLayer": outputLayer,
                 "links": links
-            }
-        }
-
+            };
+        };
         RobotMbedBehaviour.prototype.changeWeight = function (neuralNetwork) {
             $('#simConfigNeuralNetworkContent').html("");
             for (var linkId in neuralNetwork.links) {
                 this.setHandler(neuralNetwork.links[linkId]);
             }
-
-        }
-        RobotMbedBehaviour.prototype.setHandler = function (link){
+        };
+        RobotMbedBehaviour.prototype.setHandler = function (link) {
             //var link = neuralNetwork.links[linkId];
             var div = $('<div style="margin:8px 0; "></div>');
             var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
@@ -464,9 +474,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 link.weight = $(this).val();
                 e.stopPropagation();
             });
-
-        }
-
+        };
+        RobotMbedBehaviour.prototype.close = function () {
+        };
         return RobotMbedBehaviour;
     }(interpreter_aRobotBehaviour_1.ARobotBehaviour));
     exports.RobotMbedBehaviour = RobotMbedBehaviour;

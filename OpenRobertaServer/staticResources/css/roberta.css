@@ -2314,6 +2314,11 @@ pre code {
     padding: 15px;
 }
 
+#simConfigNeuralNetworkSVG {
+    width: 200px;
+    padding: 15px;
+}
+
 #test{
     width: 200px;
     padding: 15px;

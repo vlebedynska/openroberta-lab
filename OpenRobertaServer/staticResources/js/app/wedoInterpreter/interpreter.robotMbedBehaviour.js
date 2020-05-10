@@ -423,9 +423,12 @@ var __extends = (this && this.__extends) || (function () {
         RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
             var links;
             if ($.isEmptyObject(this.neuralNetwork)) {
+                this.addNodesPosition(inputLayer);
+                this.addNodesPosition(outputLayer);
                 links = this.createLinks(inputLayer, outputLayer);
                 this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
                 this.changeWeight(this.neuralNetwork);
+                this.drawNeuralNetwork(this.neuralNetwork);
             }
             else {
                 links = this.neuralNetwork.links;
@@ -475,6 +478,65 @@ var __extends = (this && this.__extends) || (function () {
                 e.stopPropagation();
             });
         };
+
+        RobotMbedBehaviour.prototype.addNodesPosition = function(layer) {
+            var i = 0;
+            for (var nodePosition in layer) {
+                var node = layer[nodePosition];
+                node.position = i;
+                i++;
+            }
+        }
+
+        RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
+            $('#simConfigNeuralNetworkSVG').html("");
+            var div = $('<div style="margin:8px 0; "></div>');
+            var svg = $('<svg xmlns="http://www.w3.org/2000/svg" width="170vw" height="150vh"   ></svg>'); //viewBox="0 0 170 250"
+            this.drawLayer(neuralNetwork.inputLayer, 50, svg);
+            this.drawLayer(neuralNetwork.outputLayer, 120, svg);
+            div.append(svg);
+            $('#simConfigNeuralNetworkSVG').append(div);
+            $('#simConfigNeuralNetworkSVG').html($('#simConfigNeuralNetworkSVG').html());
+        }
+
+
+        RobotMbedBehaviour.prototype.drawLayer = function(layer, startXPosition, svg) {
+            for (const [key,node] of Object.entries( layer )) {
+                var nodePosition = node.position;
+                var y = 50 + 100 * nodePosition;
+                var circle = $('<circle cx="' + startXPosition +'" cy="' +y +'" r="20" fill="red" />');
+                svg.append(circle);
+            }
+
+        //<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+        //<circle cx="50" cy="50" fill="red" r="10"></circle>
+        }
+
+
+
+
+
+
+
+        // RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
+        //     $('#simConfigNeuralNetworkSVG').html("");
+        //     for (var linkId in neuralNetwork.links) {
+        //         this.setDrawHandler(neuralNetwork.links[linkId]);
+        //     }
+        // }
+        //
+        //
+        // RobotMbedBehaviour.prototype.setDrawHandler = function(link) {
+        //     var div = $('<div style="margin:8px 0; "></div>');
+        //     var x = 50;
+        //     var y = 50;
+        //     var range = $('<svg xmlns="http://www.w3.org/2000/svg" width="150">\n' +
+        //         '<circle cx="' + x +'"cy="' +y +'"r="20" fill="gray"></circle>'+'<line x1="50" y1="50" x2="250" y2="50" style="stroke:rgb(255,0,0);stroke-width:2" />');
+        //     div.append(range);
+        //     $('#simConfigNeuralNetworkSVG').append(div);
+        // }
+
+
         RobotMbedBehaviour.prototype.close = function () {
         };
         return RobotMbedBehaviour;

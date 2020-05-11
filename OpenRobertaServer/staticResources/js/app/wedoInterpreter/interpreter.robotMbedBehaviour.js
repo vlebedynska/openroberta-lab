@@ -491,9 +491,12 @@ var __extends = (this && this.__extends) || (function () {
         RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
             $('#simConfigNeuralNetworkSVG').html("");
             var div = $('<div style="margin:8px 0; "></div>');
-            var svg = $('<svg xmlns="http://www.w3.org/2000/svg" width="170vw" height="150vh"   ></svg>'); //viewBox="0 0 170 250"
-            this.drawLayer(neuralNetwork.inputLayer, 50, svg);
-            this.drawLayer(neuralNetwork.outputLayer, 120, svg);
+            var svg = $('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 250"></svg>');
+            var positionX1 = 50;
+            var positionX2 = 120;
+            this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
+            this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
+            this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
             div.append(svg);
             $('#simConfigNeuralNetworkSVG').append(div);
             $('#simConfigNeuralNetworkSVG').html($('#simConfigNeuralNetworkSVG').html());
@@ -503,14 +506,35 @@ var __extends = (this && this.__extends) || (function () {
         RobotMbedBehaviour.prototype.drawLayer = function(layer, startXPosition, svg) {
             for (const [key,node] of Object.entries( layer )) {
                 var nodePosition = node.position;
-                var y = 50 + 100 * nodePosition;
-                var circle = $('<circle cx="' + startXPosition +'" cy="' +y +'" r="20" fill="red" />');
+                var y = 20 + 100 * nodePosition;
+                var circle = $('<circle/>')
+                    .attr('cx', startXPosition)
+                    .attr('cy', y)
+                    .attr('r', '20')
+                    .attr('fill', 'black')
                 svg.append(circle);
             }
+        }
 
+        RobotMbedBehaviour.prototype.drawLinks = function (links, positionX1, positionX2, svg) {
+            for (var linkID in links) {
+                var link = links[linkID];
+                var positionY1 = 20 + 100*link.inputNode.position;
+                var positionY2 = 20 + 100*link.outputNode.position;
+                var strokeWidth = link.weight*4 + 1;
+                var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
+                var line = $('<line/>')
+                    .attr('x1', positionX1)
+                    .attr('y1', positionY1)
+                    .attr('x2', positionX2)
+                    .attr('y2', positionY2)
+                    .attr('style', style)
+                svg.append(line);
+            }
+        }
         //<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
         //<circle cx="50" cy="50" fill="red" r="10"></circle>
-        }
+
 
 
 

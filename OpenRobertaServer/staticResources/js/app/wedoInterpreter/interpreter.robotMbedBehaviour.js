@@ -17,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery"], factory);
+        define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "svg"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -26,6 +26,7 @@ var __extends = (this && this.__extends) || (function () {
     var C = require("interpreter.constants");
     var U = require("interpreter.util");
     var $ = require("jquery");
+    var svgJS = require("svg");
     var RobotMbedBehaviour = /** @class */ (function (_super) {
         __extends(RobotMbedBehaviour, _super);
         function RobotMbedBehaviour() {
@@ -402,7 +403,9 @@ var __extends = (this && this.__extends) || (function () {
             U.debug('***** assert action "' + value + ' ' + _msg + ' ' + _left + ' ' + _op + ' ' + _right + '" *****');
             console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
         };
-        RobotMbedBehaviour.prototype.createLinks = function (inputLayer, outputLayer) {
+
+
+        RobotMbedBehaviour.prototype.createLinks = function(inputLayer, outputLayer) {
             var links = [];
             var weight = 0;
             for (var inputNodePosition in inputLayer) {
@@ -420,7 +423,7 @@ var __extends = (this && this.__extends) || (function () {
             }
             return links;
         };
-        RobotMbedBehaviour.prototype.processNeuralNetwork = function (inputLayer, outputLayer) {
+        RobotMbedBehaviour.prototype.processNeuralNetwork = function(inputLayer, outputLayer) {
             var links;
             if ($.isEmptyObject(this.neuralNetwork)) {
                 this.addNodesPosition(inputLayer);
@@ -450,27 +453,40 @@ var __extends = (this && this.__extends) || (function () {
                     speed = 100;
                 }
                 this.setMotorSpeed("ev3", outputNode.port, speed);
+                console.log("Motorspeed" + speed)
             }
         };
-        RobotMbedBehaviour.prototype.createNeuralNetwork = function (inputLayer, outputLayer, links) {
+        RobotMbedBehaviour.prototype.createNeuralNetwork = function(inputLayer, outputLayer, links) {
             return {
                 "inputLayer": inputLayer,
                 "outputLayer": outputLayer,
                 "links": links
             };
         };
-        RobotMbedBehaviour.prototype.changeWeight = function (neuralNetwork) {
-            $('#simConfigNeuralNetworkContent').html("");
-            for (var linkId in neuralNetwork.links) {
-                this.setHandler(neuralNetwork.links[linkId]);
-            }
-        };
-        RobotMbedBehaviour.prototype.setHandler = function (link) {
-            //var link = neuralNetwork.links[linkId];
+        RobotMbedBehaviour.prototype.changeWeight = function(neuralNetwork) {
+            $('#einReglerfuerAlles').html("");
             var div = $('<div style="margin:8px 0; "></div>');
-            var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+            var value = 0;
+            var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.1" />');
+            range.on('input', function() {
+                $(this).data("link").weight = $(this).val();
+                var width = $(this).data("link").weight * 4 + 1;
+                $(this).data("line").stroke({width: width});
+            });
             div.append(range);
-            $('#simConfigNeuralNetworkContent').append(div);
+            $('#einReglerfuerAlles').append(div);
+
+            // for (var linkId in neuralNetwork.links) {
+            //     this.setHandler(neuralNetwork.links[linkId]);
+            // }
+        };
+        RobotMbedBehaviour.prototype.setHandler = function(link) {
+            //var link = neuralNetwork.links[linkId];
+            var div = $('<div style="margin:8px 8px; "></div>');
+            var value = link.weight;
+            var range = $('<input type="range" id="range" min="0" max="1" value=' + value + ' step="0.1" />');
+            div.append(range);
+            $('#test2').append(div);
             range.change(function (e) {
                 e.preventDefault();
                 //$('#range').html(this.val());
@@ -489,76 +505,74 @@ var __extends = (this && this.__extends) || (function () {
         }
 
         RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
-            $('#simConfigNeuralNetworkSVG').html("");
-            var div = $('<div style="margin:8px 0; "></div>');
-            var svg = $('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 250"></svg>');
+            //var test = SVG();
+            $('#simConfigNeuralNetworkSVG').html('');
+            var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 300);
             var positionX1 = 50;
             var positionX2 = 120;
             this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
             this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
             this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
-            div.append(svg);
-            $('#simConfigNeuralNetworkSVG').append(div);
-            $('#simConfigNeuralNetworkSVG').html($('#simConfigNeuralNetworkSVG').html());
         }
+
 
 
         RobotMbedBehaviour.prototype.drawLayer = function(layer, startXPosition, svg) {
             for (const [key,node] of Object.entries( layer )) {
                 var nodePosition = node.position;
                 var y = 20 + 100 * nodePosition;
-                var circle = $('<circle/>')
-                    .attr('cx', startXPosition)
-                    .attr('cy', y)
-                    .attr('r', '20')
-                    .attr('fill', 'black')
-                svg.append(circle);
+                var circle = svg.circle()
+                    .radius(20)
+                    .cx(startXPosition)
+                    .cy(y)
+                    .fill('black')
             }
-        }
+        };
 
-        RobotMbedBehaviour.prototype.drawLinks = function (links, positionX1, positionX2, svg) {
+        RobotMbedBehaviour.prototype.drawLinks = function(links, positionX1, positionX2, svg) {
             for (var linkID in links) {
+                var that = this;
                 var link = links[linkID];
                 var positionY1 = 20 + 100*link.inputNode.position;
                 var positionY2 = 20 + 100*link.outputNode.position;
                 var strokeWidth = link.weight*4 + 1;
-                var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
-                var line = $('<line/>')
-                    .attr('x1', positionX1)
-                    .attr('y1', positionY1)
-                    .attr('x2', positionX2)
-                    .attr('y2', positionY2)
-                    .attr('style', style)
-                svg.append(line);
+                var colour = '#f06';
+                //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
+                var line = svg.line(positionX1,positionY1, positionX2, positionY2)
+                    .stroke({ color: colour, width: strokeWidth })
+                    .mouseover(function () {
+                        this.stroke('black')
+                    })
+                    .mouseout(function () {
+                        this.stroke(colour)
+                    })
+                    .click(function () {
+                        var link = $(this).data("link");
+                        console.log(link);
+                        var regler = $('#myRange');
+                        regler.data("link", link);
+                        regler.data("line", this);
+                        that.changeInputTypeRange(regler);
+                    })
+                ;
+                $(line).data("link", link);
+
             }
         }
-        //<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-        //<circle cx="50" cy="50" fill="red" r="10"></circle>
+
+        RobotMbedBehaviour.prototype.changeInputTypeRange = function(regler) {
+            //var value = slider.value;
+            var value = regler.data("link").weight;
+            //var line = document.getElementById("testLine");
+
+            regler.val(value);
+        }
 
 
 
-
-
-
-
-
-        // RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
-        //     $('#simConfigNeuralNetworkSVG').html("");
-        //     for (var linkId in neuralNetwork.links) {
-        //         this.setDrawHandler(neuralNetwork.links[linkId]);
-        //     }
-        // }
-        //
-        //
-        // RobotMbedBehaviour.prototype.setDrawHandler = function(link) {
-        //     var div = $('<div style="margin:8px 0; "></div>');
-        //     var x = 50;
-        //     var y = 50;
-        //     var range = $('<svg xmlns="http://www.w3.org/2000/svg" width="150">\n' +
-        //         '<circle cx="' + x +'"cy="' +y +'"r="20" fill="gray"></circle>'+'<line x1="50" y1="50" x2="250" y2="50" style="stroke:rgb(255,0,0);stroke-width:2" />');
-        //     div.append(range);
-        //     $('#simConfigNeuralNetworkSVG').append(div);
-        // }
+        RobotMbedBehaviour.prototype.mouseOver = function(line) {
+            line.stroke = "rgb(0,255,0)";
+        }
 
 
         RobotMbedBehaviour.prototype.close = function () {

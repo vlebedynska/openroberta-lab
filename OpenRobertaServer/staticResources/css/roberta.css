@@ -2310,21 +2310,21 @@ pre code {
 
 
 #simConfigNeuralNetworkContent {
-    width: 200px;
+    width: 300px;
     padding: 15px;
 }
 
 #simConfigNeuralNetworkSVG {
-    width: 200px;
+    width: 300px;
     padding: 15px;
 }
 
 #test{
-    width: 200px;
+    width: 300px;
     padding: 15px;
 }
 
 #simConfigNeuralNetworkModal .modal-dialog{
     width: inherit;
-    background: #f9f9f9;
+    background: #fcfaec;
 }

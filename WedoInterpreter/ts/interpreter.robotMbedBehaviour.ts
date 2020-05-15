@@ -434,9 +434,12 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	public processNeuralNetwork(inputLayer, outputLayer) {
 		var links;
 		if ($.isEmptyObject(this.neuralNetwork)) {
+			this.addNodesPosition(inputLayer);
+			this.addNodesPosition(outputLayer);
 			links = this.createLinks(inputLayer, outputLayer);
 			this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
 			this.changeWeight(this.neuralNetwork);
+			this.drawNeuralNetwork(this.neuralNetwork);
 		} else {
 			links = this.neuralNetwork.links;
 			for (var inputNodeID in inputLayer) {
@@ -457,6 +460,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 				speed = 100;
 			}
 			this.setMotorSpeed("ev3", outputNode.port, speed);
+			console.log("Motorspeed" + speed)
 		}
 	}
 
@@ -469,25 +473,109 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	}
 
 	public changeWeight(neuralNetwork) {
-		$('#simConfigNeuralNetworkContent').html("");
-		for (var linkId in neuralNetwork.links) {
-			this.setHandler(neuralNetwork.links[linkId]);
-		}
+		$('#einReglerfuerAlles').html("");
+		var div = $('<div style="margin:8px 0; "></div>');
+		var value = 0;
+		var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
+		range.on('input', function() {
+			$(this).data("link").weight = $(this).val();
+			var width = $(this).data("link").weight * 4 + 1;
+			$(this).data("line").stroke({width: width});
+		});
+		div.append(range);
+		$('#einReglerfuerAlles').append(div);
+		// for (var linkId in neuralNetwork.links) {
+		// 	this.setHandler(neuralNetwork.links[linkId]);
+		// }
 
 	}
-	public setHandler(link){
-		//var link = neuralNetwork.links[linkId];
-		var div = $('<div style="margin:8px 0; "></div>');
-		var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
-		div.append(range);
-		$('#simConfigNeuralNetworkContent').append(div);
-		range.change(function (e) {
-			e.preventDefault();
-			//$('#range').html(this.val());
-			link.weight = $(this).val();
-			e.stopPropagation();
-		});
+	// public setHandler(link){
+	// 	//var link = neuralNetwork.links[linkId];
+	// 	var div = $('<div style="margin:8px 0; "></div>');
+	// 	var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+	// 	div.append(range);
+	// 	$('#simConfigNeuralNetworkContent').append(div);
+	// 	range.change(function (e) {
+	// 		e.preventDefault();
+	// 		//$('#range').html(this.val());
+	// 		link.weight = $(this).val();
+	// 		e.stopPropagation();
+	// 	});
+	//
+	// }
 
+	public addNodesPosition(layer) {
+		var i = 0;
+		for (var nodePosition in layer) {
+			var node = layer[nodePosition];
+			node.position = i;
+			i++;
+		}
+	}
+
+	public drawNeuralNetwork(neuralNetwork) {
+		//var test = SVG();
+		$('#simConfigNeuralNetworkSVG').html('');
+		var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 300);
+		var positionX1 = 50;
+		var positionX2 = 120;
+		this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
+		this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
+		this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
+	}
+
+	public drawLayer(layer, startXPosition, svg) {
+		for (const [key,node] of Object.entries( layer )) {
+			var nodePosition = node.position;
+			var y = 20 + 100 * nodePosition;
+			var circle = svg.circle()
+				.radius(20)
+				.cx(startXPosition)
+				.cy(y)
+				.fill('black')
+		}
+	}
+
+	public drawLinks(links, positionX1, positionX2, svg) {
+		for (var linkID in links) {
+			var that = this;
+			var link = links[linkID];
+			var positionY1 = 20 + 100*link.inputNode.position;
+			var positionY2 = 20 + 100*link.outputNode.position;
+			var strokeWidth = link.weight*4 + 1;
+			var colour = '#f06';
+			//var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
+			var line = svg.line(positionX1,positionY1, positionX2, positionY2)
+				.stroke({ color: colour, width: strokeWidth })
+				.mouseover(function () {
+					this.stroke('black')
+				})
+				.mouseout(function () {
+					this.stroke(colour)
+				})
+				.click(function () {
+					var link = $(this).data("link");
+					console.log(link);
+					var regler = $('#myRange');
+					regler.data("link", link);
+					regler.data("line", this);
+					that.changeInputTypeRange(regler);
+				})
+			;
+			$(line).data("link", link);
+
+		}
+	}
+
+	public changeInputTypeRange(regler) {
+		//var value = slider.value;
+		var value = regler.data("link").weight;
+		//var line = document.getElementById("testLine");
+		regler.val(value);
+	}
+
+	public mouseOver = function(line) {
+		line.stroke = "rgb(0,255,0)";
 	}
 
 	public close() {

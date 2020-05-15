@@ -465,12 +465,12 @@ var __extends = (this && this.__extends) || (function () {
         };
         RobotMbedBehaviour.prototype.changeWeight = function(neuralNetwork) {
             $('#einReglerfuerAlles').html("");
-            var div = $('<div style="margin:8px 0; "></div>');
+            var div = $('<div style="margin:8px 50px; "></div>');
             var value = 0;
-            var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.1" />');
+            var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
             range.on('input', function() {
                 $(this).data("link").weight = $(this).val();
-                var width = $(this).data("link").weight * 4 + 1;
+                var width = $(this).data("link").weight * 4 + 2;
                 $(this).data("line").stroke({width: width});
             });
             div.append(range);
@@ -482,7 +482,7 @@ var __extends = (this && this.__extends) || (function () {
         };
         RobotMbedBehaviour.prototype.setHandler = function(link) {
             //var link = neuralNetwork.links[linkId];
-            var div = $('<div style="margin:8px 8px; "></div>');
+            var div = $('<div style="margin:8px 40px; "></div>');
             var value = link.weight;
             var range = $('<input type="range" id="range" min="0" max="1" value=' + value + ' step="0.1" />');
             div.append(range);
@@ -507,9 +507,9 @@ var __extends = (this && this.__extends) || (function () {
         RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
             //var test = SVG();
             $('#simConfigNeuralNetworkSVG').html('');
-            var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 300);
+            var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
             var positionX1 = 50;
-            var positionX2 = 120;
+            var positionX2 = 220;
             this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
             this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
             this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
@@ -520,7 +520,7 @@ var __extends = (this && this.__extends) || (function () {
         RobotMbedBehaviour.prototype.drawLayer = function(layer, startXPosition, svg) {
             for (const [key,node] of Object.entries( layer )) {
                 var nodePosition = node.position;
-                var y = 20 + 100 * nodePosition;
+                var y = 20 + 70 * nodePosition;
                 var circle = svg.circle()
                     .radius(20)
                     .cx(startXPosition)
@@ -533,10 +533,10 @@ var __extends = (this && this.__extends) || (function () {
             for (var linkID in links) {
                 var that = this;
                 var link = links[linkID];
-                var positionY1 = 20 + 100*link.inputNode.position;
-                var positionY2 = 20 + 100*link.outputNode.position;
-                var strokeWidth = link.weight*4 + 1;
-                var colour = '#f06';
+                var positionY1 = 20 + 70*link.inputNode.position;
+                var positionY2 = 20 + 70*link.outputNode.position;
+                var strokeWidth = link.weight*4 + 2;
+                var colour = '#b5cb5f';
                 //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
                 var line = svg.line(positionX1,positionY1, positionX2, positionY2)
                     .stroke({ color: colour, width: strokeWidth })

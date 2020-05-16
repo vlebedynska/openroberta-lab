@@ -3,6 +3,7 @@ import { State } from "interpreter.state";
 import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 import * as $ from "jquery";
+import {SVG} from "svgdotjs";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
 
@@ -474,12 +475,12 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	public changeWeight(neuralNetwork) {
 		$('#einReglerfuerAlles').html("");
-		var div = $('<div style="margin:8px 0; "></div>');
+		var div = $('<div style="margin:8px 50px; "></div>');
 		var value = 0;
 		var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
 		range.on('input', function() {
 			$(this).data("link").weight = $(this).val();
-			var width = $(this).data("link").weight * 4 + 1;
+			var width = $(this).data("link").weight * 4 + 2;
 			$(this).data("line").stroke({width: width});
 		});
 		div.append(range);
@@ -516,18 +517,19 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	public drawNeuralNetwork(neuralNetwork) {
 		//var test = SVG();
 		$('#simConfigNeuralNetworkSVG').html('');
-		var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 300);
+		var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
 		var positionX1 = 50;
-		var positionX2 = 120;
+		var positionX2 = 220;
 		this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
 		this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
 		this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
 	}
 
 	public drawLayer(layer, startXPosition, svg) {
-		for (const [key,node] of Object.entries( layer )) {
-			var nodePosition = node.position;
-			var y = 20 + 100 * nodePosition;
+		for (var nodeID in layer) {
+			var node = layer[nodeID]
+			var nodePosition = (<any>node).position;
+			var y = 20 + 70 * nodePosition;
 			var circle = svg.circle()
 				.radius(20)
 				.cx(startXPosition)
@@ -540,10 +542,10 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		for (var linkID in links) {
 			var that = this;
 			var link = links[linkID];
-			var positionY1 = 20 + 100*link.inputNode.position;
-			var positionY2 = 20 + 100*link.outputNode.position;
-			var strokeWidth = link.weight*4 + 1;
-			var colour = '#f06';
+			var positionY1 = 20 + 70*link.inputNode.position;
+			var positionY2 = 20 + 70*link.outputNode.position;
+			var strokeWidth = link.weight*4 + 2;
+			var colour = '#b5cb5f';
 			//var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
 			var line = svg.line(positionX1,positionY1, positionX2, positionY2)
 				.stroke({ color: colour, width: strokeWidth })

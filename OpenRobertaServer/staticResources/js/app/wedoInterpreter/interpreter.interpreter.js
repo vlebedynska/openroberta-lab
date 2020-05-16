@@ -1,31 +1,20 @@
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "interpreter.state", "interpreter.constants", "interpreter.util"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "interpreter.state", "interpreter.constants", "interpreter.util"], function (require, exports, interpreter_state_1, C, U) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var interpreter_state_1 = require("interpreter.state");
-    var C = require("interpreter.constants");
-    var U = require("interpreter.util");
-    var Interpreter = /** @class */ (function () {
+    class Interpreter {
         /*
          *
          * . @param generatedCode argument contains the operations and the function definitions
          * . @param r implementation of the ARobotBehaviour class
          * . @param cbOnTermination is called when the program has terminated
         */
-        function Interpreter(generatedCode, r, cbOnTermination) {
+        constructor(generatedCode, r, cbOnTermination) {
             this.terminated = false;
             this.callbackOnTermination = undefined;
             this.terminated = false;
             this.callbackOnTermination = cbOnTermination;
-            var stmts = generatedCode[C.OPS];
-            var functions = generatedCode[C.FUNCTION_DECLARATION];
+            const stmts = generatedCode[C.OPS];
+            const functions = generatedCode[C.FUNCTION_DECLARATION];
             this.r = r;
             var stop = {};
             stop[C.OPCODE] = "stop";
@@ -36,27 +25,27 @@
          * run the operations.
          * . @param maxRunTime the time stamp at which the run method must have terminated. If 0 run as long as possible.
          */
-        Interpreter.prototype.run = function (maxRunTime) {
+        run(maxRunTime) {
             return this.evalOperation(maxRunTime);
-        };
+        }
         /**
          * return true, if the program is terminated
          */
-        Interpreter.prototype.isTerminated = function () {
+        isTerminated() {
             return this.terminated;
-        };
+        }
         /**
          * force the termination of the program. The termination takes place, when the NEXT operation should be executed. The delay is not significant.
          * The callbackOnTermination function is called
          */
-        Interpreter.prototype.terminate = function () {
+        terminate() {
             this.terminated = true;
             this.callbackOnTermination();
             this.r.close();
-        };
-        Interpreter.prototype.getRobotBehaviour = function () {
+        }
+        getRobotBehaviour() {
             return this.r;
-        };
+        }
         /**
          * the central interpreter. It is a stack machine interpreting operations given as JSON objects. The operations are all IMMUTABLE. It
          * - uses the S (state) component to store the state of the interpretation.
@@ -93,18 +82,18 @@
          * - push and pop values to the stack (expressions)
          * - push and pop to the stack of operations-arrays
          */
-        Interpreter.prototype.evalOperation = function (maxRunTime) {
-            var s = this.s;
-            var n = this.r;
+        evalOperation(maxRunTime) {
+            const s = this.s;
+            const n = this.r;
             while (maxRunTime >= new Date().getTime() && !n.getBlocking()) {
                 s.opLog('actual ops: ');
-                var stmt = s.getOp();
+                let stmt = s.getOp();
                 if (stmt === undefined) {
                     U.debug('PROGRAM TERMINATED. No ops remaining');
                     this.terminated = true;
                 }
                 else {
-                    var opCode = stmt[C.OPCODE];
+                    const opCode = stmt[C.OPCODE];
                     switch (opCode) {
                         case C.PROCESS_NEURAL_NETWORK: {
                             var outputLayer = s.pop();
@@ -113,8 +102,8 @@
                             break;
                         }
                         case C.ASSIGN_STMT: {
-                            var name_1 = stmt[C.NAME];
-                            s.setVar(name_1, s.pop());
+                            const name = stmt[C.NAME];
+                            s.setVar(name, s.pop());
                             break;
                         }
                         case C.CLEAR_DISPLAY_ACTION: {
@@ -129,9 +118,9 @@
                             this.evalExpr(stmt);
                             break;
                         case C.FLOW_CONTROL: {
-                            var conditional = stmt[C.CONDITIONAL];
-                            var activatedBy = stmt[C.BOOLEAN] === undefined ? true : stmt[C.BOOLEAN];
-                            var doIt = conditional ? (s.pop() === activatedBy) : true;
+                            const conditional = stmt[C.CONDITIONAL];
+                            const activatedBy = stmt[C.BOOLEAN] === undefined ? true : stmt[C.BOOLEAN];
+                            const doIt = conditional ? (s.pop() === activatedBy) : true;
                             if (doIt) {
                                 s.popOpsUntil(stmt[C.KIND]);
                                 if (stmt[C.BREAK]) {
@@ -158,76 +147,75 @@
                             }
                             break;
                         case C.LED_ON_ACTION: {
-                            var color = s.pop();
+                            const color = s.pop();
                             n.ledOnAction(stmt[C.NAME], stmt[C.PORT], color);
                             break;
                         }
                         case C.METHOD_CALL_VOID:
                         case C.METHOD_CALL_RETURN: {
-                            for (var _i = 0, _a = stmt[C.NAMES]; _i < _a.length; _i++) {
-                                var parameterName = _a[_i];
+                            for (let parameterName of stmt[C.NAMES]) {
                                 s.bindVar(parameterName, s.pop());
                             }
-                            var body = s.getFunction(stmt[C.NAME])[C.STATEMENTS];
+                            const body = s.getFunction(stmt[C.NAME])[C.STATEMENTS];
                             s.pushOps(body);
                             break;
                         }
                         case C.MOTOR_ON_ACTION: {
-                            var speedOnly = stmt[C.SPEED_ONLY];
-                            var duration = speedOnly ? undefined : s.pop();
-                            var speed = s.pop();
-                            var name_2 = stmt[C.NAME];
-                            var port = stmt[C.PORT];
-                            var durationType = stmt[C.MOTOR_DURATION];
+                            const speedOnly = stmt[C.SPEED_ONLY];
+                            let duration = speedOnly ? undefined : s.pop();
+                            const speed = s.pop();
+                            const name = stmt[C.NAME];
+                            const port = stmt[C.PORT];
+                            const durationType = stmt[C.MOTOR_DURATION];
                             if (durationType === C.DEGREE || durationType === C.DISTANCE || durationType === C.ROTATIONS) {
                                 // if durationType is defined, then duration must be defined, too. Thus, it is never 'undefined' :-)
-                                var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
+                                let rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
                                 duration = duration / rotationPerSecond * 1000;
                                 if (durationType === C.DEGREE) {
                                     duration /= 360.0;
                                 }
                             }
-                            n.motorOnAction(name_2, port, duration, speed);
+                            n.motorOnAction(name, port, duration, speed);
                             return duration ? duration : 0;
                         }
                         case C.DRIVE_ACTION: {
-                            var speedOnly = stmt[C.SPEED_ONLY];
-                            var distance = speedOnly ? undefined : s.pop();
-                            var speed = s.pop();
-                            var name_3 = stmt[C.NAME];
-                            var direction = stmt[C.DRIVE_DIRECTION];
-                            var duration = n.driveAction(name_3, direction, speed, distance);
+                            const speedOnly = stmt[C.SPEED_ONLY];
+                            const distance = speedOnly ? undefined : s.pop();
+                            const speed = s.pop();
+                            const name = stmt[C.NAME];
+                            const direction = stmt[C.DRIVE_DIRECTION];
+                            const duration = n.driveAction(name, direction, speed, distance);
                             return duration;
                         }
                         case C.TURN_ACTION: {
-                            var speedOnly = stmt[C.SPEED_ONLY];
-                            var angle = speedOnly ? undefined : s.pop();
-                            var speed = s.pop();
-                            var name_4 = stmt[C.NAME];
-                            var direction = stmt[C.TURN_DIRECTION];
-                            var duration = n.turnAction(name_4, direction, speed, angle);
+                            const speedOnly = stmt[C.SPEED_ONLY];
+                            const angle = speedOnly ? undefined : s.pop();
+                            const speed = s.pop();
+                            const name = stmt[C.NAME];
+                            const direction = stmt[C.TURN_DIRECTION];
+                            const duration = n.turnAction(name, direction, speed, angle);
                             return duration;
                         }
                         case C.CURVE_ACTION: {
-                            var speedOnly = stmt[C.SPEED_ONLY];
-                            var distance = speedOnly ? undefined : s.pop();
-                            var speedR = s.pop();
-                            var speedL = s.pop();
-                            var name_5 = stmt[C.NAME];
-                            var direction = stmt[C.DRIVE_DIRECTION];
-                            var duration = n.curveAction(name_5, direction, speedL, speedR, distance);
+                            const speedOnly = stmt[C.SPEED_ONLY];
+                            const distance = speedOnly ? undefined : s.pop();
+                            const speedR = s.pop();
+                            const speedL = s.pop();
+                            const name = stmt[C.NAME];
+                            const direction = stmt[C.DRIVE_DIRECTION];
+                            const duration = n.curveAction(name, direction, speedL, speedR, distance);
                             return duration;
                         }
                         case C.STOP_DRIVE:
-                            var name_6 = stmt[C.NAME];
-                            n.driveStop(name_6);
+                            const name = stmt[C.NAME];
+                            n.driveStop(name);
                             return 0;
                         case C.BOTH_MOTORS_ON_ACTION: {
-                            var duration = s.pop();
-                            var speedB = s.pop();
-                            var speedA = s.pop();
-                            var portA = stmt[C.PORT_A];
-                            var portB = stmt[C.PORT_B];
+                            const duration = s.pop();
+                            const speedB = s.pop();
+                            const speedA = s.pop();
+                            const portA = stmt[C.PORT_A];
+                            const portB = stmt[C.PORT_B];
                             n.motorOnAction(portA, portA, duration, speedA);
                             n.motorOnAction(portB, portB, duration, speedB);
                             return duration;
@@ -237,15 +225,15 @@
                             return 0;
                         }
                         case C.MOTOR_SET_POWER: {
-                            var speed = s.pop();
-                            var name_7 = stmt[C.NAME];
-                            var port = stmt[C.PORT];
-                            n.setMotorSpeed(name_7, port, speed);
+                            const speed = s.pop();
+                            const name = stmt[C.NAME];
+                            const port = stmt[C.PORT];
+                            n.setMotorSpeed(name, port, speed);
                             return 0;
                         }
                         case C.MOTOR_GET_POWER: {
-                            var port = stmt[C.PORT];
-                            n.getMotorSpeed(s, name_6, port);
+                            const port = stmt[C.PORT];
+                            n.getMotorSpeed(s, name, port);
                             break;
                         }
                         case C.REPEAT_STMT:
@@ -253,10 +241,10 @@
                             break;
                         case C.REPEAT_STMT_CONTINUATION:
                             if (stmt[C.MODE] === C.FOR || stmt[C.MODE] === C.TIMES) {
-                                var runVariableName = stmt[C.NAME];
-                                var end = s.get1();
-                                var incr = s.get0();
-                                var value = s.getVar(runVariableName) + incr;
+                                const runVariableName = stmt[C.NAME];
+                                const end = s.get1();
+                                const incr = s.get0();
+                                const value = s.getVar(runVariableName) + incr;
                                 if (+value >= +end) {
                                     s.popOpsUntil(C.REPEAT_STMT);
                                     s.getOp(); // the repeat has terminated
@@ -267,13 +255,13 @@
                                 }
                             }
                             else if (stmt[C.MODE] === C.FOR_EACH) {
-                                var runVariableName = stmt[C.EACH_COUNTER];
-                                var varName = stmt[C.NAME];
-                                var listName = stmt[C.LIST];
-                                var list = s.getVar(listName);
-                                var end = list.length;
-                                var incr = s.get0();
-                                var value = s.getVar(runVariableName) + incr;
+                                const runVariableName = stmt[C.EACH_COUNTER];
+                                const varName = stmt[C.NAME];
+                                const listName = stmt[C.LIST];
+                                const list = s.getVar(listName);
+                                const end = list.length;
+                                const incr = s.get0();
+                                const value = s.getVar(runVariableName) + incr;
                                 if (+value >= +end) {
                                     s.popOpsUntil(C.REPEAT_STMT);
                                     s.getOp(); // the repeat has terminated
@@ -286,18 +274,18 @@
                             }
                             break;
                         case C.SHOW_TEXT_ACTION: {
-                            var text = s.pop();
-                            var name_8 = stmt[C.NAME];
-                            if (name_8 === "ev3") {
-                                var x = s.pop();
-                                var y = s.pop();
+                            const text = s.pop();
+                            const name = stmt[C.NAME];
+                            if (name === "ev3") {
+                                const x = s.pop();
+                                const y = s.pop();
                                 n.showTextActionPosition(text, x, y);
                                 return 0;
                             }
                             return n.showTextAction(text, stmt[C.MODE]);
                         }
                         case C.SHOW_IMAGE_ACTION: {
-                            var image = void 0;
+                            let image;
                             if (stmt[C.NAME] == "ev3") {
                                 image = stmt[C.IMAGE];
                             }
@@ -307,24 +295,24 @@
                             return n.showImageAction(image, stmt[C.MODE]);
                         }
                         case C.DISPLAY_SET_BRIGHTNESS_ACTION: {
-                            var b = s.pop();
+                            const b = s.pop();
                             return n.displaySetBrightnessAction(b);
                         }
                         case C.IMAGE_SHIFT_ACTION: {
-                            var nShift = s.pop();
-                            var image = s.pop();
+                            const nShift = s.pop();
+                            const image = s.pop();
                             s.push(this.shiftImageAction(image, stmt[C.DIRECTION], nShift));
                             break;
                         }
                         case C.DISPLAY_SET_PIXEL_BRIGHTNESS_ACTION: {
-                            var b = s.pop();
-                            var y = s.pop();
-                            var x = s.pop();
+                            const b = s.pop();
+                            const y = s.pop();
+                            const x = s.pop();
                             return n.displaySetPixelBrightnessAction(x, y, b);
                         }
                         case C.DISPLAY_GET_PIXEL_BRIGHTNESS_ACTION: {
-                            var y = s.pop();
-                            var x = s.pop();
+                            const y = s.pop();
+                            const x = s.pop();
                             n.displayGetPixelBrightnessAction(s, x, y);
                             break;
                         }
@@ -339,11 +327,11 @@
                             this.terminated = true;
                             break;
                         case C.TEXT_JOIN: {
-                            var n_1 = stmt[C.NUMBER];
-                            var result = new Array(n_1);
-                            for (var i = 0; i < n_1; i++) {
-                                var e = s.pop();
-                                result[n_1 - i - 1] = e;
+                            const n = stmt[C.NUMBER];
+                            var result = new Array(n);
+                            for (let i = 0; i < n; i++) {
+                                const e = s.pop();
+                                result[n - i - 1] = e;
                             }
                             s.push(result.join(""));
                             break;
@@ -358,8 +346,8 @@
                             n.gyroReset(stmt[C.PORT]);
                             return 0;
                         case C.TONE_ACTION: {
-                            var duration = s.pop();
-                            var frequency = s.pop();
+                            const duration = s.pop();
+                            const frequency = s.pop();
                             return n.toneAction(stmt[C.NAME], frequency, duration);
                         }
                         case C.PLAY_FILE_ACTION:
@@ -374,14 +362,14 @@
                             n.setLanguage(stmt[C.LANGUAGE]);
                             break;
                         case C.SAY_TEXT_ACTION: {
-                            var pitch = s.pop();
-                            var speed = s.pop();
-                            var text = s.pop();
+                            const pitch = s.pop();
+                            const speed = s.pop();
+                            const text = s.pop();
                             return n.sayTextAction(text, speed, pitch);
                         }
                         case C.VAR_DECLARATION: {
-                            var name_9 = stmt[C.NAME];
-                            s.bindVar(name_9, s.pop());
+                            const name = stmt[C.NAME];
+                            s.bindVar(name, s.pop());
                             break;
                         }
                         case C.WAIT_STMT: {
@@ -390,25 +378,25 @@
                             break;
                         }
                         case C.WAIT_TIME_STMT: {
-                            var time = s.pop();
+                            const time = s.pop();
                             return time; // wait for handler being called
                         }
                         case C.WRITE_PIN_ACTION: {
-                            var value = s.pop();
-                            var mode = stmt[C.MODE];
-                            var pin = stmt[C.PIN];
+                            const value = s.pop();
+                            const mode = stmt[C.MODE];
+                            const pin = stmt[C.PIN];
                             n.writePinAction(pin, mode, value);
                             return 0;
                         }
                         case C.LIST_OPERATION: {
-                            var op = stmt[C.OP];
-                            var loc = stmt[C.POSITION];
-                            var ix = 0;
+                            const op = stmt[C.OP];
+                            const loc = stmt[C.POSITION];
+                            let ix = 0;
                             if (loc != C.LAST && loc != C.FIRST) {
                                 ix = s.pop();
                             }
-                            var value = s.pop();
-                            var list = s.pop();
+                            const value = s.pop();
+                            let list = s.pop();
                             ix = this.getIndex(list, loc, ix);
                             if (op == C.SET) {
                                 list[ix] = value;
@@ -425,20 +413,20 @@
                         }
                         case C.TEXT_APPEND:
                         case C.MATH_CHANGE: {
-                            var value = s.pop();
-                            var name_10 = stmt[C.NAME];
-                            s.bindVar(name_10, s.pop() + value);
+                            const value = s.pop();
+                            const name = stmt[C.NAME];
+                            s.bindVar(name, s.pop() + value);
                             break;
                         }
                         case C.DEBUG_ACTION: {
-                            var value = s.pop();
+                            const value = s.pop();
                             n.debugAction(value);
                             break;
                         }
                         case C.ASSERT_ACTION: {
-                            var right = s.pop();
-                            var left = s.pop();
-                            var value = s.pop();
+                            const right = s.pop();
+                            const left = s.pop();
+                            const value = s.pop();
                             n.assertAction(stmt[C.MSG], left, stmt[C.OP], right, value);
                             break;
                         }
@@ -469,16 +457,15 @@
                 }
             }
             return 0;
-        };
+        }
         /**
          *  called from @see evalOperation() to evaluate all kinds of expressions
          *
          * . @param expr to be evaluated
          */
-        Interpreter.prototype.evalExpr = function (expr) {
-            var _a;
-            var kind = expr[C.EXPR];
-            var s = this.s;
+        evalExpr(expr) {
+            const kind = expr[C.EXPR];
+            const s = this.s;
             switch (kind) {
                 case C.VAR:
                     s.push(s.getVar(expr[C.NAME]));
@@ -487,20 +474,20 @@
                     s.push(+expr[C.VALUE]);
                     break;
                 case C.CREATE_LIST: {
-                    var n = expr[C.NUMBER];
+                    const n = expr[C.NUMBER];
                     var arr = new Array(n);
-                    for (var i = 0; i < n; i++) {
-                        var e = s.pop();
+                    for (let i = 0; i < n; i++) {
+                        const e = s.pop();
                         arr[n - i - 1] = e;
                     }
                     s.push(arr);
                     break;
                 }
                 case C.CREATE_LIST_REPEAT: {
-                    var rep = s.pop();
-                    var val = s.pop();
+                    const rep = s.pop();
+                    const val = s.pop();
                     var arr = new Array();
-                    for (var i = 0; i < rep; i++) {
+                    for (let i = 0; i < rep; i++) {
                         arr[i] = val;
                     }
                     s.push(arr);
@@ -519,18 +506,18 @@
                     s.push(expr[C.VALUE]);
                     break;
                 case C.RGB_COLOR_CONST: {
-                    var b = s.pop();
-                    var g = s.pop();
-                    var r = s.pop();
+                    const b = s.pop();
+                    const g = s.pop();
+                    const r = s.pop();
                     s.push([r, g, b]);
                     break;
                 }
                 case C.UNARY: {
-                    var subOp = expr[C.OP];
+                    const subOp = expr[C.OP];
                     switch (subOp) {
                         case C.NOT:
                             var truthy;
-                            var bool = s.pop();
+                            const bool = s.pop();
                             if (bool === 'true') {
                                 truthy = true;
                             }
@@ -543,7 +530,7 @@
                             s.push(!truthy);
                             break;
                         case C.NEG:
-                            var value = s.pop();
+                            const value = s.pop();
                             s.push(-value);
                             break;
                         default:
@@ -552,7 +539,7 @@
                     break;
                 }
                 case C.MATH_CONST: {
-                    var value = expr[C.VALUE];
+                    const value = expr[C.VALUE];
                     switch (value) {
                         case 'PI':
                             s.push(Math.PI);
@@ -578,8 +565,8 @@
                     break;
                 }
                 case C.SINGLE_FUNCTION: {
-                    var subOp = expr[C.OP];
-                    var value = s.pop();
+                    const subOp = expr[C.OP];
+                    const value = s.pop();
                     U.debug('---------- ' + subOp + ' with ' + value);
                     switch (subOp) {
                         case 'SQUARE':
@@ -639,17 +626,17 @@
                     break;
                 }
                 case C.MATH_CONSTRAIN_FUNCTION: {
-                    var max_1 = s.pop();
-                    var min_1 = s.pop();
-                    var value = s.pop();
-                    s.push(Math.min(Math.max(value, min_1), max_1));
+                    const max = s.pop();
+                    const min = s.pop();
+                    const value = s.pop();
+                    s.push(Math.min(Math.max(value, min), max));
                     break;
                 }
                 case C.RANDOM_INT: {
                     var max = s.pop();
                     var min = s.pop();
                     if (min > max) {
-                        _a = [max, min], min = _a[0], max = _a[1];
+                        [min, max] = [max, min];
                     }
                     s.push(Math.floor(Math.random() * (max - min + 1) + min));
                     break;
@@ -658,8 +645,8 @@
                     s.push(Math.random());
                     break;
                 case C.MATH_PROP_FUNCT: {
-                    var subOp = expr[C.OP];
-                    var value = s.pop();
+                    const subOp = expr[C.OP];
+                    const value = s.pop();
                     switch (subOp) {
                         case 'EVEN':
                             s.push(this.isWhole(value) && value % 2 === 0);
@@ -680,7 +667,7 @@
                             s.push(value < 0);
                             break;
                         case 'DIVISIBLE_BY':
-                            var first = s.pop();
+                            const first = s.pop();
                             s.push(first % value === 0);
                             break;
                         default:
@@ -689,8 +676,8 @@
                     break;
                 }
                 case C.MATH_ON_LIST: {
-                    var subOp = expr[C.OP];
-                    var value = s.pop();
+                    const subOp = expr[C.OP];
+                    const value = s.pop();
                     switch (subOp) {
                         case C.SUM:
                             s.push(this.sum(value));
@@ -719,7 +706,7 @@
                     break;
                 }
                 case C.LIST_OPERATION: {
-                    var subOp = expr[C.OP];
+                    const subOp = expr[C.OP];
                     switch (subOp) {
                         case C.LIST_IS_EMPTY:
                             s.push(s.pop().length == 0);
@@ -729,8 +716,8 @@
                             break;
                         case C.LIST_FIND_ITEM:
                             {
-                                var item = s.pop();
-                                var list = s.pop();
+                                const item = s.pop();
+                                const list = s.pop();
                                 if (expr[C.POSITION] == C.FIRST) {
                                     s.push(list.indexOf(item));
                                 }
@@ -743,14 +730,14 @@
                         case C.REMOVE:
                         case C.GET_REMOVE:
                             {
-                                var loc = expr[C.POSITION];
-                                var ix = 0;
+                                const loc = expr[C.POSITION];
+                                let ix = 0;
                                 if (loc != C.LAST && loc != C.FIRST) {
                                     ix = s.pop();
                                 }
-                                var list = s.pop();
+                                let list = s.pop();
                                 ix = this.getIndex(list, loc, ix);
-                                var v = list[ix];
+                                let v = list[ix];
                                 if (subOp == C.GET_REMOVE || subOp == C.GET) {
                                     s.push(v);
                                 }
@@ -761,16 +748,16 @@
                             break;
                         case C.LIST_GET_SUBLIST:
                             {
-                                var position = expr[C.POSITION];
-                                var start_ix = void 0;
-                                var end_ix = void 0;
+                                const position = expr[C.POSITION];
+                                let start_ix;
+                                let end_ix;
                                 if (position[1] != C.LAST) {
                                     end_ix = s.pop();
                                 }
                                 if (position[0] != C.FIRST) {
                                     start_ix = s.pop();
                                 }
-                                var list = s.pop();
+                                let list = s.pop();
                                 start_ix = this.getIndex(list, position[0], start_ix);
                                 end_ix = this.getIndex(list, position[1], end_ix) + 1;
                                 s.push(list.slice(start_ix, end_ix));
@@ -782,22 +769,22 @@
                     break;
                 }
                 case C.BINARY: {
-                    var subOp = expr[C.OP];
-                    var right = s.pop();
-                    var left = s.pop();
+                    const subOp = expr[C.OP];
+                    const right = s.pop();
+                    const left = s.pop();
                     s.push(this.evalBinary(subOp, left, right));
                     break;
                 }
                 default:
                     U.dbcException("invalid expr op: " + kind);
             }
-        };
-        Interpreter.prototype.evalBinary = function (subOp, left, right) {
-            var leftIsArray = Array.isArray(left);
-            var rightIsArray = Array.isArray(right);
+        }
+        evalBinary(subOp, left, right) {
+            let leftIsArray = Array.isArray(left);
+            let rightIsArray = Array.isArray(right);
             if (leftIsArray && rightIsArray) {
-                var leftLen = left.length;
-                var rightLen = right.length;
+                let leftLen = left.length;
+                let rightLen = right.length;
                 switch (subOp) {
                     case C.EQ:
                         if (leftLen === rightLen) {
@@ -850,7 +837,7 @@
                         U.dbcException("invalid binary expr supOp: " + subOp);
                 }
             }
-        };
+        }
         /**
          * called from @see evalOperation() to run a repeat statement
          *
@@ -866,14 +853,14 @@
          *
          * . @param stmt the repeat statement
          */
-        Interpreter.prototype.evalRepeat = function (stmt) {
-            var s = this.s;
-            var mode = stmt[C.MODE];
-            var contl = stmt[C.STMT_LIST];
+        evalRepeat(stmt) {
+            const s = this.s;
+            const mode = stmt[C.MODE];
+            const contl = stmt[C.STMT_LIST];
             if (contl.length !== 1 || contl[0][C.OPCODE] !== C.REPEAT_STMT_CONTINUATION) {
                 U.dbcException("repeat expects an embedded continuation statement");
             }
-            var cont = contl[0];
+            const cont = contl[0];
             switch (mode) {
                 case C.FOREVER:
                 case C.UNTIL:
@@ -883,12 +870,12 @@
                     s.pushOps(cont[C.STMT_LIST]);
                     break;
                 case C.FOR_EACH: {
-                    var runVariableName = stmt[C.EACH_COUNTER];
-                    var varName = stmt[C.NAME];
-                    var listName = stmt[C.LIST];
-                    var start = s.get1();
-                    var list = s.getVar(listName);
-                    var end = list.length;
+                    const runVariableName = stmt[C.EACH_COUNTER];
+                    const varName = stmt[C.NAME];
+                    const listName = stmt[C.LIST];
+                    const start = s.get1();
+                    const list = s.getVar(listName);
+                    const end = list.length;
                     if (+start >= +end) {
                         s.pop();
                         s.pop();
@@ -906,9 +893,9 @@
                 }
                 case C.TIMES:
                 case C.FOR: {
-                    var runVariableName = stmt[C.NAME];
-                    var start = s.get2();
-                    var end = s.get1();
+                    const runVariableName = stmt[C.NAME];
+                    const start = s.get2();
+                    const end = s.get1();
                     if (+start >= +end) {
                         s.pop();
                         s.pop();
@@ -926,13 +913,13 @@
                 default:
                     U.dbcException("invalid repeat mode: " + mode);
             }
-        };
+        }
         /**
          * return true if the parameter is prime
          *
          * . @param n to be checked for primality
          */
-        Interpreter.prototype.isPrime = function (n) {
+        isPrime(n) {
             if (n < 2) {
                 return false;
             }
@@ -942,54 +929,54 @@
             if (n % 2 === 0) {
                 return false;
             }
-            for (var i = 3, s = Math.sqrt(n); i <= s; i += 2) {
+            for (let i = 3, s = Math.sqrt(n); i <= s; i += 2) {
                 if (n % i === 0) {
                     return false;
                 }
             }
             return true;
-        };
+        }
         /**
          * return true if the value is whole number
          *
          * . @param value to be checked
          */
-        Interpreter.prototype.isWhole = function (value) {
+        isWhole(value) {
             return Number(value) === value && value % 1 === 0;
-        };
-        Interpreter.prototype.min = function (values) {
+        }
+        min(values) {
             return Math.min.apply(null, values);
-        };
-        Interpreter.prototype.max = function (values) {
+        }
+        max(values) {
             return Math.max.apply(null, values);
-        };
-        Interpreter.prototype.sum = function (values) {
-            return values.reduce(function (a, b) { return a + b; }, 0);
-        };
-        Interpreter.prototype.mean = function (value) {
-            var v = this.sum(value) / value.length;
+        }
+        sum(values) {
+            return values.reduce((a, b) => a + b, 0);
+        }
+        mean(value) {
+            const v = this.sum(value) / value.length;
             return Number(v.toFixed(2));
-        };
-        Interpreter.prototype.median = function (values) {
-            values.sort(function (a, b) { return a - b; });
-            var median = (values[(values.length - 1) >> 1] + values[values.length >> 1]) / 2;
+        }
+        median(values) {
+            values.sort((a, b) => a - b);
+            const median = (values[(values.length - 1) >> 1] + values[values.length >> 1]) / 2;
             return Number(median.toFixed(2));
-        };
-        Interpreter.prototype.std = function (values) {
-            var avg = this.mean(values);
-            var diffs = values.map(function (value) { return value - avg; });
-            var squareDiffs = diffs.map(function (diff) { return diff * diff; });
-            var avgSquareDiff = this.mean(squareDiffs);
+        }
+        std(values) {
+            const avg = this.mean(values);
+            const diffs = values.map((value) => value - avg);
+            const squareDiffs = diffs.map((diff) => diff * diff);
+            const avgSquareDiff = this.mean(squareDiffs);
             return Number(Math.sqrt(avgSquareDiff).toFixed(2));
-        };
-        Interpreter.prototype.getRandomInt = function (max) {
+        }
+        getRandomInt(max) {
             return Math.floor(Math.random() * Math.floor(max));
-        };
+        }
         //    private round2precision( x: number, precision: number ): number {
         //        var y = +x + ( precision === undefined ? 0.5 : precision / 2 );
         //        return y - ( y % ( precision === undefined ? 1 : +precision ) );
         //    }
-        Interpreter.prototype.getIndex = function (list, loc, ix) {
+        getIndex(list, loc, ix) {
             if (loc == C.FROM_START) {
                 return ix;
             }
@@ -1005,16 +992,16 @@
             else {
                 throw 'Unhandled option (lists_getSublist).';
             }
-        };
-        Interpreter.prototype.invertImage = function (image) {
+        }
+        invertImage(image) {
             for (var i = 0; i < image.length; i++) {
                 for (var j = 0; j < image[i].length; j++) {
                     image[i][j] = Math.abs(255 - image[i][j]);
                 }
             }
             return image;
-        };
-        Interpreter.prototype.shiftImageAction = function (image, direction, nShift) {
+        }
+        shiftImageAction(image, direction, nShift) {
             nShift = Math.round(nShift);
             var shift = {
                 down: function () {
@@ -1057,8 +1044,7 @@
                 shift[direction]();
             }
             return image;
-        };
-        return Interpreter;
-    }());
+        }
+    }
     exports.Interpreter = Interpreter;
 });

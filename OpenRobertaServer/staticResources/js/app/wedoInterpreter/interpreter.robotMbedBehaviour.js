@@ -1,42 +1,17 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "svg"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "svgdotjs"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, svgdotjs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var interpreter_aRobotBehaviour_1 = require("interpreter.aRobotBehaviour");
-    var C = require("interpreter.constants");
-    var U = require("interpreter.util");
-    var $ = require("jquery");
-    var svgJS = require("svg");
-    var RobotMbedBehaviour = /** @class */ (function (_super) {
-        __extends(RobotMbedBehaviour, _super);
-        function RobotMbedBehaviour() {
-            var _this = _super.call(this) || this;
-            _this.hardwareState.motors = {};
-            _this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
+    class RobotMbedBehaviour extends interpreter_aRobotBehaviour_1.ARobotBehaviour {
+        constructor() {
+            super();
+            this.mouseOver = function (line) {
+                line.stroke = "rgb(0,255,0)";
+            };
+            this.hardwareState.motors = {};
+            this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             U.loggingEnabled(true, true);
-            return _this;
         }
-        RobotMbedBehaviour.prototype.getSample = function (s, name, sensor, port, mode) {
+        getSample(s, name, sensor, port, mode) {
             var robotText = 'robot: ' + name + ', port: ' + port + ', mode: ' + mode;
             U.debug(robotText + ' getsample from ' + sensor);
             var sensorName = sensor;
@@ -49,12 +24,12 @@ var __extends = (this && this.__extends) || (function () {
             else {
                 s.push(this.getSensorValue(sensorName, port, mode));
             }
-        };
-        RobotMbedBehaviour.prototype.getEncoderValue = function (mode, port) {
-            var sensor = this.hardwareState.sensors.encoder;
+        }
+        getEncoderValue(mode, port) {
+            const sensor = this.hardwareState.sensors.encoder;
             port = port == C.MOTOR_LEFT ? C.LEFT : C.RIGHT;
             if (port != undefined) {
-                var v = sensor[port];
+                const v = sensor[port];
                 if (v === undefined) {
                     return "undefined";
                 }
@@ -63,8 +38,8 @@ var __extends = (this && this.__extends) || (function () {
                 }
             }
             return sensor;
-        };
-        RobotMbedBehaviour.prototype.rotation2Unit = function (value, unit) {
+        }
+        rotation2Unit(value, unit) {
             switch (unit) {
                 case C.DEGREE:
                     return value;
@@ -75,9 +50,9 @@ var __extends = (this && this.__extends) || (function () {
                 default:
                     return 0;
             }
-        };
-        RobotMbedBehaviour.prototype.getSensorValue = function (sensorName, port, mode) {
-            var sensor = this.hardwareState.sensors[sensorName];
+        }
+        getSensorValue(sensorName, port, mode) {
+            const sensor = this.hardwareState.sensors[sensorName];
             if (sensor === undefined) {
                 return "undefined";
             }
@@ -104,8 +79,8 @@ var __extends = (this && this.__extends) || (function () {
             else {
                 return v;
             }
-        };
-        RobotMbedBehaviour.prototype.encoderReset = function (port) {
+        }
+        encoderReset(port) {
             U.debug('encoderReset for ' + port);
             this.hardwareState.actions.encoder = {};
             if (port == C.MOTOR_LEFT) {
@@ -114,42 +89,42 @@ var __extends = (this && this.__extends) || (function () {
             else {
                 this.hardwareState.actions.encoder.rightReset = true;
             }
-        };
-        RobotMbedBehaviour.prototype.timerReset = function (port) {
+        }
+        timerReset(port) {
             this.hardwareState.timers[port] = Date.now();
             U.debug('timerReset for ' + port);
-        };
-        RobotMbedBehaviour.prototype.timerGet = function (port) {
-            var now = Date.now();
+        }
+        timerGet(port) {
+            const now = Date.now();
             var startTime = this.hardwareState.timers[port];
             if (startTime === undefined) {
                 startTime = this.hardwareState.timers['start'];
             }
-            var delta = now - startTime;
+            const delta = now - startTime;
             U.debug('timerGet for ' + port + ' returned ' + delta);
             return delta;
-        };
-        RobotMbedBehaviour.prototype.ledOnAction = function (name, port, color) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
+        }
+        ledOnAction(name, port, color) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' led on color ' + color);
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led.color = color;
-        };
-        RobotMbedBehaviour.prototype.statusLightOffAction = function (name, port) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
+        }
+        statusLightOffAction(name, port) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' led off');
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led.mode = C.OFF;
-        };
-        RobotMbedBehaviour.prototype.toneAction = function (name, frequency, duration) {
+        }
+        toneAction(name, frequency, duration) {
             U.debug(name + ' piezo: ' + ', frequency: ' + frequency + ', duration: ' + duration);
             this.hardwareState.actions.tone = {};
             this.hardwareState.actions.tone.frequency = frequency;
             this.hardwareState.actions.tone.duration = duration;
             this.setBlocking(true);
             return 0;
-        };
-        RobotMbedBehaviour.prototype.playFileAction = function (file) {
+        }
+        playFileAction(file) {
             U.debug('play file: ' + file);
             this.hardwareState.actions.tone = {};
             this.hardwareState.actions.tone.file = file;
@@ -165,21 +140,21 @@ var __extends = (this && this.__extends) || (function () {
                 case '4':
                     return 500;
             }
-        };
-        RobotMbedBehaviour.prototype.setVolumeAction = function (volume) {
+        }
+        setVolumeAction(volume) {
             U.debug('set volume: ' + volume);
             this.hardwareState.actions.volume = Math.max(Math.min(100, volume), 0);
             this.hardwareState.volume = Math.max(Math.min(100, volume), 0);
-        };
-        RobotMbedBehaviour.prototype.getVolumeAction = function (s) {
+        }
+        getVolumeAction(s) {
             U.debug('get volume');
             s.push(this.hardwareState.volume);
-        };
-        RobotMbedBehaviour.prototype.setLanguage = function (language) {
+        }
+        setLanguage(language) {
             U.debug('set language ' + language);
             this.hardwareState.actions.language = language;
-        };
-        RobotMbedBehaviour.prototype.sayTextAction = function (text, speed, pitch) {
+        }
+        sayTextAction(text, speed, pitch) {
             if (this.hardwareState.actions.sayText == undefined) {
                 this.hardwareState.actions.sayText = {};
             }
@@ -188,10 +163,10 @@ var __extends = (this && this.__extends) || (function () {
             this.hardwareState.actions.sayText.pitch = pitch;
             this.setBlocking(true);
             return 0;
-        };
-        RobotMbedBehaviour.prototype.motorOnAction = function (name, port, duration, speed) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
-            var durText = duration === undefined ? ' w.o. duration' : (' for ' + duration + ' msec');
+        }
+        motorOnAction(name, port, duration, speed) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
+            const durText = duration === undefined ? ' w.o. duration' : (' for ' + duration + ' msec');
             U.debug(robotText + ' motor speed ' + speed + durText);
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
@@ -199,15 +174,15 @@ var __extends = (this && this.__extends) || (function () {
             this.hardwareState.actions.motors[port] = speed;
             this.hardwareState.motors[port] = speed;
             return 0;
-        };
-        RobotMbedBehaviour.prototype.motorStopAction = function (name, port) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
+        }
+        motorStopAction(name, port) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor stop');
             this.motorOnAction(name, port, 0, 0);
-        };
-        RobotMbedBehaviour.prototype.driveAction = function (name, direction, speed, distance) {
-            var robotText = 'robot: ' + name + ', direction: ' + direction;
-            var durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
+        }
+        driveAction(name, direction, speed, distance) {
+            const robotText = 'robot: ' + name + ', direction: ' + direction;
+            const durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
             U.debug(robotText + ' motor speed ' + speed + durText);
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
@@ -224,18 +199,18 @@ var __extends = (this && this.__extends) || (function () {
             this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speed;
             this.hardwareState.motors[C.MOTOR_LEFT] = speed;
             this.hardwareState.motors[C.MOTOR_RIGHT] = speed;
-            var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
+            const rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
             }
             else {
-                var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
+                const rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
-        };
-        RobotMbedBehaviour.prototype.curveAction = function (name, direction, speedL, speedR, distance) {
-            var robotText = 'robot: ' + name + ', direction: ' + direction;
-            var durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
+        }
+        curveAction(name, direction, speedL, speedR, distance) {
+            const robotText = 'robot: ' + name + ', direction: ' + direction;
+            const durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
             U.debug(robotText + ' left motor speed ' + speedL + ' right motor speed ' + speedR + durText);
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
@@ -254,19 +229,19 @@ var __extends = (this && this.__extends) || (function () {
             this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speedR;
             this.hardwareState.motors[C.MOTOR_LEFT] = speedL;
             this.hardwareState.motors[C.MOTOR_RIGHT] = speedR;
-            var avgSpeed = 0.5 * (Math.abs(speedL) + Math.abs(speedR));
-            var rotationPerSecond = C.MAX_ROTATION * avgSpeed / 100.0;
+            const avgSpeed = 0.5 * (Math.abs(speedL) + Math.abs(speedR));
+            const rotationPerSecond = C.MAX_ROTATION * avgSpeed / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
             }
             else {
-                var rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
+                const rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
-        };
-        RobotMbedBehaviour.prototype.turnAction = function (name, direction, speed, angle) {
-            var robotText = 'robot: ' + name + ', direction: ' + direction;
-            var durText = angle === undefined ? ' w.o. duration' : (' for ' + angle + ' msec');
+        }
+        turnAction(name, direction, speed, angle) {
+            const robotText = 'robot: ' + name + ', direction: ' + direction;
+            const durText = angle === undefined ? ' w.o. duration' : (' for ' + angle + ' msec');
             U.debug(robotText + ' motor speed ' + speed + durText);
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
@@ -280,16 +255,16 @@ var __extends = (this && this.__extends) || (function () {
                 speed = 0;
             }
             this.setTurnSpeed(speed, direction);
-            var rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
+            const rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || angle === undefined) {
                 return 0;
             }
             else {
-                var rotations = C.TURN_RATIO * (Math.abs(angle) / 720.);
+                const rotations = C.TURN_RATIO * (Math.abs(angle) / 720.);
                 return rotations / rotationPerSecond * 1000;
             }
-        };
-        RobotMbedBehaviour.prototype.setTurnSpeed = function (speed, direction) {
+        }
+        setTurnSpeed(speed, direction) {
             if (direction == C.LEFT) {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = -speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speed;
@@ -298,51 +273,51 @@ var __extends = (this && this.__extends) || (function () {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = -speed;
             }
-        };
-        RobotMbedBehaviour.prototype.driveStop = function (name) {
+        }
+        driveStop(name) {
             U.debug('robot: ' + name + ' stop motors');
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
             }
             this.hardwareState.actions.motors[C.MOTOR_LEFT] = 0;
             this.hardwareState.actions.motors[C.MOTOR_RIGHT] = 0;
-        };
-        RobotMbedBehaviour.prototype.getMotorSpeed = function (s, name, port) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
+        }
+        getMotorSpeed(s, name, port) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor get speed');
-            var speed = this.hardwareState.motors[port];
+            const speed = this.hardwareState.motors[port];
             s.push(speed);
-        };
-        RobotMbedBehaviour.prototype.setMotorSpeed = function (name, port, speed) {
-            var robotText = 'robot: ' + name + ', port: ' + port;
+        }
+        setMotorSpeed(name, port, speed) {
+            const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor speed ' + speed);
             if (this.hardwareState.actions.motors == undefined) {
                 this.hardwareState.actions.motors = {};
             }
             this.hardwareState.actions.motors[port] = speed;
             this.hardwareState.motors[port] = speed;
-        };
-        RobotMbedBehaviour.prototype.showTextAction = function (text, mode) {
-            var showText = "" + text;
+        }
+        showTextAction(text, mode) {
+            const showText = "" + text;
             U.debug('***** show "' + showText + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display[mode.toLowerCase()] = showText;
             this.setBlocking(true);
             return 0;
-        };
-        RobotMbedBehaviour.prototype.showTextActionPosition = function (text, x, y) {
-            var showText = "" + text;
+        }
+        showTextActionPosition(text, x, y) {
+            const showText = "" + text;
             U.debug('***** show "' + showText + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display.text = showText;
             this.hardwareState.actions.display.x = x;
             this.hardwareState.actions.display.y = y;
-        };
-        RobotMbedBehaviour.prototype.showImageAction = function (image, mode) {
-            var showImage = "" + image;
+        }
+        showImageAction(image, mode) {
+            const showImage = "" + image;
             U.debug('***** show "' + showImage + '" *****');
-            var imageLen = image.length;
-            var duration = 0;
+            const imageLen = image.length;
+            let duration = 0;
             if (mode == C.ANIMATION) {
                 duration = imageLen * 200;
             }
@@ -352,20 +327,20 @@ var __extends = (this && this.__extends) || (function () {
                 this.hardwareState.actions.display.mode = mode.toLowerCase();
             }
             return duration;
-        };
-        RobotMbedBehaviour.prototype.displaySetBrightnessAction = function (value) {
+        }
+        displaySetBrightnessAction(value) {
             U.debug('***** set brightness "' + value + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display[C.BRIGHTNESS] = value;
             return 0;
-        };
-        RobotMbedBehaviour.prototype.lightAction = function (mode, color) {
+        }
+        lightAction(mode, color) {
             U.debug('***** light action mode= "' + mode + ' color=' + color + '" *****');
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led[C.MODE] = mode;
             this.hardwareState.actions.led[C.COLOR] = color;
-        };
-        RobotMbedBehaviour.prototype.displaySetPixelBrightnessAction = function (x, y, brightness) {
+        }
+        displaySetPixelBrightnessAction(x, y, brightness) {
             U.debug('***** set pixel x="' + x + ", y=" + y + ", brightness=" + brightness + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display[C.PIXEL] = {};
@@ -373,39 +348,37 @@ var __extends = (this && this.__extends) || (function () {
             this.hardwareState.actions.display[C.PIXEL][C.Y] = y;
             this.hardwareState.actions.display[C.PIXEL][C.BRIGHTNESS] = brightness;
             return 0;
-        };
-        RobotMbedBehaviour.prototype.displayGetPixelBrightnessAction = function (s, x, y) {
+        }
+        displayGetPixelBrightnessAction(s, x, y) {
             U.debug('***** get pixel x="' + x + ", y=" + y + '" *****');
-            var sensor = this.hardwareState.sensors[C.DISPLAY][C.PIXEL];
+            const sensor = this.hardwareState.sensors[C.DISPLAY][C.PIXEL];
             s.push(sensor[y][x]);
-        };
-        RobotMbedBehaviour.prototype.clearDisplay = function () {
+        }
+        clearDisplay() {
             U.debug('clear display');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display.clear = true;
-        };
-        RobotMbedBehaviour.prototype.writePinAction = function (pin, mode, value) {
+        }
+        writePinAction(pin, mode, value) {
             this.hardwareState.actions["pin" + pin] = {};
             this.hardwareState.actions["pin" + pin][mode] = {};
             this.hardwareState.actions["pin" + pin][mode] = value;
-        };
-        RobotMbedBehaviour.prototype.gyroReset = function (_port) {
+        }
+        gyroReset(_port) {
             throw new Error("Method not implemented.");
-        };
-        RobotMbedBehaviour.prototype.getState = function () {
+        }
+        getState() {
             return this.hardwareState;
-        };
-        RobotMbedBehaviour.prototype.debugAction = function (value) {
+        }
+        debugAction(value) {
             U.debug('***** debug action "' + value + '" *****');
             console.log(value);
-        };
-        RobotMbedBehaviour.prototype.assertAction = function (_msg, _left, _op, _right, value) {
+        }
+        assertAction(_msg, _left, _op, _right, value) {
             U.debug('***** assert action "' + value + ' ' + _msg + ' ' + _left + ' ' + _op + ' ' + _right + '" *****');
             console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
-        };
-
-
-        RobotMbedBehaviour.prototype.createLinks = function(inputLayer, outputLayer) {
+        }
+        createLinks(inputLayer, outputLayer) {
             var links = [];
             var weight = 0;
             for (var inputNodePosition in inputLayer) {
@@ -422,8 +395,8 @@ var __extends = (this && this.__extends) || (function () {
                 }
             }
             return links;
-        };
-        RobotMbedBehaviour.prototype.processNeuralNetwork = function(inputLayer, outputLayer) {
+        }
+        processNeuralNetwork(inputLayer, outputLayer) {
             var links;
             if ($.isEmptyObject(this.neuralNetwork)) {
                 this.addNodesPosition(inputLayer);
@@ -453,49 +426,47 @@ var __extends = (this && this.__extends) || (function () {
                     speed = 100;
                 }
                 this.setMotorSpeed("ev3", outputNode.port, speed);
-                console.log("Motorspeed" + speed)
+                console.log("Motorspeed" + speed);
             }
-        };
-        RobotMbedBehaviour.prototype.createNeuralNetwork = function(inputLayer, outputLayer, links) {
+        }
+        createNeuralNetwork(inputLayer, outputLayer, links) {
             return {
                 "inputLayer": inputLayer,
                 "outputLayer": outputLayer,
                 "links": links
             };
-        };
-        RobotMbedBehaviour.prototype.changeWeight = function(neuralNetwork) {
+        }
+        changeWeight(neuralNetwork) {
             $('#einReglerfuerAlles').html("");
             var div = $('<div style="margin:8px 50px; "></div>');
             var value = 0;
             var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
-            range.on('input', function() {
+            range.on('input', function () {
                 $(this).data("link").weight = $(this).val();
                 var width = $(this).data("link").weight * 4 + 2;
-                $(this).data("line").stroke({width: width});
+                $(this).data("line").stroke({ width: width });
             });
             div.append(range);
             $('#einReglerfuerAlles').append(div);
-
             // for (var linkId in neuralNetwork.links) {
-            //     this.setHandler(neuralNetwork.links[linkId]);
+            // 	this.setHandler(neuralNetwork.links[linkId]);
             // }
-        };
-        RobotMbedBehaviour.prototype.setHandler = function(link) {
-            //var link = neuralNetwork.links[linkId];
-            var div = $('<div style="margin:8px 40px; "></div>');
-            var value = link.weight;
-            var range = $('<input type="range" id="range" min="0" max="1" value=' + value + ' step="0.1" />');
-            div.append(range);
-            $('#test2').append(div);
-            range.change(function (e) {
-                e.preventDefault();
-                //$('#range').html(this.val());
-                link.weight = $(this).val();
-                e.stopPropagation();
-            });
-        };
-
-        RobotMbedBehaviour.prototype.addNodesPosition = function(layer) {
+        }
+        // public setHandler(link){
+        // 	//var link = neuralNetwork.links[linkId];
+        // 	var div = $('<div style="margin:8px 0; "></div>');
+        // 	var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
+        // 	div.append(range);
+        // 	$('#simConfigNeuralNetworkContent').append(div);
+        // 	range.change(function (e) {
+        // 		e.preventDefault();
+        // 		//$('#range').html(this.val());
+        // 		link.weight = $(this).val();
+        // 		e.stopPropagation();
+        // 	});
+        //
+        // }
+        addNodesPosition(layer) {
             var i = 0;
             for (var nodePosition in layer) {
                 var node = layer[nodePosition];
@@ -503,8 +474,7 @@ var __extends = (this && this.__extends) || (function () {
                 i++;
             }
         }
-
-        RobotMbedBehaviour.prototype.drawNeuralNetwork = function(neuralNetwork) {
+        drawNeuralNetwork(neuralNetwork) {
             //var test = SVG();
             $('#simConfigNeuralNetworkSVG').html('');
             var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
@@ -514,70 +484,54 @@ var __extends = (this && this.__extends) || (function () {
             this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
             this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
         }
-
-
-
-        RobotMbedBehaviour.prototype.drawLayer = function(layer, startXPosition, svg) {
-            for (const [key,node] of Object.entries( layer )) {
+        drawLayer(layer, startXPosition, svg) {
+            for (var nodeID in layer) {
+                var node = layer[nodeID];
                 var nodePosition = node.position;
                 var y = 20 + 70 * nodePosition;
                 var circle = svg.circle()
                     .radius(20)
                     .cx(startXPosition)
                     .cy(y)
-                    .fill('black')
+                    .fill('black');
             }
-        };
-
-        RobotMbedBehaviour.prototype.drawLinks = function(links, positionX1, positionX2, svg) {
+        }
+        drawLinks(links, positionX1, positionX2, svg) {
             for (var linkID in links) {
                 var that = this;
                 var link = links[linkID];
-                var positionY1 = 20 + 70*link.inputNode.position;
-                var positionY2 = 20 + 70*link.outputNode.position;
-                var strokeWidth = link.weight*4 + 2;
+                var positionY1 = 20 + 70 * link.inputNode.position;
+                var positionY2 = 20 + 70 * link.outputNode.position;
+                var strokeWidth = link.weight * 4 + 2;
                 var colour = '#b5cb5f';
                 //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
-                var line = svg.line(positionX1,positionY1, positionX2, positionY2)
+                var line = svg.line(positionX1, positionY1, positionX2, positionY2)
                     .stroke({ color: colour, width: strokeWidth })
                     .mouseover(function () {
-                        this.stroke('black')
-                    })
+                    this.stroke('black');
+                })
                     .mouseout(function () {
-                        this.stroke(colour)
-                    })
+                    this.stroke(colour);
+                })
                     .click(function () {
-                        var link = $(this).data("link");
-                        console.log(link);
-                        var regler = $('#myRange');
-                        regler.data("link", link);
-                        regler.data("line", this);
-                        that.changeInputTypeRange(regler);
-                    })
-                ;
+                    var link = $(this).data("link");
+                    console.log(link);
+                    var regler = $('#myRange');
+                    regler.data("link", link);
+                    regler.data("line", this);
+                    that.changeInputTypeRange(regler);
+                });
                 $(line).data("link", link);
-
             }
         }
-
-        RobotMbedBehaviour.prototype.changeInputTypeRange = function(regler) {
+        changeInputTypeRange(regler) {
             //var value = slider.value;
             var value = regler.data("link").weight;
             //var line = document.getElementById("testLine");
-
             regler.val(value);
         }
-
-
-
-        RobotMbedBehaviour.prototype.mouseOver = function(line) {
-            line.stroke = "rgb(0,255,0)";
+        close() {
         }
-
-
-        RobotMbedBehaviour.prototype.close = function () {
-        };
-        return RobotMbedBehaviour;
-    }(interpreter_aRobotBehaviour_1.ARobotBehaviour));
+    }
     exports.RobotMbedBehaviour = RobotMbedBehaviour;
 });

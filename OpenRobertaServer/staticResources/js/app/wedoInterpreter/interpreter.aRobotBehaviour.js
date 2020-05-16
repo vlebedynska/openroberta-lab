@@ -1,16 +1,8 @@
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var ARobotBehaviour = /** @class */ (function () {
-        function ARobotBehaviour() {
+    class ARobotBehaviour {
+        constructor() {
             this.hardwareState = {};
             this.hardwareState.timers = {};
             this.hardwareState.timers['start'] = Date.now();
@@ -19,21 +11,19 @@
             this.neuralNetwork = {};
             this.blocking = false;
         }
-        ARobotBehaviour.prototype.getActionState = function (actionType, resetState) {
-            if (resetState === void 0) { resetState = false; }
-            var v = this.hardwareState.actions[actionType];
+        getActionState(actionType, resetState = false) {
+            let v = this.hardwareState.actions[actionType];
             if (resetState) {
                 delete this.hardwareState.actions[actionType];
             }
             return v;
-        };
-        ARobotBehaviour.prototype.setBlocking = function (value) {
+        }
+        setBlocking(value) {
             this.blocking = value;
-        };
-        ARobotBehaviour.prototype.getBlocking = function () {
+        }
+        getBlocking() {
             return this.blocking;
-        };
-        return ARobotBehaviour;
-    }());
+        }
+    }
     exports.ARobotBehaviour = ARobotBehaviour;
 });

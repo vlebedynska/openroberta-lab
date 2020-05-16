@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
         "outDir": "../OpenRobertaServer/staticResources/js/app/wedoInterpreter",
-        "target": "es5",
+        "target": "es2015",
         "rootDir": "./ts",
         "typeRoots" : ["./node_modules/@types"],
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
         
         "module": "amd",
         "baseUrl": "./ts",
@@ -16,6 +17,6 @@
         "**/node_modules",
         "**/interpreter.runStackMachineJson.ts"
     ],
-    "compileOnSave": false,
-    "buildOnSave": false
+    "compileOnSave": true,
+    "buildOnSave": true
 }

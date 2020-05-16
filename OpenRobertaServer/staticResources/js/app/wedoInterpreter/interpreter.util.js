@@ -1,15 +1,6 @@
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "interpreter.constants"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "interpreter.constants"], function (require, exports, C) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var C = require("interpreter.constants");
     function dbc(expected, actual) {
         if (expected !== actual) {
             var msg = 'DBC. Expected: ' + expected + ' but got: ' + actual;
@@ -62,8 +53,7 @@
         }
         var opl = '';
         var counter = 0;
-        for (var _i = 0, operations_1 = operations; _i < operations_1.length; _i++) {
-            var op = operations_1[_i];
+        for (let op of operations) {
             var opc = op[C.OPCODE];
             if (op[C.OPCODE] === C.EXPR) {
                 opc = opc + '[' + op[C.EXPR];

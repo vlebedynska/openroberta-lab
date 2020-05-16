@@ -17,14 +17,14 @@
             <value name="S4">
 <!--                <block type="robBrick_ultrasonic" id="5" intask="true"></block>-->
             </value>
-            <value name="MA">
+            <value name="MB">
                 <block type="robBrick_motor_big" id="6" intask="true">
                     <field name="MOTOR_REGULATION">TRUE</field>
                     <field name="MOTOR_REVERSE">OFF</field>
                     <field name="MOTOR_DRIVE">RIGHT</field>
                 </block>
             </value>
-            <value name="MB">
+            <value name="MC">
                 <block type="robBrick_motor_big" id="7" intask="true">
                     <field name="MOTOR_REGULATION">TRUE</field>
                     <field name="MOTOR_REVERSE">OFF</field>

@@ -2325,6 +2325,11 @@ pre code {
 }
 
 #simConfigNeuralNetworkModal .modal-dialog{
+    margin: 0px;
     width: inherit;
     background: #fcfaec;
+}
+
+#simConfigNeuralNetworkModal {
+    border: 2px solid rgba(107, 134, 14, 0.5);
 }

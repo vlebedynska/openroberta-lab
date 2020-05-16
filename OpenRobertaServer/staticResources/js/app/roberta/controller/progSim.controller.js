@@ -109,6 +109,9 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
             $("#simButtonsCollapse").collapse('hide');
         });
 
+
+        $('#simConfigNeuralNetworkModal').draggable();
+
         $('#simConfigNeuralNetwork').on('click', function (event) {
             var position = $("#simDiv").position();
             position.top += 12;
@@ -119,7 +122,6 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
                 left : 'initial',
                 bottom : 'inherit'
             });
-            $('#simConfigNeuralNetwork').draggable();
             $("#simButtonsCollapse").collapse('hide');
         });
 

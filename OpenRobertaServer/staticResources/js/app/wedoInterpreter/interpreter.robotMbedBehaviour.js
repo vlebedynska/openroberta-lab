@@ -448,6 +448,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             });
             div.append(range);
             $('#einReglerfuerAlles').append(div);
+            range.on("mousedown touchstart", function(e) {
+                e.stopPropagation();
+            });
             // for (var linkId in neuralNetwork.links) {
             // 	this.setHandler(neuralNetwork.links[linkId]);
             // }
@@ -520,8 +523,10 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     regler.data("link", link);
                     regler.data("line", this);
                     that.changeInputTypeRange(regler);
+
                 });
                 $(line).data("link", link);
+
             }
         }
         changeInputTypeRange(regler) {
@@ -529,6 +534,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var value = regler.data("link").weight;
             //var line = document.getElementById("testLine");
             regler.val(value);
+
         }
         close() {
         }

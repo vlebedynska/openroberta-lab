@@ -485,6 +485,9 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		});
 		div.append(range);
 		$('#einReglerfuerAlles').append(div);
+		range.on("mousedown touchstart", function(e) {
+			e.stopPropagation();
+		});
 		// for (var linkId in neuralNetwork.links) {
 		// 	this.setHandler(neuralNetwork.links[linkId]);
 		// }

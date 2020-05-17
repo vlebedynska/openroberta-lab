@@ -30,8 +30,8 @@ public class AiOutput<V> extends AiNode<V> {
      * @param property
      * @param comment that the user added to the block
      */
-    public AiOutput(BlockType kind, JSONObject aiOutputNodeData, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, property, comment);
+    public AiOutput(BlockType kind, Integer threshold, JSONObject aiOutputNodeData, BlocklyBlockProperties property, BlocklyComment comment) {
+        super(kind, threshold, property, comment);
         this.aiOutputNodeData = aiOutputNodeData;
         setReadOnly();
     }
@@ -39,8 +39,8 @@ public class AiOutput<V> extends AiNode<V> {
     /**
      * TODO Doku
      */
-    public static <V> AiOutput<V> make(JSONObject aiOutputAction, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiOutput<V>(BlockTypeContainer.getByName("AI_NN_OUTPUT_NODE"), aiOutputAction, properties, comment);
+    public static <V> AiOutput<V> make(JSONObject aiOutputAction, Integer threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new AiOutput<V>(BlockTypeContainer.getByName("AI_NN_OUTPUT_NODE"), threshold, aiOutputAction, properties, comment);
     }
 
     @Override
@@ -60,7 +60,8 @@ public class AiOutput<V> extends AiNode<V> {
      */
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
         JSONObject aiOutputNodeData = createOutputNodeData(block, helper);
-        return AiOutput.make(aiOutputNodeData, helper.extractBlockProperties(block), helper.extractComment(block));
+        Integer threshold = 0;
+        return AiOutput.make(aiOutputNodeData, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 
     private static <V> JSONObject createOutputNodeData(Block block, AbstractJaxb2Ast<V> helper) {

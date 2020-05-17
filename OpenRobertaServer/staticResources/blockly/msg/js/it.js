@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "calibra";
 Blockly.Msg.SENSOR_CODE = "code pad";
 Blockly.Msg.SENSOR_COLOUR = "sensore di colore";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";  // untranslated
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";  // untranslated
 Blockly.Msg.SENSOR_COMPASS = "sensore della bussola";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT bussola";
 Blockly.Msg.SENSOR_DETECTFACE = "rilevatore volto";

@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "Calibrare";
 Blockly.Msg.SENSOR_CODE = "Tastatura cu numere";
 Blockly.Msg.SENSOR_COLOUR = "Senzor de culoare";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";  // untranslated
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";  // untranslated
 Blockly.Msg.SENSOR_COMPASS = "Compas";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "Compas HT";
 Blockly.Msg.SENSOR_DETECTFACE = "Detector facial";

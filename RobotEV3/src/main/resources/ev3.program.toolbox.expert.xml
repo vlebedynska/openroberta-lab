@@ -2,7 +2,7 @@
   <category name="TOOLBOX_AI" svg="true">
     <category name="TOOLBOX_NEURAL_NETWORKS" svg="true">
       <block type="ai_neural_network"/>
-      <block type="ai_nn_input_node"/>
+      <block type="ai_nn_input_node_ultrasonic"/>
       <block type="ai_nn_output_node"/>
     </category>
     <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">

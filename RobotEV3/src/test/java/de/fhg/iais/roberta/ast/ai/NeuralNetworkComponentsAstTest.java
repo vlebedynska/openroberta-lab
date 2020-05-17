@@ -9,11 +9,20 @@ import de.fhg.iais.roberta.util.test.UnitTestHelper;
 public class NeuralNetworkComponentsAstTest extends AstTest {
 
     @Test
-    public void validateInputNode() throws Exception {
+    public void validateInputNodeUltrasonic() throws Exception {
         String a =
-            "BlockAST[project=[[Location[x=188,y=337],AiInput[UltrasonicSensor[1,DISTANCE,NO_SLOT],Threshold=0]]]]";
+            "BlockAST[project=[[Location[x=63,y=113],AiInput[UltrasonicSensor[1,DISTANCE,NO_SLOT],Threshold=0]]]]";
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/input_node.xml");
     }
+
+    @Test
+    public void validateInputNodeColourRGB() throws Exception {
+        String a =
+            "BlockAST[project=[[Location[x=63,y=113],AiInput[ColorSensor[1,RGB,NO_SLOT],Threshold=0]]]]";
+        UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/input_node_colour_rgb.xml");
+    }
+
+
     @Ignore
     @Test
     public void validateOutputNode() throws Exception{

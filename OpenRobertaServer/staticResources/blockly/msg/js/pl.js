@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "calibrate";  // untranslated
 Blockly.Msg.SENSOR_CODE = "sensor kodu dwójkowego";
 Blockly.Msg.SENSOR_COLOUR = "czujnik kolorów";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";  // untranslated
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";  // untranslated
 Blockly.Msg.SENSOR_COMPASS = "kompas";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT compass sensor";  // untranslated
 Blockly.Msg.SENSOR_DETECTFACE = "face detector";  // untranslated

@@ -4,7 +4,8 @@
             <field name="WHEEL_DIAMETER">5.6</field>
             <field name="TRACK_WIDTH">18</field>
             <value name="S1">
-                <block type="robBrick_ultrasonic" id="2" intask="true"></block>
+                <block type="robBrick_colour" id="4" intask="true"></block>
+<!--                <block type="robBrick_ultrasonic" id="2" intask="true"></block>-->
 <!--                <block type="robBrick_touch" id="2" intask="true"></block>-->
             </value>
             <value name="S2">

@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "calibrate";
 Blockly.Msg.SENSOR_CODE = "code pad";
 Blockly.Msg.SENSOR_COLOUR = "colour sensor";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";
 Blockly.Msg.SENSOR_COMPASS = "compass sensor";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT compass sensor";
 Blockly.Msg.SENSOR_DETECTFACE = "face detector";

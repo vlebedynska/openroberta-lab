@@ -2,6 +2,7 @@ package de.fhg.iais.roberta.visitor.ai;
 
 import de.fhg.iais.roberta.syntax.Phrase;
 import de.fhg.iais.roberta.syntax.ai.AiInput;
+import de.fhg.iais.roberta.syntax.ai.AiInputNodeColourSensor;
 import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
 import de.fhg.iais.roberta.syntax.ai.AiOutput;
 import de.fhg.iais.roberta.util.dbc.DbcException;
@@ -35,6 +36,10 @@ public interface IAiVisitor<V> extends IVisitor<V> {
 
     default V visitAiOutputNode(AiOutput<V> aiOutputNode) {
         throw getNotImplementedException(aiOutputNode);
+    }
+
+    default V visitAiInputNodeColourSensor(AiInputNodeColourSensor<V> aiInputNodeColourSensor) {
+        throw getNotImplementedException(aiInputNodeColourSensor);
     }
 
 }

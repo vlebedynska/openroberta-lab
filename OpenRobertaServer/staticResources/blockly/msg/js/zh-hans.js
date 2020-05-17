@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "校准";
 Blockly.Msg.SENSOR_CODE = "代码垫";
 Blockly.Msg.SENSOR_COLOUR = "彩色传感器";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";  // untranslated
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";  // untranslated
 Blockly.Msg.SENSOR_COMPASS = "罗盘传感器";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT罗盘传感器";
 Blockly.Msg.SENSOR_DETECTFACE = "脸部探测器";

@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "калібраваць";
 Blockly.Msg.SENSOR_CODE = "кодавая клавіатура";
 Blockly.Msg.SENSOR_COLOUR = "датчык колеру";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "line tracker";  // untranslated
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Percentage";  // untranslated
 Blockly.Msg.SENSOR_COMPASS = "компас";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT-компас";
 Blockly.Msg.SENSOR_DETECTFACE = "Распазнавальнік твараў";

@@ -1233,6 +1233,7 @@ Blockly.Msg.SENSOR_CALIBRATE = "Kalibriere";
 Blockly.Msg.SENSOR_CODE = "Binär-Code";
 Blockly.Msg.SENSOR_COLOUR = "Farbsensor";
 Blockly.Msg.SENSOR_COLOUR_EDISON = "Linienfolger";
+Blockly.Msg.SENSOR_COLOUR_PERSENTAGE = "-Anteil";
 Blockly.Msg.SENSOR_COMPASS = "Kompasssensor";
 Blockly.Msg.SENSOR_COMPASS_EV3 = "HT Kompasssensor";
 Blockly.Msg.SENSOR_DETECTFACE = "Gesichtserkennung";

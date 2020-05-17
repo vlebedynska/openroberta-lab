@@ -9,7 +9,7 @@ import de.fhg.iais.roberta.syntax.lang.expr.Expr;
     TODO Doku
  */
 public abstract class AiNode<V> extends Expr<V> {
-
+    protected final Integer threshold;
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
      *
@@ -17,8 +17,13 @@ public abstract class AiNode<V> extends Expr<V> {
      * @param property
      * @param comment  that the user added to the block
      */
-    public AiNode(BlockType kind, BlocklyBlockProperties property, BlocklyComment comment) {
+    public AiNode(BlockType kind, Integer threshold, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, property, comment);
+        this.threshold = threshold;
+    }
+
+    public Integer getThreshold() {
+        return threshold;
     }
 
     @Override

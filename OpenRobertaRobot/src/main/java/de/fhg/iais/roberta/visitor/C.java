@@ -39,6 +39,7 @@ public class C {
     public static final String CONTINUE = "continue";
     public static final String CREATE_DEBUG_ACTION = "CreateDebugAction";
     public static final String CREATE_INPUT_NODE = "createInputNode";
+    public static final String CREATE_INPUT_NODE_COLOUR_SENSOR = "createInputNodeColourSensor";
     public static final String CREATE_OUTPUT_NODE = "createOutputNode";
     public static final String CREATE_LIST = "createList";
     public static final String CREATE_LIST_REPEAT = "createListREPEAT";
@@ -271,6 +272,7 @@ public class C {
     public static final String TONE_ACTION = "ToneAction";
     public static final String TOUCH = "touch";
     public static final int TRACKWIDTH = 40;
+    public static final String THRESHOLD = "threshold";
     public static final String TURN_ACTION = "TurnAction";
     public static final String TURN_DIRECTION = "turnDirection";
     public static final String TURN_LIGHT = "turnLight";

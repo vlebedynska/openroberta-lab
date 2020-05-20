@@ -10,6 +10,8 @@ import de.fhg.iais.roberta.syntax.lang.expr.Expr;
  */
 public abstract class AiNode<V> extends Expr<V> {
     protected final Integer threshold;
+    public static final int DEFAULT_THRESHOLD = 0;
+
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
      *

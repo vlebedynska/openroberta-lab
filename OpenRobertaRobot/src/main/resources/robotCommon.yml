@@ -5,7 +5,7 @@ block:
       type: [ai_nn_input_node_ultrasonic]
   AI_NN_INPUT_NODE_COLOURSENSOR_RGB_CHANNEL:
       category: EXPR
-      implementor: de.fhg.iais.roberta.syntax.ai.AiInput
+      implementor: de.fhg.iais.roberta.syntax.ai.AiInputNodeColourSensor
       type: [ai_nn_input_node_coloursensor_rgb_channel]
   AI_NN_OUTPUT_NODE:
     category: EXPR

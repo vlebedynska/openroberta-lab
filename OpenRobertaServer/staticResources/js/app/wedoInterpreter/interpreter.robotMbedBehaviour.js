@@ -448,7 +448,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             });
             div.append(range);
             $('#einReglerfuerAlles').append(div);
-            range.on("mousedown touchstart", function(e) {
+            range.on("mousedown touchstart", function (e) {
                 e.stopPropagation();
             });
             // for (var linkId in neuralNetwork.links) {
@@ -480,7 +480,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         drawNeuralNetwork(neuralNetwork) {
             //var test = SVG();
             $('#simConfigNeuralNetworkSVG').html('');
-            var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
+            var svg = svgdotjs_1.SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
             var positionX1 = 50;
             var positionX2 = 220;
             this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
@@ -523,10 +523,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     regler.data("link", link);
                     regler.data("line", this);
                     that.changeInputTypeRange(regler);
-
                 });
                 $(line).data("link", link);
-
             }
         }
         changeInputTypeRange(regler) {
@@ -534,8 +532,37 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var value = regler.data("link").weight;
             //var line = document.getElementById("testLine");
             regler.val(value);
-
         }
+
+        splitRGB (node) {
+            var aktuelleFarbe = node.colour;
+            var kanal = 0;
+            switch (aktuelleFarbe) {
+                case "R":
+                    kanal = node.externalSensor[0];
+                    break;
+                case "G":
+                    kanal = node.externalSensor[1];
+                    break;
+                case "B":
+                    kanal = node.externalSensor[2];
+                    break;
+            }
+            var wert = kanal/2.55;
+            node.externalSensor = wert;
+        }
+
+
+        // addPosition(externalSensor) {
+        //     var i = 0;
+        //     for (var channelID in externalSensor) {
+        //         var channel = externalSensor[channelID];
+        //         channel.position = i;
+        //         i++;
+        //     }
+        //
+        // }
+
         close() {
         }
     }

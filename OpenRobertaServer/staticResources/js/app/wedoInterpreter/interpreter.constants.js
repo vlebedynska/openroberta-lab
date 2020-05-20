@@ -39,6 +39,7 @@ define(["require", "exports"], function (require, exports) {
     exports.CONTINUE = "continue";
     exports.CREATE_DEBUG_ACTION = "CreateDebugAction";
     exports.CREATE_INPUT_NODE = "createInputNode";
+    exports.CREATE_INPUT_NODE_COLOUR_SENSOR = "createInputNodeColourSensor";
     exports.CREATE_OUTPUT_NODE = "createOutputNode";
     exports.CREATE_LIST = "createList";
     exports.CREATE_LIST_REPEAT = "createListREPEAT";
@@ -268,6 +269,7 @@ define(["require", "exports"], function (require, exports) {
     exports.TONE_ACTION = "ToneAction";
     exports.TOUCH = "touch";
     exports.TRACKWIDTH = 40;
+    exports.THRESHOLD = "threshold";
     exports.TURN_ACTION = "TurnAction";
     exports.TURN_DIRECTION = "turnDirection";
     exports.TURN_LIGHT = "turnLight";

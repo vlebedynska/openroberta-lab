@@ -16,8 +16,6 @@ import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
-import sun.lwawt.macosx.CPrinterDevice;
-import sun.lwawt.macosx.CSystemTray;
 
 /**
     TODO Doku
@@ -72,9 +70,6 @@ public class AiInput<V> extends AiNode<V> {
         String sensorInfo = helper.extractField(fields, BlocklyConstants.INPUTNODE, "");
         ExternalSensor<V> externalSensor = createSensorAst(sensorInfo, block, helper);
 
-        String sensorInfo2 = helper.extractField(fields, BlocklyConstants.SENSORPORT, "");
-        ExternalSensor<V> externalSensor2 = createSensorAst(sensorInfo, block, helper);
-
         String thresholdInfo = helper.extractField(fields, BlocklyConstants.THRESHOLD, "");
         Integer threshold = getThresholdValue(thresholdInfo);
 
@@ -85,7 +80,6 @@ public class AiInput<V> extends AiNode<V> {
     private static <V> ExternalSensor<V> createSensorAst(String sensorInfo, Block block, AbstractJaxb2Ast<V> helper) {
         BlocklyDropdownFactory factory = helper.getDropdownFactory();
             String[] sensorInfoList = sensorInfo.toLowerCase().split("_");
-            String sensorType = sensorInfoList[0];
             String portName = sensorInfoList[2];
             String modeName = BlocklyConstants.DISTANCE;
             String slotName = BlocklyConstants.NO_SLOT;

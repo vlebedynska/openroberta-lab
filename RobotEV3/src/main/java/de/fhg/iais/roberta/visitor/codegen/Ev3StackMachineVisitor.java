@@ -235,6 +235,16 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
     }
 
     @Override
+    public V visitAiInputNodeColourSensor(AiInputNodeColourSensor<V> aiInputNodeColourSensor) {
+        if (aiInputNodeColourSensor.getExternalSensor() != null) {
+            aiInputNodeColourSensor.getExternalSensor().accept(this);
+        }
+        AiInputNodeColourSensor.Colour colour = aiInputNodeColourSensor.getColour();
+        int threshold = aiInputNodeColourSensor.getThreshold();
+        return app(mk(C.CREATE_INPUT_NODE_COLOUR_SENSOR).put(C.THRESHOLD, threshold).put(C.COLOUR, colour));
+    }
+
+    @Override
     public V visitAiOutputNode(AiOutput<V> aiOutputNode) {
         JSONObject a = aiOutputNode.getAiOutputNodeData();
         return app(mk(C.CREATE_OUTPUT_NODE).put("data", a));
@@ -247,23 +257,6 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         // aiNeuralNetwork.getListNNLinks(); //TODO
 
         JSONObject o = mk(C.PROCESS_NEURAL_NETWORK);
-
-   /*     int outputNodeValue = 0;
-        for ( Expr<AiOutput<V>> outputNode : outputLayer.getExprList().getEl() ) {
-            for ( AiLink<V> link : listOfLinks ) {
-                if ( outputNode == link.getNode2()) {
-                    int sensorValue = 0;
-                    AiInput<V> inputNode = (AiInput<V>)link.getNode1();
-                    ExternalSensor<V> externalSensor = inputNode.getExternalSensor();
-                    if (externalSensor instanceof UltrasonicSensor) {
-                        sensorValue = ((UltrasonicSensor)externalSensor).
-                    }
-                    outputNodeValue += link.getWeight() * link.getNode1();
-                    tempNode.sensorWert = tempNode.sensorWert + (kante.nodeInput.sensorWert * kante.gewicht);
-                }
-            }
-            //nehme alle Kanten und schaue, ob sie zum temNode passen
-        }*/
         return app(o);
     }
 

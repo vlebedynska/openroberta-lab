@@ -1,17 +1,10 @@
 package de.fhg.iais.roberta.syntax.ai;
-
-import de.fhg.iais.roberta.blockly.generated.Block;
-import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
-import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
-import de.fhg.iais.roberta.visitor.IVisitor;
-import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
-
-import java.util.List;
 
 public abstract class AiInputNode<V> extends AiNode<V> {
 
+    //public static final int DEFAULT_THRESHOLD = 0;
     protected final ExternalSensor<V> externalSensor;
 
 
@@ -21,5 +14,7 @@ public abstract class AiInputNode<V> extends AiNode<V> {
         setReadOnly();
     }
 
-
+    public ExternalSensor<V> getExternalSensor() {
+        return externalSensor;
+    }
 }

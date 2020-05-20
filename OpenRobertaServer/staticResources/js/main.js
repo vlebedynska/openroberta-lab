@@ -107,6 +107,9 @@ require.config({
             deps : [ 'blockly' ],
             exports : 'Blockly'
         },
+        'svgdotjs' : {
+            exports : 'SVG'
+        },
         'volume-meter' : {
             exports : "Volume",
             init : function() {
@@ -163,7 +166,6 @@ require([ 'require', 'wrap', 'log', 'jquery', 'jquery-cookie', 'guiState.control
     webviewController = require('webview.controller');
     sourceCodeEditorController = require('sourceCodeEditor.controller');
     codeflask = require('codeflask');
-    S = require('svgdotjs');
     $(document).ready(WRAP.fn3(init, 'page init'));
 });
 

@@ -18,7 +18,7 @@ public class NeuralNetworkComponentsAstTest extends AstTest {
     @Test
     public void validateInputNodeColourRGB() throws Exception {
         String a =
-            "BlockAST[project=[[Location[x=63,y=113],AiInput[ColorSensor[1,RGB,NO_SLOT],Threshold=0]]]]";
+            "BlockAST[project=[[Location[x=63,y=113],AiInputNodeColourSensor[ColorSensor[1,RGB,NO_SLOT],Threshold=0,Colour=R]]]]";
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/input_node_colour_rgb.xml");
     }
 

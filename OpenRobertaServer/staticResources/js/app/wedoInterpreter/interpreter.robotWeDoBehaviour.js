@@ -19,6 +19,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             U.loggingEnabled(true, true);
         }
         // @ts-ignore
+        extractColourChannelAndNormalize(node) {
+            throw new Error("Method not implemented.");
+        }
         processNeuralNetwork(inputLayer, outputLayer) {
             throw new Error("Method not implemented.");
         }

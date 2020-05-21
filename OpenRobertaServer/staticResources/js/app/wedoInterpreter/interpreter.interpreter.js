@@ -431,19 +431,17 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.CREATE_INPUT_NODE_COLOUR_SENSOR: {
-                            //var threshold = stmt[C.THRESHOLD];
-                            //var colour = stmt[C.COLOR];
-                            var node = {
+                            let node = {
                                 externalSensor: s.pop(),
                                 threshold: stmt[C.THRESHOLD],
                                 colour: stmt[C.COLOUR]
-                            }
-                            n.splitRGB(node);
+                            };
+                            n.extractColourChannelAndNormalize(node);
                             s.push(node);
                             break;
                         }
                         case C.CREATE_INPUT_NODE: {
-                            var node = {
+                            let node = {
                                 threshold: s.pop(),
                                 externalSensor: s.pop()
                             };

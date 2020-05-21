@@ -533,36 +533,25 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             //var line = document.getElementById("testLine");
             regler.val(value);
         }
-
-        splitRGB (node) {
-            var aktuelleFarbe = node.colour;
-            var kanal = 0;
-            switch (aktuelleFarbe) {
+        extractColourChannelAndNormalize(node) {
+            var colourChannel;
+            switch (node.colour) {
                 case "R":
-                    kanal = node.externalSensor[0];
+                    colourChannel = 0;
                     break;
                 case "G":
-                    kanal = node.externalSensor[1];
+                    colourChannel = 1;
                     break;
                 case "B":
-                    kanal = node.externalSensor[2];
+                    colourChannel = 2;
                     break;
+                default:
+                    throw node.colour + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
             }
-            var wert = kanal/2.55;
-            node.externalSensor = wert;
+            var colourChannelValue = node.externalSensor[colourChannel];
+            var inputValue = colourChannelValue / 2.55;
+            node.externalSensor = inputValue;
         }
-
-
-        // addPosition(externalSensor) {
-        //     var i = 0;
-        //     for (var channelID in externalSensor) {
-        //         var channel = externalSensor[channelID];
-        //         channel.position = i;
-        //         i++;
-        //     }
-        //
-        // }
-
         close() {
         }
     }

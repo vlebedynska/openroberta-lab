@@ -440,8 +440,18 @@ export class Interpreter {
                         n.assertAction( stmt[C.MSG], left, stmt[C.OP], right, value );
                         break;
                     }
+                    case C.CREATE_INPUT_NODE_COLOUR_SENSOR: {
+                        let node = {
+                            externalSensor: s.pop(),
+                            threshold: stmt[C.THRESHOLD],
+                            colour: stmt[C.COLOUR]
+                        }
+                        n.extractColourChannelAndNormalize(node);
+                        s.push(node);
+                        break;
+                    }
                     case C.CREATE_INPUT_NODE: {
-                        var node = {
+                        let node = {
                             threshold: s.pop(),
                             externalSensor: s.pop()
                         };

@@ -32,8 +32,11 @@ export class RobotWeDoBehaviour extends ARobotBehaviour {
         U.loggingEnabled( true, true );
     }
 // @ts-ignore
-    public processNeuralNetwork(inputLayer: any, outputLayer: any): void {
+    public extractColourChannelAndNormalize(node: any): void {
+        throw new Error("Method not implemented.");
+    }
 
+    public processNeuralNetwork(inputLayer: any, outputLayer: any): void {
         throw new Error("Method not implemented.");
     }
 

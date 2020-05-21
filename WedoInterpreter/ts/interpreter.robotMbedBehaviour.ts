@@ -583,6 +583,26 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		line.stroke = "rgb(0,255,0)";
 	}
 
+	public extractColourChannelAndNormalize (node) {
+		var colourChannel;
+		switch (node.colour) {
+			case "R":
+				colourChannel = 0;
+				break;
+			case "G":
+				colourChannel = 1;
+				break;
+			case "B":
+				colourChannel = 2;
+				break;
+			default:
+				throw node.colour + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
+		}
+		var colourChannelValue = node.externalSensor[colourChannel];
+		var inputValue = colourChannelValue/2.55;
+		node.externalSensor = inputValue;
+	}
+
 	public close() {
 	}
 }

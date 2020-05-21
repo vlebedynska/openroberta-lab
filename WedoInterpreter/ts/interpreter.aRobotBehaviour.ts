@@ -65,6 +65,6 @@ export abstract class ARobotBehaviour {
     abstract debugAction( value: any ): void;
     abstract assertAction( msg: string, left: any, op: string, right: any, value: boolean ): void;
     abstract processNeuralNetwork( inputLayer: any, outputLayer: any ): void;
-
+    abstract extractColourChannelAndNormalize(node: any): void;
     abstract close(): void;
 }

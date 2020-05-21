@@ -9,8 +9,6 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             };
             this.hardwareState.motors = {};
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
-
-
             U.loggingEnabled(true, true);
         }
         getSample(s, name, sensor, port, mode) {
@@ -501,8 +499,6 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     .fill('black');
             }
         }
-
-
         drawLinks(links, positionX1, positionX2, svg) {
             let lineAlt;
             for (var linkID in links) {
@@ -519,32 +515,31 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     this.stroke('black');
                 })
                     .mouseout(function () {
-                            if (lineAlt != this) {
-                            this.stroke(colour)
-                        }
+                    if (lineAlt != this) {
+                        this.stroke(colour);
+                    }
                 })
                     .click(function () {
-                        var link = $(this).data("link");
-                        console.log(link);
-                        var regler = $('#myRange');
-                        regler.data("link", link);
-                        regler.data("line", this);
-                        that.changeInputTypeRange(regler);
-                        lineAlt = that.changeLineColour(this, lineAlt);
-                    })
-                ;
+                    var link = $(this).data("link");
+                    console.log(link);
+                    var regler = $('#myRange');
+                    regler.data("link", link);
+                    regler.data("line", this);
+                    that.changeInputTypeRange(regler);
+                    lineAlt = that.changeLineColour(this, lineAlt);
+                });
                 $(line).data("link", link);
             }
         }
         changeLineColour(line, lineAlt) {
-                if (lineAlt != undefined) {
-                    lineAlt.stroke('#b5cb5f');
-                    lineAlt.back();
-                }
-                line.front();
-                line.stroke('black');
-                lineAlt = line;
-                return lineAlt;
+            if (lineAlt != undefined) {
+                lineAlt.stroke('#b5cb5f');
+                lineAlt.back();
+            }
+            line.front();
+            line.stroke('black');
+            lineAlt = line;
+            return lineAlt;
         }
         changeInputTypeRange(regler) {
             //var value = slider.value;

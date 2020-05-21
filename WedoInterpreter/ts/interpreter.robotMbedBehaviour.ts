@@ -542,6 +542,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	}
 
 	public drawLinks(links, positionX1, positionX2, svg) {
+		let lineAlt;
 		for (var linkID in links) {
 			var that = this;
 			var link = links[linkID];
@@ -556,7 +557,9 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 					this.stroke('black')
 				})
 				.mouseout(function () {
-					this.stroke(colour)
+					if (lineAlt != this) {
+						this.stroke(colour)
+					}
 				})
 				.click(function () {
 					var link = $(this).data("link");
@@ -565,11 +568,23 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 					regler.data("link", link);
 					regler.data("line", this);
 					that.changeInputTypeRange(regler);
+					lineAlt = that.changeLineColour(this, lineAlt);
 				})
 			;
 			$(line).data("link", link);
 
 		}
+	}
+
+	public changeLineColour(line, lineAlt) {
+		if (lineAlt != undefined) {
+			lineAlt.stroke('#b5cb5f');
+			lineAlt.back();
+		}
+		line.front();
+		line.stroke('black');
+		lineAlt = line;
+		return lineAlt;
 	}
 
 	public changeInputTypeRange(regler) {

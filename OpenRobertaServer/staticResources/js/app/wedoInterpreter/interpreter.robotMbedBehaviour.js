@@ -9,6 +9,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             };
             this.hardwareState.motors = {};
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
+            this.draggingElement = null;
             U.loggingEnabled(true, true);
         }
         getSample(s, name, sensor, port, mode) {
@@ -403,7 +404,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 this.addNodesPosition(outputLayer);
                 links = this.createLinks(inputLayer, outputLayer);
                 this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
-                this.changeWeight(this.neuralNetwork);
+                //this.changeWeight(this.neuralNetwork);
                 this.drawNeuralNetwork(this.neuralNetwork);
             }
             else {
@@ -436,25 +437,25 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 "links": links
             };
         }
-        changeWeight(neuralNetwork) {
-            $('#einReglerfuerAlles').html("");
-            var div = $('<div style="margin:8px 50px; "></div>');
-            var value = 0;
-            var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
-            range.on('input', function () {
-                $(this).data("link").weight = $(this).val();
-                var width = $(this).data("link").weight * 4 + 2;
-                $(this).data("line").stroke({ width: width });
-            });
-            div.append(range);
-            $('#einReglerfuerAlles').append(div);
-            range.on("mousedown touchstart", function (e) {
-                e.stopPropagation();
-            });
+        // changeWeight(neuralNetwork) {
+        //     $('#einReglerfuerAlles').html("");
+        //     var div = $('<div style="margin:8px 50px; "></div>');
+        //     var value = 0;
+        //     var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
+        //     range.on('input', function () {
+        //         $(this).data("link").weight = $(this).val();
+        //         var width = $(this).data("link").weight * 4 + 2;
+        //         $(this).data("line").stroke({ width: width });
+        //     });
+        //     div.append(range);
+        //     $('#einReglerfuerAlles').append(div);
+        //     range.on("mousedown touchstart", function (e) {
+        //         e.stopPropagation();
+        //     });
             // for (var linkId in neuralNetwork.links) {
             // 	this.setHandler(neuralNetwork.links[linkId]);
             // }
-        }
+        //}
         // public setHandler(link){
         // 	//var link = neuralNetwork.links[linkId];
         // 	var div = $('<div style="margin:8px 0; "></div>');
@@ -478,14 +479,39 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             }
         }
         drawNeuralNetwork(neuralNetwork) {
+            var that = this;
             //var test = SVG();
             $('#simConfigNeuralNetworkSVG').html('');
             var svg = svgdotjs_1.SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
+            svg.mousemove(function (e) {
+                e.stopPropagation();
+                if (that.draggingElement != null) {
+                    that.mousemoved(svg, that, e)
+
+                    var line = $(that.draggingElement).data('line').node;
+                    var circleCenter = {"x": that.draggingElement.cx(), "y": that.draggingElement.cy()};
+                    var accuracy = 100;
+                    var fullWeight = 1;
+                    var weight = that.getLengthFromPathStartToPointAndCalculateWeigth(line, circleCenter, accuracy, fullWeight)
+                    $($(that.draggingElement).data('line')).data('link').weight = weight;
+
+                    var width = weight * 4 + 2;
+                    $(that.draggingElement).data('line').stroke({ width: width });
+
+                }
+            });
+            $(document).mouseup( function(e) {
+
+
+                that.draggingElement = null;
+                that.speichereStand();
+            });
             var positionX1 = 50;
             var positionX2 = 220;
             this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
             this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
             this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
+
         }
         drawLayer(layer, startXPosition, svg) {
             for (var nodeID in layer) {
@@ -522,12 +548,24 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     .click(function () {
                     var link = $(this).data("link");
                     console.log(link);
-                    var regler = $('#myRange');
-                    regler.data("link", link);
-                    regler.data("line", this);
-                    that.changeInputTypeRange(regler);
+                    // var regler = $('#myRange');
+                    // regler.data("link", link);
+                    // regler.data("line", this);
+                    // that.changeInputTypeRange(regler);
                     lineAlt = that.changeLineColour(this, lineAlt);
                 });
+                var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
+                var circle = svg.circle()
+                    .radius(7)
+                    .fill('red')
+                    .cx(pointOnLine.x+20) //?
+                    .cy(pointOnLine.y+20) //?
+                    .mousedown(function () {
+                        console.log("Mouse is down");
+                        that.draggingElement = this;
+                    });
+
+                $(circle).data("line", line)
                 $(line).data("link", link);
             }
         }
@@ -541,12 +579,12 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             lineAlt = line;
             return lineAlt;
         }
+
         changeInputTypeRange(regler) {
-            //var value = slider.value;
             var value = regler.data("link").weight;
-            //var line = document.getElementById("testLine");
             regler.val(value);
         }
+
         extractColourChannelAndNormalize(node) {
             var colourChannel;
             switch (node.colour) {
@@ -566,6 +604,109 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var inputValue = colourChannelValue / 2.55;
             node.externalSensor = inputValue;
         }
+
+
+
+
+
+
+        getLengthFromPathStartToPointAndCalculateWeigth(path, point, accuracy, fullWeight) {
+            var totalLength = path.getTotalLength();
+            var step = totalLength/accuracy;
+            var t = 0;
+            var currentDistance;
+            var minDistanceData = {"t":t, "distance": Number.MAX_VALUE};
+
+
+            /**
+             * <--        totalLength         -->
+             * <step> <step> <step> <step> <step>
+             * ------|------|------|---*--|------
+             *       t-->         cirlceCenter
+             *       <--  distance  -->
+             *
+             */
+            for (t=0; t<=totalLength; t+=step) {
+                t = this.round(t, 4);
+                currentDistance = this.calcDistance(path.getPointAtLength(t), point)
+                if (currentDistance < minDistanceData.distance) {
+                    minDistanceData = {"t":t, "distance": currentDistance}; //p2 - distance from point at length to circle center
+                }
+            }
+            var weight = minDistanceData.t/step * fullWeight/accuracy;
+            return weight;
+
+
+        }
+
+        round(num, places)
+        { var multiplier = Math.pow(10, places);
+            return (Math.round(num * multiplier) / multiplier);
+        }
+
+
+        calcDistance(p1, p2) {
+            return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
+        }
+
+
+        speichereStand(e) {
+            console.log("speichere Stand")
+        }
+
+        mousemoved(svg,mbedBehaviour, e) {
+            console.log("Start moving!")
+            var m = svg.point(e.pageX, e.pageY),
+                p = mbedBehaviour.closestPoint($(mbedBehaviour.draggingElement).data("line").node, m);
+            //lineTest.attr("x1", p[0]).attr("y1", p[1]).attr("x2", m.x).attr("y2", m.y);
+            mbedBehaviour.draggingElement.attr("cx", p[0]).attr("cy", p[1]);
+        }
+
+
+        closestPoint(pathNode, point) {
+            var pathLength = pathNode.getTotalLength(),
+                precision = 8,
+                best,
+                bestLength,
+                bestDistance = Infinity;
+
+            // linear scan for coarse approximation
+            for (var scan, scanLength = 0, scanDistance; scanLength <= pathLength; scanLength += precision) {
+                if ((scanDistance = distance2(scan = pathNode.getPointAtLength(scanLength))) < bestDistance) {
+                    best = scan, bestLength = scanLength, bestDistance = scanDistance;
+                }
+            }
+            // binary search for precise estimate
+            precision /= 2;
+            while (precision > 0.5) {
+                var before,
+                    after,
+                    beforeLength,
+                    afterLength,
+                    beforeDistance,
+                    afterDistance;
+                if ((beforeLength = bestLength - precision) >= 0 && (beforeDistance = distance2(before = pathNode.getPointAtLength(beforeLength))) < bestDistance) {
+                    best = before, bestLength = beforeLength, bestDistance = beforeDistance;
+                } else if ((afterLength = bestLength + precision) <= pathLength && (afterDistance = distance2(after = pathNode.getPointAtLength(afterLength))) < bestDistance) {
+                    best = after, bestLength = afterLength, bestDistance = afterDistance;
+                } else {
+                    precision /= 2;
+                }
+            }
+
+            best = [best.x, best.y];
+            best.distance = Math.sqrt(bestDistance);
+            return best;
+
+            function distance2(p) {
+                var dx = p.x - point.x,
+                    dy = p.y - point.y;
+                return dx * dx + dy * dy;
+            }
+        }
+
+
+
         close() {
         }
     }

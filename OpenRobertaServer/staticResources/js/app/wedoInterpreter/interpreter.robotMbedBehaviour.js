@@ -501,10 +501,12 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 }
             });
             $(document).mouseup( function(e) {
+                if (that.draggingElement != null) {
+                    $(that.draggingElement).data('line').stroke('#b5cb5f');
+                    that.draggingElement = null;
+                    that.speichereStand();
+                }
 
-
-                that.draggingElement = null;
-                that.speichereStand();
             });
             var positionX1 = 50;
             var positionX2 = 220;
@@ -552,29 +554,31 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     // regler.data("link", link);
                     // regler.data("line", this);
                     // that.changeInputTypeRange(regler);
-                    lineAlt = that.changeLineColour(this, lineAlt);
+                    lineAlt = that.changeLineColour(this, lineAlt, null);
                 });
                 var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
                 var circle = svg.circle()
-                    .radius(7)
+                    .radius(8)
                     .fill('red')
                     .cx(pointOnLine.x+20) //?
-                    .cy(pointOnLine.y+20) //?
+                    .cy(pointOnLine.y)
+                    .front() //?
                     .mousedown(function () {
                         console.log("Mouse is down");
                         that.draggingElement = this;
-                    });
-
+                        lineAlt = that.changeLineColour( $(that.draggingElement).data('line').stroke('black'), lineAlt, this);
+                        })
                 $(circle).data("line", line)
                 $(line).data("link", link);
             }
         }
-        changeLineColour(line, lineAlt) {
+        changeLineColour(line, lineAlt, sliderElement) {
             if (lineAlt != undefined) {
                 lineAlt.stroke('#b5cb5f');
                 lineAlt.back();
             }
-            line.front();
+            //line.front();
+            sliderElement.front();
             line.stroke('black');
             lineAlt = line;
             return lineAlt;

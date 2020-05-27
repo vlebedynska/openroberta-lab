@@ -34,22 +34,37 @@ class QLearningAlgorithm {
 
 class ReinforcementProblem {
 
-    constructor(states, actions) {
-        this.problem = problem;
+    constructor(statesAndActions) {
+        this.statesAndActions = statesAndActions;
+        this.states = [];
+        for (var state in statesAndActions.keys()) {
+            states.push(state);
+        }
     }
 
     getRandomState() {
-        return randomState
+        var indexOfState = Math.floor(Math.random() * this.states.length)
+        return this.states[indexOfState] ;
     }
 
     getAvailableActions(state) {
-        return possibleActions;
+        var availableActions = [];
+        var actions = this.statesAndActions[state];
+        for (var actionIndex in actions) {
+            if (actions[actionIndex] !== undefined) {
+                availableActions.push(actionIndex);
+            }
+            return availableActions;
+        }
     }
 
     takeAction(state, action) {
-        return rewardAndNewState;
+        var actions = this.statesAndActions[state];
+        return {
+            "reward": actions[action],
+            "newState" : action
+        };
     }
-
 }
 
 

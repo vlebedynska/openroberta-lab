@@ -50,6 +50,28 @@
       </block>
     </category>
     <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">
+      <block type="ai_q_learning_states_and_actions_matrix_3_x_3" id="IUJLU!rzwElCjD@+4%6}" intask="false">
+        <field name="Start">A</field>
+        <field name="Finish">I</field>
+      </block>
+      <block type="ai_q_barrier_mountain" id=")eljm6pw3ob0}Ua6SmBm" intask="false">
+        <field name="Start">A</field>
+        <field name="Finish">I</field>
+      </block>
+      <block type="ai_q_drive_the_best_way" id="]c-r#3qKk_C@5Q@iU+th" intask="false">
+        <value name="POWER">
+          <block type="math_number" id="gy#qt`?AOW+yUwZNI}2/" intask="false">
+            <field name="NUM">30</field>
+          </block>
+        </value>
+      </block>
+      <block type="ai_q_apply_learning_rule" id="24=TMbMJo|N0s#{o1E!1" intask="false"></block>
+      <block type="ai_q_learner_config" id="/=W!|#l0HTvb-sK*h3MT" intask="false">
+        <field name="alpha">0.1</field>
+        <field name="gamma">0.2</field>
+        <field name="nu">0.1</field>
+        <field name="rho">0.1</field>
+      </block>
     </category>
     <category name="TOOLBOX_CLUSTERING" svg="true">
 

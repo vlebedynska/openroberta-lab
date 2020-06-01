@@ -1,0 +1,10 @@
+<block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="ev3" xmlversion="" description="" tags="undefined">
+    <instance x="63" y="88">
+        <block type="ai_q_learner_config" id="*c-MhV+vn/sSKar6}w6Q" intask="false">
+            <field name="alpha">0.1</field>
+            <field name="gamma">0.2</field>
+            <field name="nu">0.1</field>
+            <field name="rho">0.1</field>
+        </block>
+    </instance>
+</block_set>

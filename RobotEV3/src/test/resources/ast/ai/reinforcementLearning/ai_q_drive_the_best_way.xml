@@ -1,0 +1,11 @@
+<block_set xmlns="http://de.fhg.iais.roberta.blockly" robottype="ev3" xmlversion="" description="" tags="undefined">
+    <instance x="88" y="163">
+        <block type="ai_q_drive_the_best_way" id="o[(qBRq/Z[D(1Aucq)WM" intask="false">
+            <value name="POWER">
+                <block type="math_number" id="d`:v^_?,p)Wc_Aw/:EKu" intask="false">
+                    <field name="NUM">30</field>
+                </block>
+            </value>
+        </block>
+    </instance>
+</block_set>

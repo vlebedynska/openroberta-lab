@@ -9,16 +9,13 @@ class Test {
         ];
         var problem = new ReinforcementProblem(statesAndActions);
 
-        new QLearningAlgorithm().qLearner(problem, 600, 9007199254740991, 0.1,0.1, 0.1, 1 )
+        new QLearningAlgorithm().qLearner(problem, 20, 9007199254740991, 0.1,0.5, 1, 0.1)
 
     }
 }
 
 class QLearningAlgorithm {
-    // constructor() {
-    //     this.qvalues = new QValueStore();
-    //
-    // }
+    
     qLearner(problem, episodes, timeLimit, alpha, gamma, rho, nu) {
         var qValueStore = new QValueStore(problem.statesAndActions);
         var state = problem.getRandomState();
@@ -45,8 +42,6 @@ class QLearningAlgorithm {
             state = newState;
             timeLimit = timeLimit - (Date.now()- startTime);
             episodes = episodes - 1;
-
-
         }
     }
 }
@@ -86,6 +81,7 @@ class ReinforcementProblem {
     }
 
     takeOneOfActions(actions) {
+        //TODO Available Actions ?
         return actions[Math.floor(Math.random() * actions.length)];
     }
 }
@@ -110,6 +106,7 @@ class QValueStore {
     }
 
     getBestAction(state) {
+        //TODO Available Actions ?
         var actions = this.qMatrix[state];
         var bestActionValue = -1;
         var bestAction;
@@ -121,12 +118,6 @@ class QValueStore {
             }
         }
         return bestAction;
-
-
-        // var actionsFiltered = actions.filter(function(item) {
-        //     return item != undefined;
-        // });
-        // return Math.max(...actionsFiltered); //maxValue(state)
     }
 
     storeQValue(state, action, value) {

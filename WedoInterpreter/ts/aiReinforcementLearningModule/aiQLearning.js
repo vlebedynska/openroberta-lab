@@ -9,7 +9,7 @@ class Test {
         ];
         var problem = new ReinforcementProblem(statesAndActions);
 
-        new QLearningAlgorithm().qLearner(problem, 20, 9007199254740991, 0.1,0.5, 1, 0.1)
+        new QLearningAlgorithm().qLearner(problem, 300, 9007199254740991, 0.1,0.5, 1, 0.1)
 
     }
 }
@@ -20,7 +20,12 @@ class QLearningAlgorithm {
         var qValueStore = new QValueStore(problem.statesAndActions);
         var state = problem.getRandomState();
         var action;
-        while( (timeLimit > 0)  &&  (episodes > 0)) {
+        var chars = "ABCDEFGHI";
+
+        var timer = setInterval(function () {
+            if( !((timeLimit > 0)  &&  (episodes > 0))) {
+                clearInterval(timer);
+            }
             var startTime = Date.now();
             if (Math.random() < nu) {
                 state = problem.getRandomState();
@@ -37,12 +42,14 @@ class QLearningAlgorithm {
             var q = qValueStore.getQValue(state, action);
             var maxQ = qValueStore.getQValue(newState, qValueStore.getBestAction(newState));
             q = (1-alpha) * q + alpha * (reward + gamma * maxQ);
+            svg.find("#"+chars.charAt(state) + chars.charAt(newState)).stroke({width: q/10})
             qValueStore.storeQValue(state, action, q);
             console.log("state " + state + " > " + newState + "; reward " + reward + "; q " + q + "; maxQ " + maxQ);
             state = newState;
             timeLimit = timeLimit - (Date.now()- startTime);
             episodes = episodes - 1;
-        }
+        }, 50)
+
     }
 }
 

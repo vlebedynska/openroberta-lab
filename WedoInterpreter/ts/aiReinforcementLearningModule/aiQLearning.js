@@ -1,31 +1,62 @@
 class Test {
 
-    testStart() {
+    testStart(){
+        var that = this;
         var statesAndActions = [
-            [undefined, 0, undefined, undefined],
+            [undefined, 100, undefined, undefined],
             [0, undefined, 0, undefined],
-            [undefined, 0, undefined, 100],
-            [undefined, undefined, 0, 100]
+            [undefined, 0, undefined, 0],
+            [undefined, undefined, 0, 0]
         ];
         var problem = new ReinforcementProblem(statesAndActions);
+        var qLearnerCallback = function (qValueStore) {
+                console.log(qValueStore);
+                that.createOptimalPath(qValueStore, "D", "A");
+        }
+        new QLearningAlgorithm().qLearner(problem, 300   , 9007199254740991, 0.1,0.5, 1, 0.1, qLearnerCallback)
 
-        new QLearningAlgorithm().qLearner(problem, 300, 9007199254740991, 0.1,0.5, 1, 0.1)
 
     }
+
+    createOptimalPath(qValueStore, startNode, finishNode) {
+        var lastQValues = [];
+        var chars = "ABCDEFGHI";
+        var test;
+        for(var i = chars.indexOf(startNode); i !== chars.indexOf(finishNode); i=test) {
+            var qValueLine = qValueStore.qMatrix[i];
+            var id = this.indexOfMax(qValueLine);
+            lastQValues.push(chars.charAt(i) + chars.charAt(id))
+            test = id;
+        }
+    }
+
+    indexOfMax(arr) {
+        if (arr.length === 0) {
+            return -1;
+        }
+        var max = arr[0];
+        var maxIndex = 0;
+        for (var i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                maxIndex = i;
+                max = arr[i];
+            }
+        }
+        return maxIndex;
+    }
+
 }
 
 class QLearningAlgorithm {
     
-    qLearner(problem, episodes, timeLimit, alpha, gamma, rho, nu) {
+    qLearner(problem, episodes, timeLimit, alpha, gamma, rho, nu, callback) {
         var qValueStore = new QValueStore(problem.statesAndActions);
         var state = problem.getRandomState();
         var action;
         var chars = "ABCDEFGHI";
 
         var timer = setInterval(function () {
-            if( !((timeLimit > 0)  &&  (episodes > 0))) {
-                clearInterval(timer);
-            }
+
             var startTime = Date.now();
             if (Math.random() < nu) {
                 state = problem.getRandomState();
@@ -48,9 +79,15 @@ class QLearningAlgorithm {
             state = newState;
             timeLimit = timeLimit - (Date.now()- startTime);
             episodes = episodes - 1;
-        }, 50)
-
+            if( !((timeLimit > 0)  &&  (episodes > 0))) {
+                clearInterval(timer);
+                callback(qValueStore);
+            }
+        }, 50);
+        return qValueStore;
     }
+
+
 }
 
 class ReinforcementProblem {

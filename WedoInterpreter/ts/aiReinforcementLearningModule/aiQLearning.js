@@ -8,7 +8,7 @@ const ResultState = {
 
 Object.freeze(ResultState);
 
-function generateStatesAndActionsFromSVG(svg) {
+function generateStatesAndActionsFromSVG(svg, finishNode) {
     var statesAndActions = [];
     var allPathes = svg.find('.cls-customPathColor');
     allPathes.each(function(item) {
@@ -18,8 +18,11 @@ function generateStatesAndActionsFromSVG(svg) {
         let secondValue = tokens[2]; //1
         if(statesAndActions[firstValue] == undefined) {
             statesAndActions[firstValue] = [];
+        } else if (secondValue == finishNode) {
+            statesAndActions[firstValue][secondValue] = 50;
+        } else {
+            statesAndActions[firstValue][secondValue] = 0;
         }
-        statesAndActions[firstValue][secondValue] = 0;
     })
     return statesAndActions;
 }
@@ -28,10 +31,7 @@ class Test {
 
     testStart() {
         var that = this;
-        var statesAndActions = generateStatesAndActionsFromSVG(svg);
-        statesAndActions[3][5] = 50;
-        statesAndActions[6][5] = 50;
-        statesAndActions[7][5] = 50;
+        var statesAndActions = generateStatesAndActionsFromSVG(svg, 5);
         // var statesAndActions = [
         //     [undefined, 100, undefined, undefined],
         //     [0, undefined, 0, undefined],
@@ -39,7 +39,7 @@ class Test {
         //     [undefined, undefined, 0, 0]
         // ];
         var problem = new ReinforcementProblem(statesAndActions);
-        new QLearningAlgorithm().qLearner(problem, 50, 9007199254740991, 0.1, 0.5, 1, 0.1, that.qLearnerCallback)
+        new QLearningAlgorithm().qLearner(problem, 200, 9007199254740991, 0.1, 0.5, 1, 0.1, that.qLearnerCallback)
 
 
     }
@@ -60,13 +60,20 @@ function drawOptimalPath(optimalPathResult) {
         for (var qValue in optimalPathResult.optimalPath) {
             var firstValue = optimalPathResult.optimalPath[parseInt(qValue)];
             var secondValue = optimalPathResult.optimalPath[parseInt(qValue)+1];
-            var pathCopyWhite = findPathWithID(svg, firstValue, secondValue).clone();
-            pathCopyWhite.addTo(svg2);
-            pathCopyWhite.stroke({width: 80, color: '#d5bfbf'}).back();
+            if (secondValue !== null) {
+                try {
+                    var pathCopyWhite = findPathWithID(svg, firstValue, secondValue).clone();
+                    pathCopyWhite.addTo(svg2);
+                    pathCopyWhite.stroke({width: 80, color: '#d5bfbf'}).back();
 
-            var pathCopyBlack = findPathWithID(svg, firstValue, secondValue).clone();
-            pathCopyBlack.addTo(svg2);
-            pathCopyBlack.stroke({width: 30, color: '#000000'});
+                    var pathCopyBlack = findPathWithID(svg, firstValue, secondValue).clone();
+                    pathCopyBlack.addTo(svg2);
+                    pathCopyBlack.stroke({width: 30, color: '#000000'});
+                } catch (error) {
+                    console.log(pathCopyWhite + " > " + pathCopyBlack)
+                }
+            }
+
         }
     }
 }

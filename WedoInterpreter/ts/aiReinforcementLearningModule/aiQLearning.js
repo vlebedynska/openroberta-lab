@@ -1,5 +1,5 @@
 const linkIDPrefix = "path-";
-
+const finishNode = 7;
 
 const ResultState = {
     "SUCCESS": 1,
@@ -31,7 +31,7 @@ class Test {
 
     testStart() {
         var that = this;
-        var statesAndActions = generateStatesAndActionsFromSVG(svg, 5);
+        var statesAndActions = generateStatesAndActionsFromSVG(svg, finishNode);
         // var statesAndActions = [
         //     [undefined, 100, undefined, undefined],
         //     [0, undefined, 0, undefined],
@@ -39,43 +39,65 @@ class Test {
         //     [undefined, undefined, 0, 0]
         // ];
         var problem = new ReinforcementProblem(statesAndActions);
-        new QLearningAlgorithm().qLearner(problem, 200, 9007199254740991, 0.1, 0.5, 1, 0.1, that.qLearnerCallback)
+        new QLearningAlgorithm().qLearner(problem, 150, 9007199254740991, 0.1, 0.8, 0.1, 0.1, that.qLearnerCallback)
 
 
     }
 
-    qLearnerCallback (qValueStore) {
+    qLearnerCallback (qValueStore, problem) {
         console.log(qValueStore);
-        drawOptimalPath(qValueStore.createOptimalPath(0, 5));
+        drawOptimalPath(qValueStore.createOptimalPath(0, finishNode, problem));
+        hideAllPathsExeptTheOptimal();
     }
 
 
 
 }
 
+function hideAllPathsExeptTheOptimal() {
+    svg.find('.cls-customPathColor').hide();
+}
+
 function drawOptimalPath(optimalPathResult) {
     if (optimalPathResult.resultState == ResultState.ERROR) {
         console.log("...")
     } else {
+        var combinedPath;
         for (var qValue in optimalPathResult.optimalPath) {
             var firstValue = optimalPathResult.optimalPath[parseInt(qValue)];
             var secondValue = optimalPathResult.optimalPath[parseInt(qValue)+1];
             if (secondValue !== null) {
                 try {
-                    var pathCopyWhite = findPathWithID(svg, firstValue, secondValue).clone();
-                    pathCopyWhite.addTo(svg2);
-                    pathCopyWhite.stroke({width: 80, color: '#d5bfbf'}).back();
 
-                    var pathCopyBlack = findPathWithID(svg, firstValue, secondValue).clone();
-                    pathCopyBlack.addTo(svg2);
-                    pathCopyBlack.stroke({width: 30, color: '#000000'});
+                    if (combinedPath == undefined) {
+                        var combinedPath = findPathWithID(svg, firstValue, secondValue);
+                    } else {
+                        var temp = findPathWithID(svg, firstValue, secondValue).array();
+                        // temp.stroke({linecap: 'round'})
+                        temp.splice(0, 1);
+                        combinedPath.array().push(...temp)
+                        combinedPath.plot(combinedPath.array());
+                    }
                 } catch (error) {
-                    console.log(pathCopyWhite + " > " + pathCopyBlack)
+                    //console.log(pathCopyWhite + " > " + pathCopyBlack)
                 }
             }
-
         }
+        combinedPath.addTo(svg);
+        combinedPath.removeClass('cls-customPathColor');
+        combinedPath.addClass('pink-flower')
+        combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round' })
+            .fill('none');
+
+        var pathCopyBlack = combinedPath.clone();
+        pathCopyBlack.addTo(svg);
+        pathCopyBlack.removeClass('cls-customPathColor')
+        pathCopyBlack.addClass('pink-flower')
+        pathCopyBlack.stroke({width: 30, color: '#000000'})
+            .fill('none');
+        console.log(combinedPath.array())
     }
+
 }
 
 function findPathWithID(svg, firstValue, secondValue) {
@@ -99,39 +121,27 @@ class QLearningAlgorithm {
             if (Math.random() < rho) {
                 action = problem.takeOneOfActions(actions);
             } else {
-                action = qValueStore.getBestAction(state);
+                action = qValueStore.getBestAction(state, actions);
             }
             var rewardAndNewState = problem.takeAction(state, action);
             var reward = rewardAndNewState["reward"];
             var newState = rewardAndNewState["newState"];
             var q = qValueStore.getQValue(state, action);
-            var maxQ = qValueStore.getQValue(newState, qValueStore.getBestAction(newState));
+            var newStateActions = problem.getAvailableActions(newState);
+            var maxQ = qValueStore.getQValue(newState, qValueStore.getBestAction(newState, newStateActions));
             q = (1 - alpha) * q + alpha * (reward + gamma * maxQ);
             if (previousPath !== undefined) {
                 previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
             }
             previousPath = findPathWithID(svg, state, newState);
             let pathLength = previousPath.length();
-            if (state > newState) {
-                previousPath.stroke({color: '#8fdc5d', dasharray: "" + pathLength + ", " + pathLength , dashoffset: "" + (pathLength*(-1)), width: q*2 + 10});
-                previousPath.animate({
-                    duration: 400,
-                    delay: 0,
-                    when: 'now',
-                    // times: 5,
-                    // wait: 20
-                }).attr( "stroke-dashoffset", 0 );
-            } else {
-                previousPath.stroke({color: '#8fdc5d', dasharray: "" + pathLength + ", " + pathLength, dashoffset: "" + pathLength, width: q*2 + 10});
-                previousPath.animate({
-                    duration: 400,
-                    delay: 0,
-                    when: 'now',
-                    // times: 5,
-                    // wait: 20
-                }).attr( "stroke-dashoffset", 0 );
-            }
-
+            let direction = state > newState ? -1 : 1;
+            previousPath.stroke({color: '#8fdc5d', dasharray: "" + pathLength + ", " + pathLength , dashoffset: "" + (pathLength*direction), width: q*2 + 10});
+            previousPath.animate({
+                duration: 100,
+                delay: 0,
+                when: 'now',
+            }).attr( "stroke-dashoffset", 0 );
             qValueStore.storeQValue(state, action, q);
             console.log("state " + state + " > " + newState + "; reward " + reward + "; q " + q + "; maxQ " + maxQ);
             state = newState;
@@ -140,9 +150,9 @@ class QLearningAlgorithm {
             if (!((timeLimit > 0) && (episodes > 0))) {
                 previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
                 clearInterval(timer);
-                callback(qValueStore);
+                callback(qValueStore, problem);
             }
-        }, 300);
+        }, 100);
         return qValueStore;
     }
 
@@ -208,15 +218,14 @@ class QValueStore {
         return actions[action]; //associatedQValue
     }
 
-    getBestAction(state) {
-        //TODO Available Actions ?
-        var actions = this.qMatrix[state];
+    getBestAction(state, availableActions) {
+        var actionsQMatrix = this.qMatrix[state];
         var bestActionValue = -1;
         var bestAction;
-        for (var actionIndex in actions) {
-            var action = actions[actionIndex];
-            if (action != undefined && action > bestActionValue) {
-                bestActionValue = actions[actionIndex];
+        for (var actionIndex in actionsQMatrix) {
+            var action = actionsQMatrix[actionIndex];
+            if (action != undefined && availableActions.includes(""+actionIndex) && action > bestActionValue ) {
+                bestActionValue = actionsQMatrix[actionIndex];
                 bestAction = actionIndex
             }
         }
@@ -228,12 +237,12 @@ class QValueStore {
         actions[action] = value; // === this.qMatrix[state][action] = value;
     }
 
-    createOptimalPath(startState, endState) {
+    createOptimalPath(startState, endState, problem) {
         var optimalPath = [startState];
         var currentState = startState;
         var resultState = ResultState.SUCCESS;
         while (currentState !== endState) {
-            var nextState = parseInt(this.getBestAction(currentState));
+            var nextState = parseInt(this.getBestAction(currentState, problem.getAvailableActions(currentState)));
             currentState = nextState;
             if (optimalPath.includes(currentState)) {
                 console.log("Zyklus geschlossen bei: " + currentState);

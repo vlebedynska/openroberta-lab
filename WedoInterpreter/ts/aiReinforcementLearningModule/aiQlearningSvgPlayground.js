@@ -7,7 +7,7 @@ function file_get_contents(uri, callback) {
 
 
 function drawSVG(text) {
-    svg = SVG().addTo('#svgPlayground').size(1000, 1000);
+    svg = SVG().addTo('#svgPlayground').size(1000, 1000).viewbox("0 0 3148 1764");
     svg.svg(text);
     svg2 = SVG().addTo('#svgPlayground2').size(1000, 1000).viewbox("0 0 3148 1764");
     svg.find('.cls-customPathColor').stroke({ color: '#fcfcfc', opacity: 0.9, width: 0 });

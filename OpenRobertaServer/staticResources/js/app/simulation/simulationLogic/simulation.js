@@ -38,7 +38,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
         '/js/app/simulation/simBackgrounds/microbitBackground.svg', '/js/app/simulation/simBackgrounds/simpleBackground.svg',
         '/js/app/simulation/simBackgrounds/drawBackground.svg', '/js/app/simulation/simBackgrounds/robertaBackground.svg',
         '/js/app/simulation/simBackgrounds/rescueBackground.svg', '/js/app/simulation/simBackgrounds/wroBackground.svg',
-        '/js/app/simulation/simBackgrounds/mathBackground.svg'
+        '/js/app/simulation/simBackgrounds/mathBackground.svg', '/js/app/simulation/simBackgrounds/marsTopView.svg'
     ];
     var imgListIE = ['/js/app/simulation/simBackgrounds/baustelle.png', '/js/app/simulation/simBackgrounds/ruler.png',
         '/js/app/simulation/simBackgrounds/wallPattern.png', '/js/app/simulation/simBackgrounds/calliopeBackground.png',
@@ -96,6 +96,20 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
     preloadImages();
 
     var currentBackground = 2;
+
+    function updateBackground(num, source) {
+        imgObjectList[num] = new Image(1000, 500);
+        imgObjectList[num].src = source;
+        imgObjectList[num].onload = function () {
+            setTimeout(function () {
+                setBackground(num, setBackground);
+            }
+            , 100);
+            //initScene();
+        };
+    }
+
+    exports.updateBackground = updateBackground;
 
     function setBackground(num, callback) {
         if (num == undefined) {

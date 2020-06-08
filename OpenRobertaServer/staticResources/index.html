@@ -345,6 +345,8 @@ limitations under the License.
                         data-original-title="" title=""></button>
                     <button id="simConfigNeuralNetwork" type="button" class="simRobot blbtn typcn typcn-neural-network" lkey="Blockly.Msg.MENU_SIM_IMPORT_TOOLTIP" rel="tooltip"
                         data-original-title="" title=""></button>
+                    <button id="simConfigRLQLearning" type="button" class="simRobot blbtn typcn typcn-spiral" lkey="Blockly.Msg.MENU_SIM_IMPORT_TOOLTIP" rel="tooltip"
+                            data-original-title="" title=""></button>
 
                 </div>
             </div>
@@ -1249,6 +1251,17 @@ limitations under the License.
             <div id="simConfigNeuralNetworkSVG"></div>
         </div>
     </div>
+
+    <!-- Popup for q learning algorithm robot -> EV3 -->
+    <div class="modal fade simConfigRLQLearning" data-backdrop="false" id="simConfigRLQLearningModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">&times;</button>
+            </div>
+            <div id="qLearningBackgroundArea"></div>
+        </div>
+    </div>
+
     </div>
     <div id="device-size">
         <div id="xs" class="visible-xs"></div>

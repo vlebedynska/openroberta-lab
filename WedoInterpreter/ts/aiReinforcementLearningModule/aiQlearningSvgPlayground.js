@@ -17,6 +17,5 @@ function drawSVG(text) {
 
 file_get_contents("./Mars_Top_View-08.svg", function (text) {
     drawSVG(text);
-
     new Test().testStart();
 });

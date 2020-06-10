@@ -388,6 +388,8 @@
 	"PROCEDURES_IFRETURN_TOOLTIP": "Wenn der erste Wert wahr (true) ist, gib den zweiten Wert zurück.",
 	"PROCEDURES_IFRETURN_HELPURL": "http://c2.com/cgi/wiki?GuardClause",
 	"PROCEDURES_IFRETURN_WARNING": "Warnung: Dieser Block darf nur innerhalb eines Funktionsblock genutzt werden.",
+	"RL_DRAW_OPTIMAL_PATH": "Zeichne den optimalen Weg",
+	"RL_DRAW_OPTIMA_PATH_TOOLTIP": "Mit der gewonnen Erfahrung wird der optimale Weg auf der Karte gezeichnet.",
 	"MAP": "Karte",
 	"RL_STARTING_POSITION": "Start",
 	"RL_FINISH_POSITION": "Ziel",

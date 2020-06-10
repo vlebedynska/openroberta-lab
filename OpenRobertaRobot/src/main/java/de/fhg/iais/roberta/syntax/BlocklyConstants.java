@@ -14,6 +14,13 @@ public final class BlocklyConstants {
     public static final String OUTPUTNODE = "OUTPUTNODE";
     public static final String INPUT_LAYER = "INPUT_LAYER";
     public static final String OUTPUT_LAYER = "OUTPUT_LAYER";
+    public static final String OBSTACLE = "OBSTACLE";
+    public static final String QLEARNING_START = "START"; //TODO Blockly ändern
+    public static final String QLEARNING_FINISH = "FINISH"; //TODO Blockly ändern
+    public static final String QLEARNING_ALPHA = "ALPHA"; //TODO Blockly ändern
+    public static final String QLEARNING_GAMMA = "GAMMA"; //TODO Blockly ändern
+    public static final String QLEARNING_NU = "NU"; //TODO Blockly ändern
+    public static final String QLEARNING_RHO = "RHO"; //TODO Blockly ändern
 
     public static final String ADD = "ADD";
     public static final String ELSE = "ELSE";

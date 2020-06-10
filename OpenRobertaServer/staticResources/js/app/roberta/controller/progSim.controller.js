@@ -265,11 +265,16 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
             console.log("...")
         } else {
             var combinedPath;
+            var combinedPathTestPurpose;
             for (var qValue in optimalPathResult.optimalPath) {
                 var firstValue = optimalPathResult.optimalPath[parseInt(qValue)];
                 var secondValue = optimalPathResult.optimalPath[parseInt(qValue)+1];
                 if (secondValue !== null) {
+
                     try {
+                        combinedPathTestPurpose = findPathWithID(svg, firstValue, secondValue);
+                        combinedPathTestPurpose.addTo(svg);
+                        combinedPathTestPurpose.stroke({width: 20, color: '#1ad274'})
 
                         if (combinedPath == undefined) {
                             var combinedPath = findPathWithID(svg, firstValue, secondValue);
@@ -281,23 +286,25 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
                             combinedPath.plot(combinedPath.array());
                         }
                     } catch (error) {
-                        //console.log(pathCopyWhite + " > " + pathCopyBlack)
+                        console.log(combinedPathTestPurpose + " > " + combinedPath);
                     }
                 }
             }
             combinedPath.addTo(svg);
             combinedPath.removeClass('cls-customPathColor');
             combinedPath.addClass('pink-flower')
-            combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round' })
+            combinedPath.stroke({width: 13, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round' })
                 .fill('none');
 
-            var pathCopyBlack = combinedPath.clone();
-            pathCopyBlack.addTo(svg);
-            pathCopyBlack.removeClass('cls-customPathColor')
-            pathCopyBlack.addClass('pink-flower')
-            pathCopyBlack.stroke({width: 30, color: '#000000'})
-                .fill('none');
-            console.log(combinedPath.array())
+
+
+            // var pathCopyBlack = combinedPath.clone();
+            // pathCopyBlack.addTo(svg);
+            // pathCopyBlack.removeClass('cls-customPathColor')
+            // pathCopyBlack.addClass('pink-flower')
+            // pathCopyBlack.stroke({width: 30, color: '#000000'})
+            //     .fill('none');
+            // console.log(combinedPath.array())
         }
 
     }

@@ -65,6 +65,7 @@ public enum BlocklyType {
     PRIM("",false, NUMBER, BOOLEAN),
     INPUTNODE("InputNode", false, ANY),
     OUTPUTNODE("OutputNode", false, ANY),
+    OBSTACLE("Obstacle", false, ANY),
     NOTHING("", false, REF, PRIM),
     VOID("",false),
     CONNECTION("Connection",false, ANY),

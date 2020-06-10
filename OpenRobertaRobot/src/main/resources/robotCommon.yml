@@ -1,4 +1,20 @@
 block:
+  AI_RL_Q_GAIN_EXPERIENCE:
+    category: STMT
+    implementor: de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlGainExperience
+    type: [ai_q_apply_learning_rule]
+  AI_RL_Q_LEARNER_CONFIG:
+      category: STMT
+      implementor: de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlSetUpQLearningBehaviour
+      type: [ai_q_learner_config]
+  AI_RL_OBSTACLE:
+      category: EXPR
+      implementor: de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlObstacle
+      type: [ai_q_barrier_mountain]
+  AI_RL_ENVIRONMENT:
+      category: STMT
+      implementor: de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlEnvironment
+      type: [ai_q_learning_states_and_actions_map]
   AI_NN_INPUT_NODE:
       category: EXPR
       implementor: de.fhg.iais.roberta.syntax.ai.AiInput

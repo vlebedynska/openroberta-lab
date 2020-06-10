@@ -11,7 +11,7 @@ public class ReinforcementLearningQLearningComponentsAstTest extends AstTest {
     public void validateRlEnvironment() throws Exception {
         String a =
             "BlockAST[project=[[Location[x=122,y=43],MainTask[],RlEnvironment[Startnode:0Finish-Node:8Obstacles:ListCreate[OBSTACLE,EmptyExpr[defVal=ARRAY],EmptyExpr[defVal=ARRAY],EmptyExpr[defVal=ARRAY]]]]]]";
-        UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/reinforcementLearning/ai_q_learning_states_and_actions_matrix_3_x_3.xml");
+        UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/reinforcementLearning/ai_q_learning_states_and_actions_map.xml");
     }
 
     @Test

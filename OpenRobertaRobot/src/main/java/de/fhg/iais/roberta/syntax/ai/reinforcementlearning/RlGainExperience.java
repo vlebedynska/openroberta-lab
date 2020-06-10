@@ -11,6 +11,8 @@ import java.util.List;
 
 public class RlGainExperience <V> extends Stmt<V> {
 
+    private static final String AI_RL_Q_GAIN_EXPERIENCE = "AI_RL_Q_GAIN_EXPERIENCE";
+
     /**
      * This constructor set the kind of the statement object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
      *
@@ -25,11 +27,11 @@ public class RlGainExperience <V> extends Stmt<V> {
 
 
     public static <V> RlGainExperience<V> make(BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new RlGainExperience<V>(BlockTypeContainer.getByName("AI_RL_Q_GAIN_EXPERIENCE"), properties, comment);
+        return new RlGainExperience<V>(BlockTypeContainer.getByName(AI_RL_Q_GAIN_EXPERIENCE), properties, comment);
     }
 
     public String toString() {
-        return this.getClass().getSimpleName() + " [" + " Nothing to convert: " + " ]";
+        return this.getClass().getSimpleName() + "[]";
     }
 
 
@@ -39,11 +41,12 @@ public class RlGainExperience <V> extends Stmt<V> {
 
 
 
-
+    //FIXME impl
     @Override protected V acceptImpl(IVisitor<V> visitor) {
         return null;
     }
 
+    //FIXME impl
     @Override public Block astToBlock() {
         return null;
     }

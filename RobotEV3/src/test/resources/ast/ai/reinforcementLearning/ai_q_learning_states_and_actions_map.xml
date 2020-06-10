@@ -4,7 +4,7 @@
         <mutation declare="false"></mutation>
         <field name="DEBUG">FALSE</field>
       </block>
-      <block type="ai_q_learning_states_and_actions_matrix_3_x_3" id="IUJLU!rzwElCjD@+4%6}" intask="true">
+      <block type="ai_q_learning_states_and_actions_map" id="IUJLU!rzwElCjD@+4%6}" intask="true">
         <field name="START">A</field>
         <field name="FINISH">I</field>
         <value name="OBSTACLE">

@@ -12,6 +12,9 @@ import de.fhg.iais.roberta.visitor.IVisitor;
 import java.util.List;
 
 public class RlObstacle<V> extends Expr<V> {
+
+    private static final String AI_RL_OBSTACLE = "AI_RL_OBSTACLE";
+
     private final int startNode;
     private final int finishNode;
 
@@ -23,7 +26,7 @@ public class RlObstacle<V> extends Expr<V> {
     }
 
     public static <V> RlObstacle<V> make(BlocklyBlockProperties properties, BlocklyComment comment, int startNode, int finishNode) {
-        return new RlObstacle<V>(BlockTypeContainer.getByName("AI_RL_OBSTACLE"), properties, comment, startNode, finishNode);
+        return new RlObstacle<V>(BlockTypeContainer.getByName(AI_RL_OBSTACLE), properties, comment, startNode, finishNode);
     }
 
 
@@ -36,20 +39,11 @@ public class RlObstacle<V> extends Expr<V> {
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
         List<Field> fields = helper.extractFields(block, (short) 2);
 
-        int startNode = castCharacterToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_START, null));
-        int finishNode = castCharacterToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_FINISH, null));
+        int startNode = RlUtils.castCharacterStringToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_START));
+        int finishNode = RlUtils.castCharacterStringToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_FINISH));
 
         return RlObstacle.make(helper.extractBlockProperties(block), helper.extractComment(block), startNode, finishNode);
     }
-
-
-
-    private static Integer castCharacterToInt(String character) {
-        String characters = "abcdefghijklmnopqrstuvwxyz";
-        return characters.indexOf(character.toLowerCase());
-    }
-
-
 
 
     public int getStartNode() {

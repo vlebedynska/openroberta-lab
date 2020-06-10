@@ -15,6 +15,8 @@ import java.util.List;
 
 public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
 
+    private static final String AI_RL_Q_LEARNER_CONFIG = "AI_RL_Q_LEARNER_CONFIG";
+
     private final float alpha; //learning speed between 0 (slow) and 1 (fast)
     private final float gamma; // reward between 0 (immediately) and 1 later
     private final float nu; // startposition 0 (stay on path) and 1 (start random)
@@ -48,7 +50,7 @@ public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
         float gamma,
         float nu,
         float rho) {
-        return new RlSetUpQLearningBehaviour<V>(BlockTypeContainer.getByName("AI_RL_Q_LEARNER_CONFIG"), properties, comment, alpha, gamma, nu, rho);
+        return new RlSetUpQLearningBehaviour<V>(BlockTypeContainer.getByName(AI_RL_Q_LEARNER_CONFIG), properties, comment, alpha, gamma, nu, rho);
     }
 
     public String toString() {
@@ -60,10 +62,10 @@ public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
         List<Field> fields = helper.extractFields(block, (short) 4);
 
-        float alpha = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_ALPHA, null));
-        float gamma = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_GAMMA, null));
-        float nu = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_NU, null));
-        float rho = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_RHO, null));
+        float alpha = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_ALPHA));
+        float gamma = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_GAMMA));
+        float nu = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_NU));
+        float rho = Float.parseFloat(helper.extractField(fields, BlocklyConstants.QLEARNING_RHO));
 
         return RlSetUpQLearningBehaviour.make(helper.extractBlockProperties(block), helper.extractComment(block), alpha, gamma, nu, rho);
     }

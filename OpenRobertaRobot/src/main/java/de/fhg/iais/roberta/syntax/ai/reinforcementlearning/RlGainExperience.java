@@ -5,6 +5,7 @@ import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.stmt.Stmt;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.visitor.IVisitor;
 
 import java.util.List;
@@ -46,8 +47,9 @@ public class RlGainExperience <V> extends Stmt<V> {
         return null;
     }
 
-    //FIXME impl
     @Override public Block astToBlock() {
-        return null;
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        return jaxbDestination;
     }
 }

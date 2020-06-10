@@ -7,6 +7,7 @@ import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.expr.ListCreate;
 import de.fhg.iais.roberta.syntax.lang.stmt.Stmt;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.transformer.ExprParam;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
@@ -22,6 +23,21 @@ public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
     private final float nu; // startposition 0 (stay on path) and 1 (start random)
     private final float rho; //experience 0 (none) and 1 (very experienced)
 
+    public float getAlpha() {
+        return alpha;
+    }
+
+    public float getGamma() {
+        return gamma;
+    }
+
+    public float getNu() {
+        return nu;
+    }
+
+    public float getRho() {
+        return rho;
+    }
 
     /**
      * This constructor set the kind of the statement object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -77,6 +93,12 @@ public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
     }
 
     @Override public Block astToBlock() {
-        return null;
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_ALPHA, String.valueOf(getAlpha()));
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_GAMMA, String.valueOf(getGamma()));
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_NU, String.valueOf(getNu()));
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_RHO, String.valueOf(getRho()));
+        return jaxbDestination;
     }
 }

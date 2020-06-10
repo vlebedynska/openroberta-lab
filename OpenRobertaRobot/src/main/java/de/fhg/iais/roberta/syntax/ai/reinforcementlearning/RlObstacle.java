@@ -6,6 +6,7 @@ import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.syntax.lang.expr.Expr;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
+import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
 
@@ -71,6 +72,10 @@ public class RlObstacle<V> extends Expr<V> {
     }
 
     @Override public Block astToBlock() {
-        return null;
+        Block jaxbDestination = new Block();
+        Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_START, RlUtils.castIntToCharacterAsString(getStartNode()).toUpperCase());
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_FINISH, RlUtils.castIntToCharacterAsString(getFinishNode()).toUpperCase());
+        return jaxbDestination;
     }
 }

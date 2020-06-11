@@ -44,6 +44,8 @@ public class C {
     public static final String CREATE_LIST = "createList";
     public static final String CREATE_LIST_REPEAT = "createListREPEAT";
     public static final String CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
+    public static final String CREATE_Q_LEARNING_ENVIRONMENT = "createQLearningEnvironment";
+    public static final String CREATE_OBSTACLE = "createObstacle";
     public static final String CURVE_ACTION = "CurveAction";
     public static final String DEBUG_ACTION = "DebugAction";
     public static final String DEGREE = "degree";
@@ -213,6 +215,13 @@ public class C {
     public static final String POWER = "POWER";
     public static final String PRESENCE = "presence";
     public static final String PROCESS_NEURAL_NETWORK = "processNeuralNetwork";
+    public static final String QLEARNING_STARTNODE = "qlearningStartNode";
+    public static final String QLEARNING_FINISHNODE = "qlearningFinishNode";
+    public static final String Q_LEARNING_ALPHA = "qLearningAlpha";
+    public static final String Q_LEARNING_GAMMA = "qLearningGamma";
+    public static final String Q_LEARNING_NU = "qLearningNu";
+    public static final String Q_LEARNING_RHO = "qLearningRho";
+    public static final String Q_LEARNING_DRAW_OPTIMAL_PATH = "qLearningDrawOptimalPath";
     public static final String RANDOM = "random";
     public static final String RANDOM_DOUBLE = "randDouble";
     public static final String RANDOM_INT = "randInt";
@@ -229,6 +238,7 @@ public class C {
     public static final String RIGHT = "right";
     public static final String ROTATION = "rotation";
     public static final String ROTATIONS = "rotations";
+    public static final String RUN_Q_LEARNER = "runQLearner";
     public static final String SAY_TEXT_ACTION = "SayTextAction";
     public static final String SEEK = "presence";
     public static final String SENSOR_MODE = "sensorMode";
@@ -238,6 +248,7 @@ public class C {
     public static final String SET = "set";
     public static final String SET_LANGUAGE_ACTION = "SetLanguageAction";
     public static final String SET_VOLUME_ACTION = "SetVolumeAction";
+    public static final String SETUP_Q_LEARNING_BEHAVIOUR = "setupQLearningBehaviour";
     public static final String SHAKE = "shake";
     public static final String SHOW_IMAGE_ACTION = "ShowImageAction";
     public static final String SHOW_TEXT_ACTION = "ShowTextAction";

@@ -6,6 +6,10 @@ import de.fhg.iais.roberta.bean.IProjectBean;
 import de.fhg.iais.roberta.components.ConfigurationAst;
 import de.fhg.iais.roberta.syntax.action.ev3.ShowPictureAction;
 import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlDrawOptimalPath;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlEnvironment;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlGainExperience;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.RlSetUpQLearningBehaviour;
 import de.fhg.iais.roberta.syntax.sensor.generic.HTColorSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.CompassSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.IRSeekerSensor;
@@ -54,4 +58,23 @@ public final class Ev3SimValidatorVisitor extends AbstractSimValidatorVisitor im
     @Override public Void visitAiNeuralNetwork(AiNeuralNetwork<Void> voidAiNeuralNetwork) {
         return null;
     }
+
+
+    @Override public Void visitAiRlDrawOptimalPath(RlDrawOptimalPath<Void> voidRlDrawOptimalPath) {
+        return null;
+    }
+
+    @Override public Void visitAiRlEnvironment(RlEnvironment<Void> voidRlEnvironment) {
+        return null;
+    }
+
+    @Override public Void visitAiRlGainExperience(RlGainExperience<Void> voidRlGainExperience) {
+        return null;
+    }
+
+    @Override public Void visitAiRlSetUpQLearningBehaviour(RlSetUpQLearningBehaviour<Void> voidRlSetUpQLearningBehaviour) {
+        return null;
+    }
+
+
 }

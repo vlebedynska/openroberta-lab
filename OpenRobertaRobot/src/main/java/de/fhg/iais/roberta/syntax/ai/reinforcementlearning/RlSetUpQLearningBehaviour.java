@@ -11,6 +11,7 @@ import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.transformer.ExprParam;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class RlSetUpQLearningBehaviour<V> extends Stmt<V> {
 
 
     @Override protected V acceptImpl(IVisitor<V> visitor) {
-        return null;
+        return ((IAiVisitor<V>) visitor).visitAiRlSetUpQLearningBehaviour(this);
     }
 
     @Override public Block astToBlock() {

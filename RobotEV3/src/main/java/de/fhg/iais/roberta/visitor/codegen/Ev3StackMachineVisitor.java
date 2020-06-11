@@ -3,6 +3,7 @@ package de.fhg.iais.roberta.visitor.codegen;
 import java.util.ArrayList;
 
 import de.fhg.iais.roberta.syntax.ai.*;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.*;
 import org.json.JSONObject;
 
 import de.fhg.iais.roberta.components.ConfigurationAst;
@@ -259,6 +260,54 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         JSONObject o = mk(C.PROCESS_NEURAL_NETWORK);
         return app(o);
     }
+
+    @Override
+    public V visitAiRlEnvironment(RlEnvironment<V> rlEnvironment) {
+        rlEnvironment.getListRlObstacle().accept(this);
+        int startNode = rlEnvironment.getStartNode();
+        int finishNode = rlEnvironment.getFinishNode();
+        JSONObject o = mk(C.CREATE_Q_LEARNING_ENVIRONMENT)
+            .put(C.QLEARNING_STARTNODE, startNode)
+            .put(C.QLEARNING_FINISHNODE, finishNode);
+        return app(o);
+    }
+
+    @Override
+    public V visitAiRlGainExperience(RlGainExperience<V> rlGainExperience) {
+        JSONObject o = mk(C.RUN_Q_LEARNER);
+        return app(o);
+    }
+
+    @Override
+    public V visitAiRlObstacle(RlObstacle<V> rlObstacle) {
+        int startNode = rlObstacle.getStartNode();
+        int finishNode = rlObstacle.getFinishNode();
+        JSONObject o = mk(C.CREATE_OBSTACLE)
+            .put(C.QLEARNING_STARTNODE, startNode)
+            .put(C.QLEARNING_FINISHNODE, finishNode);
+        return app(o);
+    }
+
+    @Override
+    public V visitAiRlSetUpQLearningBehaviour(RlSetUpQLearningBehaviour<V> rlSetUpQLearningBehaviour) {
+        float alpha = rlSetUpQLearningBehaviour.getAlpha();
+        float gamma = rlSetUpQLearningBehaviour.getGamma();
+        float nu = rlSetUpQLearningBehaviour.getNu();
+        float rho = rlSetUpQLearningBehaviour.getRho();
+        JSONObject o = mk(C.SETUP_Q_LEARNING_BEHAVIOUR)
+            .put(C.Q_LEARNING_ALPHA, alpha)
+            .put(C.Q_LEARNING_GAMMA, gamma)
+            .put(C.Q_LEARNING_NU, nu)
+            .put(C.Q_LEARNING_RHO, rho);
+        return app(o);
+    }
+
+    @Override
+    public V visitAiRlDrawOptimalPath(RlDrawOptimalPath<V> rlDrawOptimalPath) {
+        JSONObject o = mk(C.Q_LEARNING_DRAW_OPTIMAL_PATH);
+        return app(o);
+    }
+
 
     @Override
     public V visitTurnAction(TurnAction<V> turnAction) {

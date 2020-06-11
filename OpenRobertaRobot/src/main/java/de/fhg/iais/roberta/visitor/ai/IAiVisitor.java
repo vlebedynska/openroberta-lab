@@ -5,6 +5,7 @@ import de.fhg.iais.roberta.syntax.ai.AiInput;
 import de.fhg.iais.roberta.syntax.ai.AiInputNodeColourSensor;
 import de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork;
 import de.fhg.iais.roberta.syntax.ai.AiOutput;
+import de.fhg.iais.roberta.syntax.ai.reinforcementlearning.*;
 import de.fhg.iais.roberta.util.dbc.DbcException;
 import de.fhg.iais.roberta.visitor.IVisitor;
 
@@ -41,5 +42,15 @@ public interface IAiVisitor<V> extends IVisitor<V> {
     default V visitAiInputNodeColourSensor(AiInputNodeColourSensor<V> aiInputNodeColourSensor) {
         throw getNotImplementedException(aiInputNodeColourSensor);
     }
+
+    default V visitAiRlEnvironment(RlEnvironment<V> rlEnvironment) {throw getNotImplementedException(rlEnvironment);}
+
+    default V visitAiRlGainExperience(RlGainExperience<V> rlGainExperience) {throw getNotImplementedException(rlGainExperience);}
+
+    default V visitAiRlObstacle(RlObstacle<V> rlObstacle) {throw getNotImplementedException(rlObstacle);}
+
+    default V visitAiRlSetUpQLearningBehaviour(RlSetUpQLearningBehaviour<V> rlSetUpQLearningBehaviour) {throw getNotImplementedException(rlSetUpQLearningBehaviour);}
+
+    default V visitAiRlDrawOptimalPath(RlDrawOptimalPath<V> rlDrawOptimalPath) {throw getNotImplementedException(rlDrawOptimalPath);}
 
 }

@@ -1,7 +1,6 @@
 package de.fhg.iais.roberta.syntax.ai.reinforcementlearning;
 
 import de.fhg.iais.roberta.blockly.generated.Block;
-import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.stmt.Stmt;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
@@ -9,11 +8,9 @@ import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
-import java.util.List;
+public class RlDrawOptimalPath <V> extends Stmt<V> {
 
-public class RlGainExperience <V> extends Stmt<V> {
-
-    private static final String AI_RL_Q_GAIN_EXPERIENCE = "AI_RL_Q_GAIN_EXPERIENCE";
+    private static final String AI_RL_QLEARNING_DRAW_OPTIMAL_PATH = "AI_RL_QLEARNING_DRAW_OPTIMAL_PATH";
 
     /**
      * This constructor set the kind of the statement object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -22,14 +19,14 @@ public class RlGainExperience <V> extends Stmt<V> {
      * @param properties of the block (see {@link BlocklyBlockProperties}),
      * @param comment    of the user for the specific block
      */
-    private RlGainExperience(
+    public RlDrawOptimalPath(
         BlockType kind, BlocklyBlockProperties properties, BlocklyComment comment) {
         super(kind, properties, comment);
     }
 
 
-    public static <V> RlGainExperience<V> make(BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new RlGainExperience<V>(BlockTypeContainer.getByName(AI_RL_Q_GAIN_EXPERIENCE), properties, comment);
+    public static <V> RlDrawOptimalPath<V> make(BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new RlDrawOptimalPath<>(BlockTypeContainer.getByName(AI_RL_QLEARNING_DRAW_OPTIMAL_PATH), properties, comment);
     }
 
     public String toString() {
@@ -38,12 +35,12 @@ public class RlGainExperience <V> extends Stmt<V> {
 
 
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
-        return RlGainExperience.make(helper.extractBlockProperties(block), helper.extractComment(block));
+        return RlDrawOptimalPath.make(helper.extractBlockProperties(block), helper.extractComment(block));
     }
 
 
     @Override protected V acceptImpl(IVisitor<V> visitor) {
-        return ((IAiVisitor<V>) visitor).visitAiRlGainExperience(this);
+        return ((IAiVisitor<V>) visitor).visitAiRlDrawOptimalPath(this);
     }
 
     @Override public Block astToBlock() {
@@ -51,4 +48,5 @@ public class RlGainExperience <V> extends Stmt<V> {
         Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
         return jaxbDestination;
     }
+
 }

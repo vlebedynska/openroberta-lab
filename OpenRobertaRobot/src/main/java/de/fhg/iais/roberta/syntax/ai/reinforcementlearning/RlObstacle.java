@@ -9,6 +9,7 @@ import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class RlObstacle<V> extends Expr<V> {
     }
 
     @Override protected V acceptImpl(IVisitor<V> visitor) {
-        return null;
+        return ((IAiVisitor<V>) visitor).visitAiRlObstacle(this);
     }
 
     @Override public Block astToBlock() {

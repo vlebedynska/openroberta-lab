@@ -14,6 +14,7 @@ import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.transformer.ExprParam;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
 import de.fhg.iais.roberta.visitor.IVisitor;
+import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 public class RlEnvironment<V> extends Stmt<V> {
 
@@ -70,9 +71,7 @@ public class RlEnvironment<V> extends Stmt<V> {
     }
 
     @Override
-    protected V acceptImpl(IVisitor<V> visitor) {
-        return null; //FIXME impl
-    }
+    protected V acceptImpl(IVisitor<V> visitor) {return ((IAiVisitor<V>) visitor).visitAiRlEnvironment(this);}
 
     public String toString() {
         return this.getClass().getSimpleName() + " [" + " Startnode: " + startNode + " Finish-Node: " + finishNode + " Obstacles: " + listRlObstacle + " ]";

@@ -43,4 +43,11 @@ public class ReinforcementLearningQLearningComponentsAstTest extends AstTest {
         UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/reinforcementLearning/ai_q_drive_the_best_way.xml");
     }
 
+    @Test
+    public void validateRlDrawOptimalPath() throws Exception {
+        String a =
+            "BlockAST[project=[[Location[x=114,y=48],MainTask[],RlDrawOptimalPath[]]]]";
+        UnitTestHelper.checkProgramAstEquality(testFactory, a, "/ast/ai/reinforcementLearning/ai_q_draw_optimal_path.xml");
+    }
+
 }

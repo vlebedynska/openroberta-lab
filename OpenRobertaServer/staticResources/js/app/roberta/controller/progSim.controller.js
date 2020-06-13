@@ -141,23 +141,23 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
 
         });
 
-        $('#simConfigRLQLearningModal').on('shown.bs.modal', function (event) {
-            file_get_contents("/js/app/simulation/simBackgrounds/marsTopView.svg", function (text) {
-                drawSVG(text);
-                new Test().testStart();
-            });
-        });
-
-
-        $('#simConfigRLQLearningModal').on('hidden.bs.modal', function (event) {
-            clearInterval(timer);
-            $('#qLearningBackgroundArea').html("");
-        });
-
-        $('#simConfigRLQLearningModal').on('hide.bs.modal', function (event) {
-            clearInterval(timer);
-            $('#qLearningBackgroundArea').html("");
-        });
+        // $('#simConfigRLQLearningModal').on('shown.bs.modal', function (event) {
+        //     file_get_contents("/js/app/simulation/simBackgrounds/marsTopView.svg", function (text) {
+        //         drawSVG(text);
+        //         new Test().testStart();
+        //     });
+        // });
+        //
+        //
+        // $('#simConfigRLQLearningModal').on('hidden.bs.modal', function (event) {
+        //     clearInterval(timer);
+        //     $('#qLearningBackgroundArea').html("");
+        // });
+        //
+        // $('#simConfigRLQLearningModal').on('hide.bs.modal', function (event) {
+        //     clearInterval(timer);
+        //     $('#qLearningBackgroundArea').html("");
+        // });
 
 
         $('#simValues').onWrap('click', function(event) {
@@ -237,7 +237,6 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
             // ];
             var problem = new ReinforcementProblem(statesAndActions);
             new QLearningAlgorithm().qLearner(problem, 150, 9007199254740991, 0.1, 0.8, 1, 0.1, that.qLearnerCallback)
-
 
         }
 

@@ -44,6 +44,8 @@ define(["require", "exports"], function (require, exports) {
     exports.CREATE_LIST = "createList";
     exports.CREATE_LIST_REPEAT = "createListREPEAT";
     exports.CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
+    exports.CREATE_Q_LEARNING_ENVIRONMENT = "createQLearningEnvironment";
+    exports.CREATE_OBSTACLE = "createObstacle";
     exports.CURVE_ACTION = "CurveAction";
     exports.DEBUG_ACTION = "DebugAction";
     exports.DEGREE = "degree";
@@ -211,6 +213,13 @@ define(["require", "exports"], function (require, exports) {
     exports.POWER = "POWER";
     exports.PRESENCE = "presence";
     exports.PROCESS_NEURAL_NETWORK = "processNeuralNetwork";
+    exports.QLEARNING_STARTNODE = "qlearningStartNode";
+    exports.QLEARNING_FINISHNODE = "qlearningFinishNode";
+    exports.Q_LEARNING_ALPHA = "qLearningAlpha";
+    exports.Q_LEARNING_GAMMA = "qLearningGamma";
+    exports.Q_LEARNING_NU = "qLearningNu";
+    exports.Q_LEARNING_RHO = "qLearningRho";
+    exports.Q_LEARNING_DRAW_OPTIMAL_PATH = "qLearningDrawOptimalPath";
     exports.RANDOM = "random";
     exports.RANDOM_DOUBLE = "randDouble";
     exports.RANDOM_INT = "randInt";
@@ -227,6 +236,7 @@ define(["require", "exports"], function (require, exports) {
     exports.RIGHT = "right";
     exports.ROTATION = "rotation";
     exports.ROTATIONS = "rotations";
+    exports.RUN_Q_LEARNER = "runQLearner";
     exports.SAY_TEXT_ACTION = "SayTextAction";
     exports.SEEK = "presence";
     exports.SENSOR_MODE = "sensorMode";
@@ -235,6 +245,7 @@ define(["require", "exports"], function (require, exports) {
     exports.SET = "set";
     exports.SET_LANGUAGE_ACTION = "SetLanguageAction";
     exports.SET_VOLUME_ACTION = "SetVolumeAction";
+    exports.SETUP_Q_LEARNING_BEHAVIOUR = "setupQLearningBehaviour";
     exports.SHAKE = "shake";
     exports.SHOW_IMAGE_ACTION = "ShowImageAction";
     exports.SHOW_TEXT_ACTION = "ShowTextAction";

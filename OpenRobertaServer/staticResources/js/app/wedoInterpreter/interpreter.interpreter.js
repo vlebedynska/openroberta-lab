@@ -95,6 +95,27 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                 else {
                     const opCode = stmt[C.OPCODE];
                     switch (opCode) {
+                        case C.CREATE_Q_LEARNING_ENVIRONMENT: {
+                            var startNode = stmt[C.QLEARNING_STARTNODE];
+                            var finishNode = stmt[C.QLEARNING_FINISHNODE];
+                            var obstaclesList = s.pop();
+                            return n.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+                        }
+                        case C.SETUP_Q_LEARNING_BEHAVIOUR: {
+                            var rho = stmt[C.Q_LEARNING_RHO];
+                            var nu = stmt[C.Q_LEARNING_NU];
+                            var gamma = stmt[C.Q_LEARNING_GAMMA];
+                            var alpha = stmt[C.Q_LEARNING_ALPHA];
+                            n.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+                            break;
+                        }
+                        case C.RUN_Q_LEARNER: {
+                            return n.runQLearner();
+                        }
+                        case C.Q_LEARNING_DRAW_OPTIMAL_PATH: {
+                            n.drawOptimalPath();
+                            break;
+                        }
                         case C.PROCESS_NEURAL_NETWORK: {
                             var outputLayer = s.pop();
                             var inputLayer = s.pop();
@@ -428,6 +449,14 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             const left = s.pop();
                             const value = s.pop();
                             n.assertAction(stmt[C.MSG], left, stmt[C.OP], right, value);
+                            break;
+                        }
+                        case C.CREATE_OBSTACLE: {
+                            let obstacle = {
+                                startNode: stmt[C.QLEARNING_STARTNODE],
+                                finishNode: stmt[C.QLEARNING_FINISHNODE]
+                            }
+                            s.push(obstacle);
                             break;
                         }
                         case C.CREATE_INPUT_NODE_COLOUR_SENSOR: {

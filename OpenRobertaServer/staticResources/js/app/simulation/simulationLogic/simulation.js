@@ -353,7 +353,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
         interpreters = programs.map(function(x) {
             var src = JSON.parse(x.javaScriptProgram);
             configurations.push(x.javaScriptConfiguration);
-            return new SIM_I.Interpreter(src, new MBED_R.RobotMbedBehaviour(), callbackOnTermination);
+            return new SIM_I.Interpreter(src, new MBED_R.RobotMbedBehaviour(updateBackground), callbackOnTermination);
         });
         
 

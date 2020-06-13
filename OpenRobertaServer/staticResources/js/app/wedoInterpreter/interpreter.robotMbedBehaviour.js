@@ -1,31 +1,34 @@
-define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "svgdotjs"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, svgdotjs_1) {
+define(["require", "exports", "simulation.simulation", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "svgdotjs"], function (require, exports, SIM, interpreter_aRobotBehaviour_1, C, U, $, svgdotjs_1) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    Object.defineProperty(exports, "__esModule", {value: true});
+
     class RobotMbedBehaviour extends interpreter_aRobotBehaviour_1.ARobotBehaviour {
-        constructor() {
+        constructor(updateBackground) {
             super();
             this.mouseOver = function (line) {
                 line.stroke = "rgb(0,255,0)";
             };
             this.hardwareState.motors = {};
+            this.updateBackground = updateBackground;
+            this.qLearningAlgorithmModule = new QLearningAlgorithmModule(updateBackground);
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             this.draggingElement = null;
             U.loggingEnabled(true, true);
         }
+
         getSample(s, name, sensor, port, mode) {
             var robotText = 'robot: ' + name + ', port: ' + port + ', mode: ' + mode;
             U.debug(robotText + ' getsample from ' + sensor);
             var sensorName = sensor;
             if (sensorName == C.TIMER) {
                 s.push(this.timerGet(port));
-            }
-            else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
+            } else if (sensorName == C.ENCODER_SENSOR_SAMPLE) {
                 s.push(this.getEncoderValue(mode, port));
-            }
-            else {
+            } else {
                 s.push(this.getSensorValue(sensorName, port, mode));
             }
         }
+
         getEncoderValue(mode, port) {
             const sensor = this.hardwareState.sensors.encoder;
             port = port == C.MOTOR_LEFT ? C.LEFT : C.RIGHT;
@@ -33,13 +36,13 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 const v = sensor[port];
                 if (v === undefined) {
                     return "undefined";
-                }
-                else {
+                } else {
                     return this.rotation2Unit(v, mode);
                 }
             }
             return sensor;
         }
+
         rotation2Unit(value, unit) {
             switch (unit) {
                 case C.DEGREE:
@@ -52,6 +55,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     return 0;
             }
         }
+
         getSensorValue(sensorName, port, mode) {
             const sensor = this.hardwareState.sensors[sensorName];
             if (sensor === undefined) {
@@ -61,40 +65,38 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             if (mode != undefined) {
                 if (port != undefined) {
                     v = sensor[port][mode];
-                }
-                else {
+                } else {
                     v = sensor[mode];
                 }
-            }
-            else if (port != undefined) {
+            } else if (port != undefined) {
                 if (mode === undefined) {
                     v = sensor[port];
                 }
-            }
-            else {
+            } else {
                 return sensor;
             }
             if (v === undefined) {
                 return false;
-            }
-            else {
+            } else {
                 return v;
             }
         }
+
         encoderReset(port) {
             U.debug('encoderReset for ' + port);
             this.hardwareState.actions.encoder = {};
             if (port == C.MOTOR_LEFT) {
                 this.hardwareState.actions.encoder.leftReset = true;
-            }
-            else {
+            } else {
                 this.hardwareState.actions.encoder.rightReset = true;
             }
         }
+
         timerReset(port) {
             this.hardwareState.timers[port] = Date.now();
             U.debug('timerReset for ' + port);
         }
+
         timerGet(port) {
             const now = Date.now();
             var startTime = this.hardwareState.timers[port];
@@ -105,18 +107,21 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             U.debug('timerGet for ' + port + ' returned ' + delta);
             return delta;
         }
+
         ledOnAction(name, port, color) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' led on color ' + color);
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led.color = color;
         }
+
         statusLightOffAction(name, port) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' led off');
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led.mode = C.OFF;
         }
+
         toneAction(name, frequency, duration) {
             U.debug(name + ' piezo: ' + ', frequency: ' + frequency + ', duration: ' + duration);
             this.hardwareState.actions.tone = {};
@@ -125,6 +130,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.setBlocking(true);
             return 0;
         }
+
         playFileAction(file) {
             U.debug('play file: ' + file);
             this.hardwareState.actions.tone = {};
@@ -142,19 +148,23 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     return 500;
             }
         }
+
         setVolumeAction(volume) {
             U.debug('set volume: ' + volume);
             this.hardwareState.actions.volume = Math.max(Math.min(100, volume), 0);
             this.hardwareState.volume = Math.max(Math.min(100, volume), 0);
         }
+
         getVolumeAction(s) {
             U.debug('get volume');
             s.push(this.hardwareState.volume);
         }
+
         setLanguage(language) {
             U.debug('set language ' + language);
             this.hardwareState.actions.language = language;
         }
+
         sayTextAction(text, speed, pitch) {
             if (this.hardwareState.actions.sayText == undefined) {
                 this.hardwareState.actions.sayText = {};
@@ -165,6 +175,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.setBlocking(true);
             return 0;
         }
+
         motorOnAction(name, port, duration, speed) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             const durText = duration === undefined ? ' w.o. duration' : (' for ' + duration + ' msec');
@@ -176,11 +187,13 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.motors[port] = speed;
             return 0;
         }
+
         motorStopAction(name, port) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor stop');
             this.motorOnAction(name, port, 0, 0);
         }
+
         driveAction(name, direction, speed, distance) {
             const robotText = 'robot: ' + name + ', direction: ' + direction;
             const durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
@@ -203,12 +216,12 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             const rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 const rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
         }
+
         curveAction(name, direction, speedL, speedR, distance) {
             const robotText = 'robot: ' + name + ', direction: ' + direction;
             const durText = distance === undefined ? ' w.o. duration' : (' for ' + distance + ' msec');
@@ -234,12 +247,12 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             const rotationPerSecond = C.MAX_ROTATION * avgSpeed / 100.0;
             if (rotationPerSecond == 0.0 || distance === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 const rotations = Math.abs(distance) / (C.WHEEL_DIAMETER * Math.PI);
                 return rotations / rotationPerSecond * 1000;
             }
         }
+
         turnAction(name, direction, speed, angle) {
             const robotText = 'robot: ' + name + ', direction: ' + direction;
             const durText = angle === undefined ? ' w.o. duration' : (' for ' + angle + ' msec');
@@ -259,22 +272,22 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             const rotationPerSecond = C.MAX_ROTATION * Math.abs(speed) / 100.0;
             if (rotationPerSecond == 0.0 || angle === undefined) {
                 return 0;
-            }
-            else {
+            } else {
                 const rotations = C.TURN_RATIO * (Math.abs(angle) / 720.);
                 return rotations / rotationPerSecond * 1000;
             }
         }
+
         setTurnSpeed(speed, direction) {
             if (direction == C.LEFT) {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = -speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = speed;
-            }
-            else {
+            } else {
                 this.hardwareState.actions.motors[C.MOTOR_LEFT] = speed;
                 this.hardwareState.actions.motors[C.MOTOR_RIGHT] = -speed;
             }
         }
+
         driveStop(name) {
             U.debug('robot: ' + name + ' stop motors');
             if (this.hardwareState.actions.motors == undefined) {
@@ -283,12 +296,14 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.motors[C.MOTOR_LEFT] = 0;
             this.hardwareState.actions.motors[C.MOTOR_RIGHT] = 0;
         }
+
         getMotorSpeed(s, name, port) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor get speed');
             const speed = this.hardwareState.motors[port];
             s.push(speed);
         }
+
         setMotorSpeed(name, port, speed) {
             const robotText = 'robot: ' + name + ', port: ' + port;
             U.debug(robotText + ' motor speed ' + speed);
@@ -298,6 +313,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.motors[port] = speed;
             this.hardwareState.motors[port] = speed;
         }
+
         showTextAction(text, mode) {
             const showText = "" + text;
             U.debug('***** show "' + showText + '" *****');
@@ -306,6 +322,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.setBlocking(true);
             return 0;
         }
+
         showTextActionPosition(text, x, y) {
             const showText = "" + text;
             U.debug('***** show "' + showText + '" *****');
@@ -314,6 +331,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.display.x = x;
             this.hardwareState.actions.display.y = y;
         }
+
         showImageAction(image, mode) {
             const showImage = "" + image;
             U.debug('***** show "' + showImage + '" *****');
@@ -329,18 +347,21 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             }
             return duration;
         }
+
         displaySetBrightnessAction(value) {
             U.debug('***** set brightness "' + value + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display[C.BRIGHTNESS] = value;
             return 0;
         }
+
         lightAction(mode, color) {
             U.debug('***** light action mode= "' + mode + ' color=' + color + '" *****');
             this.hardwareState.actions.led = {};
             this.hardwareState.actions.led[C.MODE] = mode;
             this.hardwareState.actions.led[C.COLOR] = color;
         }
+
         displaySetPixelBrightnessAction(x, y, brightness) {
             U.debug('***** set pixel x="' + x + ", y=" + y + ", brightness=" + brightness + '" *****');
             this.hardwareState.actions.display = {};
@@ -350,35 +371,43 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.actions.display[C.PIXEL][C.BRIGHTNESS] = brightness;
             return 0;
         }
+
         displayGetPixelBrightnessAction(s, x, y) {
             U.debug('***** get pixel x="' + x + ", y=" + y + '" *****');
             const sensor = this.hardwareState.sensors[C.DISPLAY][C.PIXEL];
             s.push(sensor[y][x]);
         }
+
         clearDisplay() {
             U.debug('clear display');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display.clear = true;
         }
+
         writePinAction(pin, mode, value) {
             this.hardwareState.actions["pin" + pin] = {};
             this.hardwareState.actions["pin" + pin][mode] = {};
             this.hardwareState.actions["pin" + pin][mode] = value;
         }
+
         gyroReset(_port) {
             throw new Error("Method not implemented.");
         }
+
         getState() {
             return this.hardwareState;
         }
+
         debugAction(value) {
             U.debug('***** debug action "' + value + '" *****');
             console.log(value);
         }
+
         assertAction(_msg, _left, _op, _right, value) {
             U.debug('***** assert action "' + value + ' ' + _msg + ' ' + _left + ' ' + _op + ' ' + _right + '" *****');
             console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
         }
+
         createLinks(inputLayer, outputLayer) {
             var links = [];
             var weight = 0;
@@ -397,6 +426,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             }
             return links;
         }
+
         processNeuralNetwork(inputLayer, outputLayer) {
             var links;
             if ($.isEmptyObject(this.neuralNetwork)) {
@@ -406,8 +436,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
                 //this.changeWeight(this.neuralNetwork);
                 this.drawNeuralNetwork(this.neuralNetwork);
-            }
-            else {
+            } else {
                 links = this.neuralNetwork.links;
                 for (var inputNodeID in inputLayer) {
                     var inputNode = inputLayer[inputNodeID];
@@ -430,6 +459,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 console.log("Motorspeed" + speed);
             }
         }
+
         createNeuralNetwork(inputLayer, outputLayer, links) {
             return {
                 "inputLayer": inputLayer,
@@ -437,6 +467,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 "links": links
             };
         }
+
         // changeWeight(neuralNetwork) {
         //     $('#einReglerfuerAlles').html("");
         //     var div = $('<div style="margin:8px 50px; "></div>');
@@ -452,9 +483,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         //     range.on("mousedown touchstart", function (e) {
         //         e.stopPropagation();
         //     });
-            // for (var linkId in neuralNetwork.links) {
-            // 	this.setHandler(neuralNetwork.links[linkId]);
-            // }
+        // for (var linkId in neuralNetwork.links) {
+        // 	this.setHandler(neuralNetwork.links[linkId]);
+        // }
         //}
         // public setHandler(link){
         // 	//var link = neuralNetwork.links[linkId];
@@ -478,6 +509,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 i++;
             }
         }
+
         drawNeuralNetwork(neuralNetwork) {
             var that = this;
             //var test = SVG();
@@ -496,11 +528,11 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     $($(that.draggingElement).data('line')).data('link').weight = weight;
 
                     var width = weight * 4 + 2;
-                    $(that.draggingElement).data('line').stroke({ width: width });
+                    $(that.draggingElement).data('line').stroke({width: width});
 
                 }
             });
-            $(document).mouseup( function(e) {
+            $(document).mouseup(function (e) {
                 if (that.draggingElement != null) {
                     $(that.draggingElement).data('line').stroke('#b5cb5f');
                     that.draggingElement = null;
@@ -515,6 +547,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
 
         }
+
         drawLayer(layer, startXPosition, svg) {
             for (var nodeID in layer) {
                 var node = layer[nodeID];
@@ -527,6 +560,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     .fill('black');
             }
         }
+
         drawLinks(links, positionX1, positionX2, svg) {
             let lineAlt;
             for (var linkID in links) {
@@ -538,40 +572,41 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 var colour = '#b5cb5f';
                 //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
                 var line = svg.line(positionX1, positionY1, positionX2, positionY2)
-                    .stroke({ color: colour, width: strokeWidth })
+                    .stroke({color: colour, width: strokeWidth})
                     .mouseover(function () {
-                    this.stroke('black');
-                })
+                        this.stroke('black');
+                    })
                     .mouseout(function () {
-                    if (lineAlt != this) {
-                        this.stroke(colour);
-                    }
-                })
+                        if (lineAlt != this) {
+                            this.stroke(colour);
+                        }
+                    })
                     .click(function () {
-                    var link = $(this).data("link");
-                    console.log(link);
-                    // var regler = $('#myRange');
-                    // regler.data("link", link);
-                    // regler.data("line", this);
-                    // that.changeInputTypeRange(regler);
-                    lineAlt = that.changeLineColour(this, lineAlt, null);
-                });
+                        var link = $(this).data("link");
+                        console.log(link);
+                        // var regler = $('#myRange');
+                        // regler.data("link", link);
+                        // regler.data("line", this);
+                        // that.changeInputTypeRange(regler);
+                        lineAlt = that.changeLineColour(this, lineAlt, null);
+                    });
                 var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
                 var circle = svg.circle()
                     .radius(8)
                     .fill('red')
-                    .cx(pointOnLine.x+20) //?
+                    .cx(pointOnLine.x + 20) //?
                     .cy(pointOnLine.y)
                     .front() //?
                     .mousedown(function () {
                         console.log("Mouse is down");
                         that.draggingElement = this;
-                        lineAlt = that.changeLineColour( $(that.draggingElement).data('line').stroke('black'), lineAlt, this);
-                        })
+                        lineAlt = that.changeLineColour($(that.draggingElement).data('line').stroke('black'), lineAlt, this);
+                    })
                 $(circle).data("line", line)
                 $(line).data("link", link);
             }
         }
+
         changeLineColour(line, lineAlt, sliderElement) {
             if (lineAlt != undefined) {
                 lineAlt.stroke('#b5cb5f');
@@ -610,16 +645,12 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
 
 
-
-
-
-
         getLengthFromPathStartToPointAndCalculateWeigth(path, point, accuracy, fullWeight) {
             var totalLength = path.getTotalLength();
-            var step = totalLength/accuracy;
+            var step = totalLength / accuracy;
             var t = 0;
             var currentDistance;
-            var minDistanceData = {"t":t, "distance": Number.MAX_VALUE};
+            var minDistanceData = {"t": t, "distance": Number.MAX_VALUE};
 
 
             /**
@@ -630,21 +661,21 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
              *       <--  distance  -->
              *
              */
-            for (t=0; t<=totalLength; t+=step) {
+            for (t = 0; t <= totalLength; t += step) {
                 t = this.round(t, 4);
                 currentDistance = this.calcDistance(path.getPointAtLength(t), point)
                 if (currentDistance < minDistanceData.distance) {
-                    minDistanceData = {"t":t, "distance": currentDistance}; //p2 - distance from point at length to circle center
+                    minDistanceData = {"t": t, "distance": currentDistance}; //p2 - distance from point at length to circle center
                 }
             }
-            var weight = minDistanceData.t/step * fullWeight/accuracy;
+            var weight = minDistanceData.t / step * fullWeight / accuracy;
             return weight;
 
 
         }
 
-        round(num, places)
-        { var multiplier = Math.pow(10, places);
+        round(num, places) {
+            var multiplier = Math.pow(10, places);
             return (Math.round(num * multiplier) / multiplier);
         }
 
@@ -658,7 +689,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             console.log("speichere Stand")
         }
 
-        mousemoved(svg,mbedBehaviour, e) {
+        mousemoved(svg, mbedBehaviour, e) {
             console.log("Start moving!")
             var m = svg.point(e.pageX, e.pageY),
                 p = mbedBehaviour.closestPoint($(mbedBehaviour.draggingElement).data("line").node, m);
@@ -710,9 +741,381 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
 
 
+        //Reinforcement Learning
+
+
+        createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+           return this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+        }
+
+        setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+            this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+        }
+
+        runQLearner() {
+            return this.qLearningAlgorithmModule.runQLearner();
+        }
+
+        drawOptimalPath() {
+            this.qLearningAlgorithmModule.drawOptimalPath();
+        }
+
 
         close() {
         }
+
     }
+
     exports.RobotMbedBehaviour = RobotMbedBehaviour;
 });
+
+class RlUtils {
+
+    static generateStatesAndActionsFromSVG(svg, obstaclesList, finishNode) {
+        var statesAndActions = [];
+        var allPathes = svg.find('.cls-customPathColor');
+        var obstaclesArray = [];
+        for (var obstacleItem in obstaclesList) {
+            let obstacle = obstaclesList[obstacleItem]
+            obstaclesArray.push(obstacle.startNode + "-" + obstacle.finishNode);
+        }
+        allPathes.each(function (item) {
+            let obstaclePresent = false;
+            let idName = item.attr("id");
+            let tokens = idName.split("-");
+            let firstValue = tokens[1]; //0
+            let secondValue = tokens[2]; //1
+            if (statesAndActions[firstValue] == undefined) {
+                statesAndActions[firstValue] = [];
+            }
+            if (obstaclesArray.includes(firstValue + "-" + secondValue)) {
+
+            } else if (secondValue == finishNode) {
+                statesAndActions[firstValue][secondValue] = 50;
+            } else {
+                statesAndActions[firstValue][secondValue] = 0;
+            }
+        })
+        return statesAndActions;
+    }
+
+
+    static file_get_contents(uri, callback) {
+        fetch(uri).then(res => res.text()).then(text => callback(text));
+    }
+
+
+    static hideAllPathsExeptTheOptimal(svg) {
+        svg.find('.cls-customPathColor').hide();
+    }
+
+
+    static findPathWithID(svg, firstValue, secondValue) {
+        const linkIDPrefix = "path-";
+        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue)
+        return foundPath;
+    }
+
+}
+
+
+class QLearningAlgorithmModule {
+
+    constructor(updateBackground) {
+        this.svg = undefined;
+        this.startNode = undefined;
+        this.finishNode = undefined;
+        this.statesAndActions = undefined;
+        this.problem = undefined;
+        this.alpha = undefined;
+        this.gamma = undefined;
+        this.nu = undefined;
+        this.rho = undefined;
+        this.qValueStore = undefined;
+        this.episodes = 150;
+        this.timePerEpisode = 600;
+        this.updateBackground = updateBackground;
+
+    }
+
+    createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+        this.startNode = startNode;
+        this.finishNode = finishNode;
+        var path = "/js/app/simulation/simBackgrounds/marsTopView.svg";
+        this.loadSVG(path, obstaclesList, finishNode);
+        return 1000;
+    }
+
+
+    loadSVG(filePath, obstaclesList, finishNode) {
+        var that = this;
+        RlUtils.file_get_contents(filePath, function (text) {
+            that.drawSVG(text);
+            that.statesAndActions = RlUtils.generateStatesAndActionsFromSVG(that.svg, obstaclesList, finishNode);
+            that.problem = new ReinforcementProblem(that.statesAndActions);
+        });
+
+    }
+
+    drawSVG(text) {
+        $('#qLearningBackgroundArea').html("");
+        this.svg = SVG().addTo('#qLearningBackgroundArea').size(3148 / 5, 1764 / 5).viewbox("0 0 3148 1764");
+        this.svg.svg(text);
+        this.svg.find('.cls-customPathColor').stroke({color: '#fcfcfc', opacity: 0.9, width: 0});
+    }
+
+
+    setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+        this.alpha = alpha;
+        this.gamma = gamma;
+        this.nu = nu;
+        this.rho = rho;
+    }
+
+    learningEnded(qValueStore, problem) {
+
+    }
+
+    runQLearner() {
+        this.qValueStore = new QLearningAlgorithm().qLearner(this.svg, this.problem, this.episodes, 9007199254740991, this.alpha, this.gamma, this.rho, this.nu, this.learningEnded)
+        return this.episodes * this.timePerEpisode;
+    }
+
+    drawOptimalPath() {
+        console.log(this.qValueStore);
+        var optimalPathResult = this.qValueStore.createOptimalPath(this.startNode, this.finishNode, this.problem);
+        this.drawOptimalPathIntern(optimalPathResult);
+        var copyOfSVG = this.svg.clone();
+        RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
+
+        // var learnedImageHTML = $("#Layer_1").parent().html();
+        // var learnedImageHTML = $("#qLearningBackgroundArea").html();
+        var learnedImageHTML = copyOfSVG.svg();
+        //learnedImageHTML =  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="110"> <rect width="300" height="100"  style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" /> </svg>' ;
+        var learnedImage = window.btoa(learnedImageHTML);
+        var temp = 'data:image/svg+xml;base64,' + learnedImage;
+        this.updateBackground(9, temp);
+
+    }
+
+    drawOptimalPathIntern(optimalPathResult) {
+        if (optimalPathResult.resultState == ResultState.ERROR) {
+            console.log("...")
+        } else {
+            var combinedPath;
+            var combinedPathTestPurpose;
+            for (var qValue in optimalPathResult.optimalPath) {
+                var firstValue = optimalPathResult.optimalPath[parseInt(qValue)];
+                var secondValue = optimalPathResult.optimalPath[parseInt(qValue) + 1];
+                if (secondValue !== null) {
+
+                    try {
+                        // combinedPathTestPurpose = RlUtils.findPathWithID(this.svg, firstValue, secondValue);
+                        // combinedPathTestPurpose.addTo(this.svg);
+                        // combinedPathTestPurpose.stroke({width: 20, color: '#1ad274'})
+
+                        if (combinedPath == undefined) {
+                            var combinedPath = RlUtils.findPathWithID(this.svg, firstValue, secondValue);
+                        } else {
+                            var temp = RlUtils.findPathWithID(this.svg, firstValue, secondValue).array();
+                            // temp.stroke({linecap: 'round'})
+                            temp.splice(0, 1);
+                            combinedPath.array().push(...temp)
+                            combinedPath.plot(combinedPath.array());
+                        }
+                    } catch (error) {
+                        console.log(combinedPathTestPurpose + " > " + combinedPath);
+                    }
+                }
+            }
+            combinedPath.addTo(this.svg);
+            combinedPath.removeClass('cls-customPathColor');
+            combinedPath.addClass('pink-flower')
+            combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round'})
+                .fill('none');
+
+            var pathCopyBlack = combinedPath.clone();
+            pathCopyBlack.addTo(this.svg);
+            pathCopyBlack.removeClass('cls-customPathColor')
+            pathCopyBlack.addClass('pink-flower')
+            pathCopyBlack.stroke({width: 30, color: '#000000'})
+                .fill('none');
+            console.log(combinedPath.array())
+        }
+
+    }
+}
+
+
+//Utils
+
+const ResultState = {
+    "SUCCESS": 1,
+    "ERROR": 2
+}
+
+Object.freeze(ResultState);
+
+
+
+class OptimalPathResult {
+    constructor(optimalPath, resultState) {
+        this.optimalPath = optimalPath;
+        this.resultState = resultState;
+    }
+}
+
+class ReinforcementProblem {
+
+    constructor(statesAndActions) {
+        this.statesAndActions = statesAndActions;
+        this.states = [];
+        for (let state of statesAndActions.keys()) {
+            this.states.push(state);
+        }
+    }
+
+    getRandomState() {
+        var indexOfState = Math.floor(Math.random() * this.states.length)
+        return this.states[indexOfState];
+    }
+
+    getAvailableActions(state) {
+        var availableActions = [];
+        var actions = this.statesAndActions[state];
+        for (var actionIndex in actions) {
+            if (actions[actionIndex] !== undefined) {
+                availableActions.push(actionIndex);
+            }
+        }
+        return availableActions;
+    }
+
+    takeAction(state, action) {
+        var actions = this.statesAndActions[state];
+        return {
+            "reward": actions[action],
+            "newState": action
+        };
+    }
+
+    takeOneOfActions(actions) {
+        //TODO Available Actions ?
+        return actions[Math.floor(Math.random() * actions.length)];
+    }
+}
+
+
+class QValueStore {
+
+    constructor(statesAndActions) {
+        this.qMatrix = [];
+
+        for (var statesIndex in statesAndActions) {
+            var actions = statesAndActions[statesIndex].slice().fill(0);
+            this.qMatrix.push(actions)
+
+        }
+
+    }
+
+    getQValue(state, action) {
+        var actions = this.qMatrix[state];
+        return actions[action]; //associatedQValue
+    }
+
+    getBestAction(state, availableActions) {
+        var actionsQMatrix = this.qMatrix[state];
+        var bestActionValue = -1;
+        var bestAction;
+        for (var actionIndex in actionsQMatrix) {
+            var action = actionsQMatrix[actionIndex];
+            if (action != undefined && availableActions.includes("" + actionIndex) && action > bestActionValue) {
+                bestActionValue = actionsQMatrix[actionIndex];
+                bestAction = actionIndex
+            }
+        }
+        return bestAction;
+    }
+
+    storeQValue(state, action, value) {
+        var actions = this.qMatrix[state];
+        actions[action] = value; // === this.qMatrix[state][action] = value;
+    }
+
+    createOptimalPath(startState, endState, problem) {
+        var optimalPath = [startState];
+        var currentState = startState;
+        var resultState = ResultState.SUCCESS;
+        while (currentState !== endState) {
+            var nextState = parseInt(this.getBestAction(currentState, problem.getAvailableActions(currentState)));
+            currentState = nextState;
+            if (optimalPath.includes(currentState)) {
+                console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
+                resultState = ResultState.ERROR;
+                break;
+            }
+            optimalPath.push(nextState);
+        }
+        return new OptimalPathResult(optimalPath, resultState);
+    }
+}
+
+
+class QLearningAlgorithm {
+
+    qLearner(svg, problem, episodes, timeLimit, alpha, gamma, rho, nu, callback) {
+        var qValueStore = new QValueStore(problem.statesAndActions);
+        var state = problem.getRandomState();
+        var action;
+        let previousPath;
+        var timer = setInterval(function () {
+            var startTime = Date.now();
+            if (Math.random() < nu) {
+                state = problem.getRandomState();
+            }
+            var actions = problem.getAvailableActions(state);
+            if (Math.random() < rho) {
+                action = problem.takeOneOfActions(actions);
+            } else {
+                action = qValueStore.getBestAction(state, actions);
+            }
+            var rewardAndNewState = problem.takeAction(state, action);
+            var reward = rewardAndNewState["reward"];
+            var newState = rewardAndNewState["newState"];
+            var q = qValueStore.getQValue(state, action);
+            var newStateActions = problem.getAvailableActions(newState);
+            var maxQ = qValueStore.getQValue(newState, qValueStore.getBestAction(newState, newStateActions));
+            q = (1 - alpha) * q + alpha * (reward + gamma * maxQ);
+            if (previousPath !== undefined) {
+                previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
+            }
+            previousPath = RlUtils.findPathWithID(svg, state, newState);
+            let pathLength = previousPath.length();
+            let direction = state > newState ? -1 : 1;
+            previousPath.stroke({
+                color: '#8fdc5d',
+                dasharray: "" + pathLength + ", " + pathLength,
+                dashoffset: "" + (pathLength * direction),
+                width: q * 2 + 10
+            });
+            previousPath.animate({
+                duration: 400,
+                delay: 0,
+                when: 'now',
+            }).attr("stroke-dashoffset", 0);
+            qValueStore.storeQValue(state, action, q);
+            console.log("state " + state + " > " + newState + "; reward " + reward + "; q " + q + "; maxQ " + maxQ);
+            state = newState;
+            timeLimit = timeLimit - (Date.now() - startTime);
+            episodes = episodes - 1;
+            if (!((timeLimit > 0) && (episodes > 0))) {
+                previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
+                clearInterval(timer);
+                callback(qValueStore, problem);
+            }
+        }, 500);
+        return qValueStore;
+    }
+}
+

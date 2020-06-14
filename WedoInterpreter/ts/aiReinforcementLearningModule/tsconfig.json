@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./target",
+    "target": "es5",
+    "rootDir": "./ts",
+
+    "module": "umd",
+    "moduleResolution": "node",
+    "baseUrl": "./ts",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "files": [
+    "./ts/aiReinforcementLearningModule.ts"
+
+  ],
+  "compileOnSave": true,
+  "buildOnSave": true
+}

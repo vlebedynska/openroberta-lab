@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "../OpenRobertaServer/staticResources/js/app/wedoInterpreter",
-        "target": "es2015",
+        "target": "es2017",
         "rootDir": "./ts",
         "typeRoots" : ["./node_modules/@types"],
         "noUnusedLocals": false,
@@ -10,12 +10,14 @@
         "module": "amd",
         "baseUrl": "./ts",
         "paths": {
-            "interpreter.*": ["*"]
+            "xxxxinterpreter.*": ["*"],
+            "aiReinforcementLearningModule": ["./aiReinforcementLearningModule/ts/*"]
         }
     },
     "exclude": [
         "**/node_modules",
-        "**/interpreter.runStackMachineJson.ts"
+        "**/interpreter.runStackMachineJson.ts",
+        "**/aiNeuralNetworkModule"
     ],
     "compileOnSave": true,
     "buildOnSave": true

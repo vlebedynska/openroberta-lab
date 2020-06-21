@@ -1,13 +1,24 @@
 import * as SVG from "svgdotjs" ;
 
+export class AiNeuralNetworkModule {
+    private svg: SVG.Svg;
+
+    constructor(selector: string) {
+        this.init(selector);
+    }
+
+    private init(selector: string) {
+        $(selector).html('');
+        this.svg = SVG.SVG().addTo(selector);
+    }
+}
+
+
+
 export class AiNeuralNetwork {
-    private layers: Array<Array<Node>>;
-    private links: Array<Link>;
 
 
-    private constructor(layers: Array<Array<Node>>, links: Array<Link>) {
-        this.layers = layers;
-        this.links = links;
+    private constructor(public layers: Array<Array<Node>>, public links: Array<Link>) {
     }
 
 
@@ -28,106 +39,277 @@ export class AiNeuralNetwork {
         return links;
     }
 
+    public static addNodesPosition(layer: Array<Node>) {
+        let i = 0;
+        for (let node of layer) {
+            node.position = i;
+            i++;
+        }
+    }
+
     public static creteNeuralNetwork(layers: Array<Array<Node>>, weight?: number): AiNeuralNetwork {
         let links: Array<Link>  = AiNeuralNetwork.createLinks(layers, weight);
+        for ( let layer of layers ) {
+            AiNeuralNetwork.addNodesPosition(layer);
+        }
         return new AiNeuralNetwork(layers, links);
     }
+
+
 
 }
 
 export class Node {
-    private _value: number;
-    private _threshold: number;
+    position: number;
 
-
-    constructor(value: number, threshold: number) {
-        this._value = value;
-        this._threshold = threshold;
+    constructor(public value: number,
+                public threshold: number) {
     }
+    
 
-    get value(): number {
-        return this._value;
-    }
-
-    set value(value: number) {
-        this._value = value;
-    }
-
-    get threshold(): number {
-        return this._threshold;
-    }
-
-    set threshold(value: number) {
-        this._threshold = value;
-    }
 }
 
 
 export class Link {
-    private _node1: Node;
-    private _node2: Node;
-    private _weight: number;
+    constructor(public node1: Node, public node2: Node, public weight: number) {}
 
 
-    constructor(node1: Node, node2: Node, weight: number) {
-        this._node1 = node1;
-        this._node2 = node2;
-        this._weight = weight;
+}
+
+export class Draggable {
+
+    private draggingElement: SVG.Element = null;
+    private constructor(public area: SVG.Element) {
+
     }
 
-    get node1(): Node {
-        return this._node1;
+    public static create(area: SVG.Element): Draggable {
+        let draggable = new Draggable(area);
+        draggable.draggableEventHandling();
+        return draggable;
     }
 
-    get node2(): Node {
-        return this._node2;
+    public draggableEventHandling() {
+        let that = this;
+        this.area.mousemove(function (e) {
+            e.stopPropagation();
+            if (that.draggingElement != null) {
+                that.draggingElement.fire('dragmove');
+            }
+        });
+        $(document).mouseup(function (e) {
+            if (that.draggingElement != null) {
+                that.draggingElement.fire('dragend');
+                that.draggingElement = null;
+            }
+        });
     }
 
-    get weight(): number {
-        return this._weight;
-    }
+    public registerDraggableElement(element: SVG.Element) {
+        let that = this;
+        element.mousedown(function () {
+            that.draggingElement = this;
+            that.draggingElement.fire('dragstart');
+        });
 
 
-    set weight(value: number) {
-        this._weight = value;
     }
+
+    // public ondragend() {
+    //     $(that.draggingElement).data('line').stroke('#b5cb5f');
+    // }
+
 }
 
 export class AiNeuralNetworkUI {
-    private neuralNetwork: AiNeuralNetwork;
-    private svg: SVG.Svg;
+    private draggable;
 
+    private constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg ) {
+        this.draggable = Draggable.create(svg);
+    }
+
+
+    public static drawNeuralNetwork(neuralNetwork, svg) {
+
+
+        var positionX1 = 50;
+        var positionX2 = 220;
+        this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
+        this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
+        this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
+
+    }
+
+    private drawLayer(layer, startXPosition, svg) {
+        for (var nodeID in layer) {
+            var node = layer[nodeID];
+            var nodePosition = node.position;
+            var y = 20 + 70 * nodePosition;
+            var circle = svg.circle()
+                .radius(20)
+                .cx(startXPosition)
+                .cy(y)
+                .fill('black');
+        }
+    }
+
+    private drawLinks(links, positionX1, positionX2, svg) {
+        let lineAlt;
+        for (var linkID in links) {
+            var link = links[linkID];
+            var that = this;
+            let slider = SVGSlider.createSlider(svg.line(positionX1, positionY1, positionX2, positionY2), 0, 1, svg.circle(), 0.5, 0, svg.line.length);
+            slider.on('sliderValueChanged', function (sliderValueData) {
+                link.weight = sliderValueData.sliderValue;
+
+                let width = sliderValueData * 4 + 2;
+                $(that.draggingElement).data('line').stroke({width: width});
+
+            });
+
+
+            var positionY1 = 20 + 70 * link.inputNode.position;
+            var positionY2 = 20 + 70 * link.outputNode.position;
+            var strokeWidth = link.weight * 4 + 2;
+            var colour = '#b5cb5f';
+            //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
+            var line = svg.line(positionX1, positionY1, positionX2, positionY2)
+                .stroke({color: colour, width: strokeWidth})
+                .mouseover(function () {
+                    this.stroke('black');
+                })
+                .mouseout(function () {
+                    if (lineAlt != this) {
+                        this.stroke(colour);
+                    }
+                })
+                .click(function () {
+                    var link = $(this).data("link");
+                    console.log(link);
+                    // var regler = $('#myRange');
+                    // regler.data("link", link);
+                    // regler.data("line", this);
+                    // that.changeInputTypeRange(regler);
+                    lineAlt = that.changeLineColour(this, lineAlt, null);
+                });
+            var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
+            var circle = svg.circle()
+                .radius(8)
+                .fill('red')
+                .cx(pointOnLine.x + 20) //?
+                .cy(pointOnLine.y)
+                .front() //?
+                .mousedown(function () {
+                    lineAlt = that.changeLineColour($(that.draggingElement).data('line').stroke('black'), lineAlt, this);
+                })
+
+            this.draggable.registerDraggableElement(circle);
+
+            $(circle).data("line", line)
+            $(line).data("link", link);
+        }
+    }
+
+    private changeLineColour(line, lineAlt, sliderElement) {
+        if (lineAlt != undefined) {
+            lineAlt.stroke('#b5cb5f');
+            lineAlt.back();
+        }
+        //line.front();
+        sliderElement.front();
+        line.stroke('black');
+        lineAlt = line;
+        return lineAlt;
+    }
 
 }
 
 
-export class SVGSlider {
 
-    private rangeMin: number;
-    private rangeMax: number;
-    private sliderShape: SVG.Shape;
-    private path: SVG.Path;
-    private sliderValue: number;
-    private startPoint: number;
-    private endPoint: number;
+export class SVGSlider{
 
+    private static readonly ACCURACY = 100;
 
-    private constructor(path: SVG.Path, rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, sliderValue: number, startPoint = 0, endPoint = path.length()) {
-        this.rangeMin = rangeMin;
-        this.rangeMax = rangeMax;
-        this.sliderShape = sliderShape;
-        this.path = path;
-        this.sliderValue = sliderValue;
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
+    private constructor(
+        private path: SVG.Path,
+        private rangeMin: number,
+        private rangeMax: number,
+        private sliderShape: SVG.Shape,
+        private sliderValue: number,
+        private startPoint = 0,
+        private endPoint = path.length()) {
     }
 
 
-    public static createSlider(path: SVG.Path, rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, sliderValue: number, startPoint = 0, endPoint = path.length) : SVGSlider {
+    public static createSlider(path: SVG.Path,rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, sliderValue: number, startPoint = 0, endPoint = path.length) : SVGSlider {
         let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, sliderValue,startPoint, endPoint());
 
         return slider;
     }
+
+
+
+    public dragmove() {
+        let that = this;
+        this.sliderShape.on('dragmove', function() {
+            let line = that.path.node;
+            let sliderShapeCenter = {"x": that.sliderShape.cx(), "y": that.sliderShape.cy()};
+            that.sliderValue = that.getPositionOnPath(line, sliderShapeCenter, SVGSlider.ACCURACY, that.rangeMax);
+            that.setSliderValue(that.sliderValue);
+        });
+    }
+
+
+    private getPositionOnPath(path, point, accuracy, fullWeight) {
+            let totalLength = path.getTotalLength();
+            let step = totalLength/accuracy;
+            let t = 0;
+            let currentDistance;
+            let minDistanceData = {"t":t, "distance": Number.MAX_VALUE};
+
+
+            /**
+             * <--        totalLength         -->
+             * <step> <step> <step> <step> <step>
+             * ------|------|------|---*--|------
+             *       t-->         cirlceCenter
+             *       <--  distance  -->
+             *
+             */
+            for (t=0; t<=totalLength; t+=step) {
+                t = SVGSlider.round(t, 4);
+                currentDistance = SVGSlider.calcDistance(path.getPointAtLength(t), point)
+                if (currentDistance < minDistanceData.distance) {
+                    minDistanceData = {"t":t, "distance": currentDistance}; //p2 - distance from point at length to circle center
+                }
+            }
+            let sliderValue = minDistanceData.t/step * fullWeight/accuracy;
+            return sliderValue;
+        }
+
+
+    private static round(num, places) {
+        var multiplier = Math.pow(10, places);
+        return (Math.round(num * multiplier) / multiplier);
+    }
+
+    private static calcDistance(p1, p2) {
+        return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
+    }
+
+    public getSliderValue() {
+        return this.sliderValue;
+    }
+
+
+    public setSliderValue(sliderValue: number) {
+        this.sliderValue = sliderValue;
+        this.sliderShape.fire('sliderValueChanged', {'sliderValue': this.sliderValue});
+    }
+
+
+
+
 
     //
     // var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
@@ -157,49 +339,6 @@ export class SVGSlider {
     //     return lineAlt;
     // }
     //
-    // getLengthFromPathStartToPointAndCalculateWeigth(path, point, accuracy, fullWeight) {
-    //     var totalLength = path.getTotalLength();
-    //     var step = totalLength/accuracy;
-    //     var t = 0;
-    //     var currentDistance;
-    //     var minDistanceData = {"t":t, "distance": Number.MAX_VALUE};
-    //
-    //
-    //     /**
-    //      * <--        totalLength         -->
-    //      * <step> <step> <step> <step> <step>
-    //      * ------|------|------|---*--|------
-    //      *       t-->         cirlceCenter
-    //      *       <--  distance  -->
-    //      *
-    //      */
-    //     for (t=0; t<=totalLength; t+=step) {
-    //         t = this.round(t, 4);
-    //         currentDistance = this.calcDistance(path.getPointAtLength(t), point)
-    //         if (currentDistance < minDistanceData.distance) {
-    //             minDistanceData = {"t":t, "distance": currentDistance}; //p2 - distance from point at length to circle center
-    //         }
-    //     }
-    //     var weight = minDistanceData.t/step * fullWeight/accuracy;
-    //     return weight;
-    //
-    //
-    // }
-    //
-    // round(num, places)
-    // { var multiplier = Math.pow(10, places);
-    //     return (Math.round(num * multiplier) / multiplier);
-    // }
-    //
-    //
-    // calcDistance(p1, p2) {
-    //     return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
-    // }
-    //
-    //
-    // speichereStand(e) {
-    //     console.log("speichere Stand")
-    // }
     //
     // mousemoved(svg,mbedBehaviour, e) {
     //     console.log("Start moving!")
@@ -253,7 +392,9 @@ export class SVGSlider {
     // }
 
 
-
+    public on(eventName: string, param2: (sliderValueData) => void) {
+        
+    }
 }
 
 

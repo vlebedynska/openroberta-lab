@@ -70,10 +70,78 @@ export class Node {
 }
 
 
-export class Link {
-    constructor(public node1: Node, public node2: Node, public weight: number) {}
+export class Link extends EventTarget{
+    constructor(public node1: Node, public node2: Node, public _weight: number) {
+        super();
+    }
 
 
+    get weight(): number {
+        return this._weight;
+    }
+
+
+    set weight(value: number) {
+        this._weight = value;
+        let event: CustomEvent = new CustomEvent<number>('weightChanged', {detail: value});
+        this.dispatchEvent(event);
+    }
+
+
+    public on() {
+
+    }
+}
+
+export class LinkUI{
+    private static readonly COLOR_ACTIVE = 'black';
+    private static readonly COLOR_INACTIVE = '#b5cb5f';
+    private static lineOld: SVG.Path = null;
+
+    constructor(public line: SVG.Path, private readonly link: Link) {
+        this.addLinkListener();
+    };
+
+    private addLinkListener() {
+        let that = this;
+        this.link.addEventListener('weightChanged', function (value: CustomEvent) {
+            let width = value.detail.value * 4 + 2;
+            that.line.stroke({width: width});
+        });
+
+        this.line.on('selected', function () {
+
+
+        });
+
+        this.line.stroke({color: LinkUI.COLOR_INACTIVE, width: this.link.weight})
+                .mouseover(function () {
+                    this.stroke(LinkUI.COLOR_ACTIVE);
+                })
+                .mouseout(function () {
+                    if (LinkUI.lineOld != this) {
+                        this.stroke(LinkUI.COLOR_INACTIVE);
+                    }
+                })
+                .click(function () {
+                    console.log(that.link);
+                    that.activateLine(this);
+                });
+    }
+
+
+    private lineSelected () {
+
+    }
+
+    private activateLine(line) {
+        if (LinkUI.lineOld != null) {
+            LinkUI.lineOld.stroke(LinkUI.COLOR_INACTIVE);
+            LinkUI.lineOld.back();
+        }
+        this.line.stroke(LinkUI.COLOR_ACTIVE);
+        LinkUI.lineOld = line;
+    }
 }
 
 export class Draggable {
@@ -123,6 +191,10 @@ export class Draggable {
 
 export class AiNeuralNetworkUI {
     private draggable;
+    private static readonly POSITIONX1 = 50;
+    private static readonly POSITIONX2 = 220;
+    private static readonly TOP_LAYER_OFFSET = 20;
+    private static VERTICAL_DISTANCE_BETWEEN_TWO_NODES  = 70;
 
     private constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg ) {
         this.draggable = Draggable.create(svg);
@@ -132,19 +204,17 @@ export class AiNeuralNetworkUI {
     public static drawNeuralNetwork(neuralNetwork, svg) {
 
 
-        var positionX1 = 50;
-        var positionX2 = 220;
-        this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
-        this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
-        this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
+        AiNeuralNetworkUI.drawLinks(neuralNetwork.links, AiNeuralNetworkUI.POSITIONX1, AiNeuralNetworkUI.POSITIONX2, svg);
+        AiNeuralNetworkUI.drawLayer(neuralNetwork.inputLayer, AiNeuralNetworkUI.POSITIONX1, svg);
+        AiNeuralNetworkUI.drawLayer(neuralNetwork.outputLayer, AiNeuralNetworkUI.POSITIONX2, svg);
 
     }
 
-    private drawLayer(layer, startXPosition, svg) {
+    private static drawLayer(layer, startXPosition, svg) {
         for (var nodeID in layer) {
             var node = layer[nodeID];
             var nodePosition = node.position;
-            var y = 20 + 70 * nodePosition;
+            var y = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * nodePosition;
             var circle = svg.circle()
                 .radius(20)
                 .cx(startXPosition)
@@ -153,47 +223,25 @@ export class AiNeuralNetworkUI {
         }
     }
 
-    private drawLinks(links, positionX1, positionX2, svg) {
+    private static drawLinks(links, positionX1, positionX2, svg) {
         let lineAlt;
+        var that = this;
         for (var linkID in links) {
             var link = links[linkID];
-            var that = this;
+
+            let positionY1 = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * link.inputNode.position;
+            let positionY2 = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * link.outputNode.position;
+
+            let line = svg.line(positionX1, positionY1, positionX2, positionY2);
             let slider = SVGSlider.createSlider(svg.line(positionX1, positionY1, positionX2, positionY2), 0, 1, svg.circle(), 0.5, 0, svg.line.length);
-            slider.on('sliderValueChanged', function (sliderValueData) {
-                link.weight = sliderValueData.sliderValue;
-
-                let width = sliderValueData * 4 + 2;
-                $(that.draggingElement).data('line').stroke({width: width});
-
+            slider.addEventListener('sliderValueChanged', function (sliderValueData: CustomEvent) {
+                link.weight = sliderValueData.detail.sliderValue;
+x
             });
+            let linkUI = new LinkUI(line, link);
 
-
-            var positionY1 = 20 + 70 * link.inputNode.position;
-            var positionY2 = 20 + 70 * link.outputNode.position;
-            var strokeWidth = link.weight * 4 + 2;
-            var colour = '#b5cb5f';
-            //var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
-            var line = svg.line(positionX1, positionY1, positionX2, positionY2)
-                .stroke({color: colour, width: strokeWidth})
-                .mouseover(function () {
-                    this.stroke('black');
-                })
-                .mouseout(function () {
-                    if (lineAlt != this) {
-                        this.stroke(colour);
-                    }
-                })
-                .click(function () {
-                    var link = $(this).data("link");
-                    console.log(link);
-                    // var regler = $('#myRange');
-                    // regler.data("link", link);
-                    // regler.data("line", this);
-                    // that.changeInputTypeRange(regler);
-                    lineAlt = that.changeLineColour(this, lineAlt, null);
-                });
             var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
-            var circle = svg.circle()
+            let circle: SVG.Shape = svg.circle()
                 .radius(8)
                 .fill('red')
                 .cx(pointOnLine.x + 20) //?
@@ -210,23 +258,13 @@ export class AiNeuralNetworkUI {
         }
     }
 
-    private changeLineColour(line, lineAlt, sliderElement) {
-        if (lineAlt != undefined) {
-            lineAlt.stroke('#b5cb5f');
-            lineAlt.back();
-        }
-        //line.front();
-        sliderElement.front();
-        line.stroke('black');
-        lineAlt = line;
-        return lineAlt;
-    }
+
 
 }
 
 
 
-export class SVGSlider{
+export class SVGSlider extends EventTarget{
 
     private static readonly ACCURACY = 100;
 
@@ -238,6 +276,7 @@ export class SVGSlider{
         private sliderValue: number,
         private startPoint = 0,
         private endPoint = path.length()) {
+        super();
     }
 
 
@@ -304,7 +343,8 @@ export class SVGSlider{
 
     public setSliderValue(sliderValue: number) {
         this.sliderValue = sliderValue;
-        this.sliderShape.fire('sliderValueChanged', {'sliderValue': this.sliderValue});
+        let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: sliderValue});
+        this.dispatchEvent(event);
     }
 
 
@@ -392,9 +432,7 @@ export class SVGSlider{
     // }
 
 
-    public on(eventName: string, param2: (sliderValueData) => void) {
-        
-    }
+
 }
 
 

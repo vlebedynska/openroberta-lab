@@ -1,4 +1,4 @@
-import * as SVG from "svgdotjs" ;
+import * as SVG from "svgdotjs";
 
 export class AiNeuralNetworkModule {
     private svg: SVG.Svg;
@@ -10,17 +10,15 @@ export class AiNeuralNetworkModule {
     private init(selector: string) {
         $(selector).html('');
         this.svg = SVG.SVG().addTo(selector);
+        AiNeuralNetwork.creteNeuralNetwork(layers);
     }
 }
 
 
-
 export class AiNeuralNetwork {
-
 
     private constructor(public layers: Array<Array<Node>>, public links: Array<Link>) {
     }
-
 
     private static createLinks(layers: Array<Array<Node>>, weight = 0): Array<Link> {
         let links = [];
@@ -28,9 +26,9 @@ export class AiNeuralNetwork {
             let nodesFirstLayer = layers[i];
             let nodesSecondLayer = layers[i + 1];
             for (let node1Index in nodesFirstLayer) {
-                let node1: Node= nodesFirstLayer[node1Index];
+                let node1: Node = nodesFirstLayer[node1Index];
                 for (let node2Index in nodesSecondLayer) {
-                let node2: Node = nodesFirstLayer[node2Index];
+                    let node2: Node = nodesFirstLayer[node2Index];
                     var link: Link = new Link(node1, node2, weight);
                     links.push(link);
                 }
@@ -39,38 +37,53 @@ export class AiNeuralNetwork {
         return links;
     }
 
-    public static addNodesPosition(layer: Array<Node>) {
+    public static addNodesPositionXY(layerID: number, layer: Array<Node>) {
         let i = 0;
         for (let node of layer) {
-            node.position = i;
+            node.positionY = i;
+            node.positionX = layerID;
             i++;
         }
     }
 
     public static creteNeuralNetwork(layers: Array<Array<Node>>, weight?: number): AiNeuralNetwork {
-        let links: Array<Link>  = AiNeuralNetwork.createLinks(layers, weight);
-        for ( let layer of layers ) {
-            AiNeuralNetwork.addNodesPosition(layer);
+        let links: Array<Link> = AiNeuralNetwork.createLinks(layers, weight);
+        for (let layerID in layers) {
+            let layer = layers[layerID];
+            AiNeuralNetwork.addNodesPositionXY(parseInt(layerID), layer);
         }
         return new AiNeuralNetwork(layers, links);
     }
-
-
-
 }
 
 export class Node {
-    position: number;
+    private _positionX: number;
+    private _positionY: number;
 
     constructor(public value: number,
                 public threshold: number) {
     }
-    
 
+
+    get positionX(): number {
+        return this._positionX;
+    }
+
+    set positionX(value: number) {
+        this._positionX = value;
+    }
+
+    get positionY(): number {
+        return this._positionY;
+    }
+
+    set positionY(value: number) {
+        this._positionY = value;
+    }
 }
 
 
-export class Link extends EventTarget{
+export class Link extends EventTarget {
     constructor(public node1: Node, public node2: Node, public _weight: number) {
         super();
     }
@@ -87,66 +100,89 @@ export class Link extends EventTarget{
         this.dispatchEvent(event);
     }
 
-
-    public on() {
-
-    }
 }
 
-export class LinkUI{
+export class LinkUI extends EventTarget {
     private static readonly COLOR_ACTIVE = 'black';
     private static readonly COLOR_INACTIVE = '#b5cb5f';
-    private static lineOld: SVG.Path = null;
+    private static readonly RANGE_MIN = 0;
+    private static readonly RANGE_MAX = 1;
+    private static readonly STARTPOINT = 0;
+    private slider: SVGSlider;
+    private isActivated: boolean = false;
 
-    constructor(public line: SVG.Path, private readonly link: Link) {
+    constructor(private readonly link: Link, private svg: SVG.Svg, private draggable: Draggable) {
+        super();
+        this.drawSlider();
         this.addLinkListener();
     };
+
+
+    private drawSlider() {
+        let that = this;
+        let path: SVG.Path = LinkUI.createPathForLink(this.link, this.svg);
+        let circle: SVG.Shape = this.svg.circle()
+            .radius(8)
+            .fill('red')
+            .click(function () {
+                that.activateLink();
+            })
+
+        this.slider = SVGSlider.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, LinkUI.STARTPOINT, path.length);
+        this.slider.addEventListener('sliderValueChanged', function (sliderValueData: CustomEvent) {
+            that.link.weight = sliderValueData.detail.sliderValue;
+        });
+        this.draggable.registerDraggableElement(circle);
+    }
+
+    private static createPathForLink(link: Link, svg: SVG.Svg): SVG.Path {
+        let node1PositionXY = AiNeuralNetworkUI.getNodeXY(link.node1.positionX, link.node1.positionY);
+        let node2PositionXY = AiNeuralNetworkUI.getNodeXY(link.node2.positionX, link.node2.positionY);
+        return SVGUtils.createPath(svg, node1PositionXY.x, node1PositionXY.y, node2PositionXY.x, node2PositionXY.y);
+    }
 
     private addLinkListener() {
         let that = this;
         this.link.addEventListener('weightChanged', function (value: CustomEvent) {
             let width = value.detail.value * 4 + 2;
-            that.line.stroke({width: width});
+            that.slider.path.stroke({width: width});
         });
 
-        this.line.on('selected', function () {
-
-
-        });
-
-        this.line.stroke({color: LinkUI.COLOR_INACTIVE, width: this.link.weight})
-                .mouseover(function () {
-                    this.stroke(LinkUI.COLOR_ACTIVE);
-                })
-                .mouseout(function () {
-                    if (LinkUI.lineOld != this) {
-                        this.stroke(LinkUI.COLOR_INACTIVE);
-                    }
-                })
-                .click(function () {
-                    console.log(that.link);
-                    that.activateLine(this);
-                });
+        this.slider.path.stroke({color: LinkUI.COLOR_INACTIVE, width: this.link.weight})
+            .mouseover(function () {
+                this.stroke(LinkUI.COLOR_ACTIVE);
+            })
+            .mouseout(function () {
+                if (!that.isActivated) {
+                    this.stroke(LinkUI.COLOR_INACTIVE);
+                }
+            })
+            .click(function () {
+                console.log(that.link);
+                that.activateLink();
+            });
     }
 
 
-    private lineSelected () {
-
+    private activateLink() {
+        this.isActivated = true;
+        this.slider.path.stroke(LinkUI.COLOR_ACTIVE).front();
+        this.slider.sliderShape.front();
+        let event: CustomEvent = new CustomEvent('linkActivated');
+        this.dispatchEvent(event);
     }
 
-    private activateLine(line) {
-        if (LinkUI.lineOld != null) {
-            LinkUI.lineOld.stroke(LinkUI.COLOR_INACTIVE);
-            LinkUI.lineOld.back();
-        }
-        this.line.stroke(LinkUI.COLOR_ACTIVE);
-        LinkUI.lineOld = line;
+    public deactivateLink() {
+        this.isActivated = false;
+        this.slider.path.stroke(LinkUI.COLOR_INACTIVE);
     }
 }
+
 
 export class Draggable {
 
     private draggingElement: SVG.Element = null;
+
     private constructor(public area: SVG.Element) {
 
     }
@@ -190,141 +226,183 @@ export class Draggable {
 }
 
 export class AiNeuralNetworkUI {
-    private draggable;
-    private static readonly POSITIONX1 = 50;
-    private static readonly POSITIONX2 = 220;
-    private static readonly TOP_LAYER_OFFSET = 20;
-    private static VERTICAL_DISTANCE_BETWEEN_TWO_NODES  = 70;
+    private draggable: Draggable;
+    private activeLinkUI: LinkUI;
+    public static readonly LAYER_OFFSET_TOP = 20;
+    public static readonly LAYER_OFFSET_LEFT = 20;
+    public static HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES = 170;
+    public static VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 70;
 
-    private constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg ) {
+    private constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg) {
         this.draggable = Draggable.create(svg);
     }
 
 
-    public static drawNeuralNetwork(neuralNetwork, svg) {
-
-
-        AiNeuralNetworkUI.drawLinks(neuralNetwork.links, AiNeuralNetworkUI.POSITIONX1, AiNeuralNetworkUI.POSITIONX2, svg);
-        AiNeuralNetworkUI.drawLayer(neuralNetwork.inputLayer, AiNeuralNetworkUI.POSITIONX1, svg);
-        AiNeuralNetworkUI.drawLayer(neuralNetwork.outputLayer, AiNeuralNetworkUI.POSITIONX2, svg);
-
+    public drawNeuralNetwork() {
+        this.drawLinks(this.neuralNetwork.links);
+        this.drawLayer(this.neuralNetwork.layers[0]);
+        this.drawLayer(this.neuralNetwork.layers[1]);
     }
 
-    private static drawLayer(layer, startXPosition, svg) {
-        for (var nodeID in layer) {
-            var node = layer[nodeID];
-            var nodePosition = node.position;
-            var y = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * nodePosition;
-            var circle = svg.circle()
+    private drawLayer(layer) {
+        for (let node of layer) {
+            let nodePositionXY = AiNeuralNetworkUI.getNodeXY(node.positionX, node.positionY);
+            let circle = this.svg.circle()
                 .radius(20)
-                .cx(startXPosition)
-                .cy(y)
+                .cx(nodePositionXY.x)
+                .cy(nodePositionXY.y)
                 .fill('black');
         }
     }
 
-    private static drawLinks(links, positionX1, positionX2, svg) {
-        let lineAlt;
-        var that = this;
-        for (var linkID in links) {
-            var link = links[linkID];
-
-            let positionY1 = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * link.inputNode.position;
-            let positionY2 = AiNeuralNetworkUI.TOP_LAYER_OFFSET + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * link.outputNode.position;
-
-            let line = svg.line(positionX1, positionY1, positionX2, positionY2);
-            let slider = SVGSlider.createSlider(svg.line(positionX1, positionY1, positionX2, positionY2), 0, 1, svg.circle(), 0.5, 0, svg.line.length);
-            slider.addEventListener('sliderValueChanged', function (sliderValueData: CustomEvent) {
-                link.weight = sliderValueData.detail.sliderValue;
-x
+    private drawLinks(links) {
+        let that = this;
+        for (let link of links) {
+            let linkUI = new LinkUI(link, this.svg, this.draggable);
+            linkUI.addEventListener('linkActivated', function (event: CustomEvent) {
+                that.activeLinkUI.deactivateLink();
+                that.activeLinkUI = this;
             });
-            let linkUI = new LinkUI(line, link);
-
-            var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
-            let circle: SVG.Shape = svg.circle()
-                .radius(8)
-                .fill('red')
-                .cx(pointOnLine.x + 20) //?
-                .cy(pointOnLine.y)
-                .front() //?
-                .mousedown(function () {
-                    lineAlt = that.changeLineColour($(that.draggingElement).data('line').stroke('black'), lineAlt, this);
-                })
-
-            this.draggable.registerDraggableElement(circle);
-
-            $(circle).data("line", line)
-            $(line).data("link", link);
         }
     }
 
-
-
+    public static getNodeXY(nodePositionX: number, nodePositionY: number): { x, y } {
+        let x = AiNeuralNetworkUI.LAYER_OFFSET_LEFT + AiNeuralNetworkUI.HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES + nodePositionX;
+        let y = AiNeuralNetworkUI.LAYER_OFFSET_TOP + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * nodePositionY;
+        return {x: x, y: y};
+    }
 }
 
 
+export class SVGSlider extends EventTarget {
 
-export class SVGSlider extends EventTarget{
 
     private static readonly ACCURACY = 100;
+    private _sliderValue: number;
 
     private constructor(
-        private path: SVG.Path,
-        private rangeMin: number,
-        private rangeMax: number,
-        private sliderShape: SVG.Shape,
-        private sliderValue: number,
-        private startPoint = 0,
-        private endPoint = path.length()) {
+        private readonly _path: SVG.Path,
+        private readonly rangeMin: number,
+        private readonly rangeMax: number,
+        private readonly _sliderShape: SVG.Shape,
+        private readonly startPoint = 0,
+        private readonly endPoint = _path.length()) {
         super();
     }
 
+    get path(): SVG.Path {
+        return this._path;
+    }
 
-    public static createSlider(path: SVG.Path,rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, sliderValue: number, startPoint = 0, endPoint = path.length) : SVGSlider {
-        let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, sliderValue,startPoint, endPoint());
+    get sliderShape(): SVG.Shape {
+        return this._sliderShape;
+    }
 
+    get sliderValue(): number {
+        return this._sliderValue;
+    }
+
+    set sliderValue(value: number) {
+        this.sliderValue = value;
+        let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
+        this.sliderShape.cx(pointOnPath.x + 20).cy(pointOnPath.y);
+        let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: value});
+        this.dispatchEvent(event);
+    }
+
+    public static createSlider(path: SVG.Path, rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, startPoint: number, endPoint = path.length): SVGSlider {
+        let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint());
+        slider.sliderShape.on('dragmove', function (e) {
+            var m = path.root().point(e.pageX, e.pageY),
+                p = SVGUtils.closestPoint(path.node, m);
+            sliderShape.cx(p.x).cy(p.y);
+
+            let sliderShapeCenter = {x: sliderShape.cx(), y: sliderShape.cy()};
+            slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
+        });
         return slider;
     }
+}
 
 
+export class SVGUtils {
 
-    public dragmove() {
-        let that = this;
-        this.sliderShape.on('dragmove', function() {
-            let line = that.path.node;
-            let sliderShapeCenter = {"x": that.sliderShape.cx(), "y": that.sliderShape.cy()};
-            that.sliderValue = that.getPositionOnPath(line, sliderShapeCenter, SVGSlider.ACCURACY, that.rangeMax);
-            that.setSliderValue(that.sliderValue);
-        });
+    public static createPath(svg, node1PositionX, node1PositionY, node2PositionX, node2PositionY): SVG.Path {
+        return svg.path([
+            ['M', node1PositionX, node1PositionY],
+            ['L', node2PositionX, node2PositionY],
+            ['z']
+        ])
     }
 
 
-    private getPositionOnPath(path, point, accuracy, fullWeight) {
-            let totalLength = path.getTotalLength();
-            let step = totalLength/accuracy;
-            let t = 0;
-            let currentDistance;
-            let minDistanceData = {"t":t, "distance": Number.MAX_VALUE};
+    public static closestPoint(pathNode, point): {x, y, distance} {
+        var pathLength = pathNode.getTotalLength(),
+            precision = 8,
+            best,
+            bestLength,
+            bestDistance = Infinity;
 
-
-            /**
-             * <--        totalLength         -->
-             * <step> <step> <step> <step> <step>
-             * ------|------|------|---*--|------
-             *       t-->         cirlceCenter
-             *       <--  distance  -->
-             *
-             */
-            for (t=0; t<=totalLength; t+=step) {
-                t = SVGSlider.round(t, 4);
-                currentDistance = SVGSlider.calcDistance(path.getPointAtLength(t), point)
-                if (currentDistance < minDistanceData.distance) {
-                    minDistanceData = {"t":t, "distance": currentDistance}; //p2 - distance from point at length to circle center
-                }
+        // linear scan for coarse approximation
+        for (var scan, scanLength = 0, scanDistance; scanLength <= pathLength; scanLength += precision) {
+            if ((scanDistance = SVGUtils.distance2(point,scan = pathNode.getPointAtLength(scanLength))) < bestDistance) {
+                best = scan, bestLength = scanLength, bestDistance = scanDistance;
             }
-            let sliderValue = minDistanceData.t/step * fullWeight/accuracy;
-            return sliderValue;
         }
+        // binary search for precise estimate
+        precision /= 2;
+        while (precision > 0.5) {
+            var before,
+                after,
+                beforeLength,
+                afterLength,
+                beforeDistance,
+                afterDistance;
+            if ((beforeLength = bestLength - precision) >= 0 && (beforeDistance = SVGUtils.distance2(point, before = pathNode.getPointAtLength(beforeLength))) < bestDistance) {
+                best = before, bestLength = beforeLength, bestDistance = beforeDistance;
+            } else if ((afterLength = bestLength + precision) <= pathLength && (afterDistance = SVGUtils.distance2(point, after = pathNode.getPointAtLength(afterLength))) < bestDistance) {
+                best = after, bestLength = afterLength, bestDistance = afterDistance;
+            } else {
+                precision /= 2;
+            }
+        }
+        return {x: best.x, y: best.y, distance: Math.sqrt(bestDistance)};
+
+    }
+
+    public static distance2(point, p) {
+        var dx = p.x - point.x,
+            dy = p.y - point.y;
+        return dx * dx + dy * dy;
+    }
+
+
+    public static getPositionOnPath(path: SVG.Path, point, accuracy, fullWeight): number {
+        let totalLength = path.length();
+        let step = totalLength / accuracy;
+        let t = 0;
+        let currentDistance;
+        let minDistanceData = {"t": t, "distance": Number.MAX_VALUE};
+
+
+        /**
+         * <--        totalLength         -->
+         * <step> <step> <step> <step> <step>
+         * ------|------|------|---*--|------
+         *       t-->         cirlceCenter
+         *       <--  distance  -->
+         *
+         */
+        for (t = 0; t <= totalLength; t += step) {
+            t = SVGUtils.round(t, 4);
+            currentDistance = SVGUtils.calcDistance(path.node.getPointAtLength(t), point)
+            if (currentDistance < minDistanceData.distance) {
+                minDistanceData = {"t": t, "distance": currentDistance}; //p2 - distance from point at length to circle center
+            }
+        }
+        let sliderValue = minDistanceData.t / step * fullWeight / accuracy;
+        return sliderValue;
+    }
 
 
     private static round(num, places) {
@@ -336,106 +414,5 @@ export class SVGSlider extends EventTarget{
         return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
     }
 
-    public getSliderValue() {
-        return this.sliderValue;
-    }
-
-
-    public setSliderValue(sliderValue: number) {
-        this.sliderValue = sliderValue;
-        let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: sliderValue});
-        this.dispatchEvent(event);
-    }
-
-
-
-
-
-    //
-    // var pointOnLine = line.node.getPointAtLength(line.node.getTotalLength() * link.weight);
-    // var circle = svg.circle()
-    //     .radius(8)
-    //     .fill('red')
-    //     .cx(pointOnLine.x+20) //?
-    //     .cy(pointOnLine.y)
-    //     .front() //?
-    //     .mousedown(function () {
-    //         console.log("Mouse is down");
-    //         that.draggingElement = this;
-    //         lineAlt = that.changeLineColour( $(that.draggingElement).data('line').stroke('black'), lineAlt, this);
-    //     })
-    // $(circle).data("line", line)
-    // $(line).data("link", link);
-    //
-    // changeLineColour(line, lineAlt, sliderElement) {
-    //     if (lineAlt != undefined) {
-    //         lineAlt.stroke('#b5cb5f');
-    //         lineAlt.back();
-    //     }
-    //     //line.front();
-    //     sliderElement.front();
-    //     line.stroke('black');
-    //     lineAlt = line;
-    //     return lineAlt;
-    // }
-    //
-    //
-    // mousemoved(svg,mbedBehaviour, e) {
-    //     console.log("Start moving!")
-    //     var m = svg.point(e.pageX, e.pageY),
-    //         p = mbedBehaviour.closestPoint($(mbedBehaviour.draggingElement).data("line").node, m);
-    //     //lineTest.attr("x1", p[0]).attr("y1", p[1]).attr("x2", m.x).attr("y2", m.y);
-    //     mbedBehaviour.draggingElement.attr("cx", p[0]).attr("cy", p[1]);
-    // }
-    //
-    //
-    // closestPoint(pathNode, point) {
-    //     var pathLength = pathNode.getTotalLength(),
-    //         precision = 8,
-    //         best,
-    //         bestLength,
-    //         bestDistance = Infinity;
-    //
-    //     // linear scan for coarse approximation
-    //     for (var scan, scanLength = 0, scanDistance; scanLength <= pathLength; scanLength += precision) {
-    //         if ((scanDistance = distance2(scan = pathNode.getPointAtLength(scanLength))) < bestDistance) {
-    //             best = scan, bestLength = scanLength, bestDistance = scanDistance;
-    //         }
-    //     }
-    //     // binary search for precise estimate
-    //     precision /= 2;
-    //     while (precision > 0.5) {
-    //         var before,
-    //             after,
-    //             beforeLength,
-    //             afterLength,
-    //             beforeDistance,
-    //             afterDistance;
-    //         if ((beforeLength = bestLength - precision) >= 0 && (beforeDistance = distance2(before = pathNode.getPointAtLength(beforeLength))) < bestDistance) {
-    //             best = before, bestLength = beforeLength, bestDistance = beforeDistance;
-    //         } else if ((afterLength = bestLength + precision) <= pathLength && (afterDistance = distance2(after = pathNode.getPointAtLength(afterLength))) < bestDistance) {
-    //             best = after, bestLength = afterLength, bestDistance = afterDistance;
-    //         } else {
-    //             precision /= 2;
-    //         }
-    //     }
-    //
-    //     best = [best.x, best.y];
-    //     best.distance = Math.sqrt(bestDistance);
-    //     return best;
-    //
-    //     function distance2(p) {
-    //         var dx = p.x - point.x,
-    //             dy = p.y - point.y;
-    //         return dx * dx + dy * dy;
-    //     }
-    // }
-
-
-
-}
-
-
-export class SVGSliderUtils {
 
 }

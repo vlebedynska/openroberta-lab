@@ -4,13 +4,19 @@ import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 import * as $ from "jquery";
 import {SVG} from "svgdotjs";
+import * as aiNNModule from "aiNeuralNetworkModule/source/ai.neuralNetwork";
+import {AiNeuralNetworkModule, Ev3MotorOutputNode} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
+
+	private neuralNetworkModule: AiNeuralNetworkModule;
 
 	constructor() {
 		super();
 		this.hardwareState.motors = {};
+		this.neuralNetworkModule = null;
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
+
 		U.loggingEnabled(true, true);
 	}
 
@@ -414,178 +420,37 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		console.assert(value, _msg + " " + _left + " " + _op + " " + _right);
 	}
 
-	public createLinks(inputLayer, outputLayer) {
-		var links = [];
-		var weight = 0;
-		for (var inputNodePosition in inputLayer) {
-			var inputNode = inputLayer[inputNodePosition];
-			for (var outputNodePosition in outputLayer) {
-				var outputNode = outputLayer[outputNodePosition];
-				weight = inputNodePosition == outputNodePosition ? 1 : 0;
-				var link = {
-					"inputNode": inputNode,
-					"outputNode": outputNode,
-					"weight": weight
-				};
-				links.push(link);
-			}
-		}
-		return links;
-	}
+
+
 	public processNeuralNetwork(inputLayer, outputLayer) {
-		var links;
-		if ($.isEmptyObject(this.neuralNetwork)) {
-			this.addNodesPosition(inputLayer);
-			this.addNodesPosition(outputLayer);
-			links = this.createLinks(inputLayer, outputLayer);
-			this.neuralNetwork = this.createNeuralNetwork(inputLayer, outputLayer, links);
-			this.changeWeight(this.neuralNetwork);
-			this.drawNeuralNetwork(this.neuralNetwork);
-		} else {
-			links = this.neuralNetwork.links;
-			for (var inputNodeID in inputLayer) {
-				var inputNode = inputLayer[inputNodeID];
-				this.neuralNetwork.inputLayer[inputNodeID].externalSensor = inputNode.externalSensor;
+
+		if ($.isEmptyObject(this.neuralNetworkModule)) {
+			this.neuralNetworkModule = new AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", {width: 300, height: 200}, inputLayer, outputLayer);
+		}
+		//set new Values in InputLayer
+		let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
+		for (let nodeID of inputLayer) {
+			let node = inputLayer[nodeID];
+			aiNeuralNetworkInputLayer[nodeID].value = node.value;
+		}
+
+		//calculates new network nodes values
+		this.neuralNetworkModule.calculateNeuralNetworkOutput();
+
+		//set motor speed according to the new values
+		let value = 0;
+		for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer() ) {
+			if ( node2.value > 100) {
+				value = 100;
+			} else {
+				value = node2.value;
 			}
+			this.setMotorSpeed("ev3", (<Ev3MotorOutputNode>node2).port, value);
+			console.log("Motorspeed" + value)
 		}
-		for (var outputNodePosition in outputLayer) {
-			var outputNode = outputLayer[outputNodePosition];
-			var speed = 0;
-			for (var linkPosition in links) {
-				var link = links[linkPosition];
-				if (outputNode == link.outputNode) {
-					speed = speed + (link.inputNode.externalSensor * link.weight);
-				}
-			}
-			if (speed > 100) {
-				speed = 100;
-			}
-			this.setMotorSpeed("ev3", outputNode.port, speed);
-			console.log("Motorspeed" + speed)
-		}
-	}
-
-	public createNeuralNetwork(inputLayer, outputLayer, links) {
-		return {
-			"inputLayer": inputLayer,
-			"outputLayer": outputLayer,
-			"links": links
-		}
-	}
-
-	public changeWeight(neuralNetwork) {
-		$('#einReglerfuerAlles').html("");
-		var div = $('<div style="margin:8px 50px; "></div>');
-		var value = 0;
-		var range = $('<input type="range" id="myRange" min="0" max="1" value=' + value + ' step="0.05" />');
-		range.on('input', function() {
-			$(this).data("link").weight = $(this).val();
-			var width = $(this).data("link").weight * 4 + 2;
-			$(this).data("line").stroke({width: width});
-		});
-		div.append(range);
-		$('#einReglerfuerAlles').append(div);
-		range.on("mousedown touchstart", function(e) {
-			e.stopPropagation();
-		});
-		// for (var linkId in neuralNetwork.links) {
-		// 	this.setHandler(neuralNetwork.links[linkId]);
-		// }
 
 	}
-	// public setHandler(link){
-	// 	//var link = neuralNetwork.links[linkId];
-	// 	var div = $('<div style="margin:8px 0; "></div>');
-	// 	var range = $('<input type="range" min="0" max="1" value="0" step="0.1" />');
-	// 	div.append(range);
-	// 	$('#simConfigNeuralNetworkContent').append(div);
-	// 	range.change(function (e) {
-	// 		e.preventDefault();
-	// 		//$('#range').html(this.val());
-	// 		link.weight = $(this).val();
-	// 		e.stopPropagation();
-	// 	});
-	//
-	// }
 
-	public addNodesPosition(layer) {
-		var i = 0;
-		for (var nodePosition in layer) {
-			var node = layer[nodePosition];
-			node.position = i;
-			i++;
-		}
-	}
-
-	public drawNeuralNetwork(neuralNetwork) {
-		//var test = SVG();
-		$('#simConfigNeuralNetworkSVG').html('');
-		var svg = SVG().addTo('#simConfigNeuralNetworkSVG').size(300, 200);
-		var positionX1 = 50;
-		var positionX2 = 220;
-		this.drawLinks(neuralNetwork.links, positionX1, positionX2, svg);
-		this.drawLayer(neuralNetwork.inputLayer, positionX1, svg);
-		this.drawLayer(neuralNetwork.outputLayer, positionX2, svg);
-	}
-
-	public drawLayer(layer, startXPosition, svg) {
-		for (var nodeID in layer) {
-			var node = layer[nodeID]
-			var nodePosition = (<any>node).position;
-			var y = 20 + 70 * nodePosition;
-			var circle = svg.circle()
-				.radius(20)
-				.cx(startXPosition)
-				.cy(y)
-				.fill('black')
-		}
-	}
-
-	public drawLinks(links, positionX1, positionX2, svg) {
-		let lineAlt;
-		for (var linkID in links) {
-			var that = this;
-			var link = links[linkID];
-			var positionY1 = 20 + 70*link.inputNode.position;
-			var positionY2 = 20 + 70*link.outputNode.position;
-			var strokeWidth = link.weight*4 + 2;
-			var colour = '#b5cb5f';
-			//var style = "stroke:rgb(255,0,0);stroke-width:" + strokeWidth;
-			var line = svg.line(positionX1,positionY1, positionX2, positionY2)
-				.stroke({ color: colour, width: strokeWidth })
-				.mouseover(function () {
-					this.stroke('black')
-				})
-				.mouseout(function () {
-					if (lineAlt != this) {
-						this.stroke(colour)
-					}
-				})
-				.click(function () {
-					var link = $(this).data("link");
-					console.log(link);
-					var regler = $('#myRange');
-					regler.data("link", link);
-					regler.data("line", this);
-					that.changeInputTypeRange(regler);
-					lineAlt = that.changeLineColour(this, lineAlt);
-				})
-			;
-			$(line).data("link", link);
-
-		}
-	}
-
-	public changeLineColour(line, lineAlt) {
-		if (lineAlt != undefined) {
-			lineAlt.stroke('#b5cb5f');
-			lineAlt.back();
-		}
-		line.front();
-		line.stroke('black');
-		lineAlt = line;
-		return lineAlt;
-	}
 
 	public changeInputTypeRange(regler) {
 		//var value = slider.value;

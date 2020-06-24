@@ -1,23 +1,64 @@
 import * as SVG from "svgdotjs";
 
 export class AiNeuralNetworkModule {
+
+
     private svg: SVG.Svg;
+    private readonly _aiNeuralNetwork: AiNeuralNetwork = null;
+    private readonly _aiNeuralNetworkUI: AiNeuralNetworkUI = null;
 
-    constructor(selector: string) {
-        this.init(selector);
-    }
-
-    private init(selector: string) {
+    public constructor(selector: string, size: {width: number, height: number}, ...layers: Array<Array<Node>> ) {
         $(selector).html('');
-        this.svg = SVG.SVG().addTo(selector);
-        AiNeuralNetwork.creteNeuralNetwork(layers);
+        this.svg = SVG.SVG().addTo(selector).size(size.width, size.height);
+        this._aiNeuralNetwork = this.createNeuralNetwork(...layers);
+        this._aiNeuralNetworkUI = new AiNeuralNetworkUI(this.aiNeuralNetwork, this.svg);
     }
+
+    get aiNeuralNetwork(): AiNeuralNetwork {
+        if (this._aiNeuralNetwork != null) {
+            return this._aiNeuralNetwork;
+        } else {
+            return null;
+        }
+    }
+
+    get aiNeuralNetworkUI(): AiNeuralNetworkUI {
+        return this._aiNeuralNetworkUI;
+    }
+
+
+    private createNeuralNetwork(... layers: Array<Array<Node>>): AiNeuralNetwork {
+        if (this._aiNeuralNetwork != null) {
+            return;
+        }
+        return AiNeuralNetwork.createNeuralNetwork(layers);
+    }
+
+    public calculateNeuralNetworkOutput() {
+        this.aiNeuralNetwork.calculateNeuralNetworkOutput();
+    }
+
+
 }
 
 
 export class AiNeuralNetwork {
 
-    private constructor(public layers: Array<Array<Node>>, public links: Array<Link>) {
+    private readonly _layers: Array<Array<Node>>
+    private readonly _links: Array<Link>
+
+    private constructor(layers: Array<Array<Node>>, links: Array<Link>) {
+        this._layers = layers;
+        this._links = links;
+
+    }
+
+    get layers(): Array<Array<Node>> {
+        return this._layers;
+    }
+
+    get links(): Array<Link> {
+        return this._links;
     }
 
     private static createLinks(layers: Array<Array<Node>>, weight = 0): Array<Link> {
@@ -29,7 +70,7 @@ export class AiNeuralNetwork {
                 let node1: Node = nodesFirstLayer[node1Index];
                 for (let node2Index in nodesSecondLayer) {
                     let node2: Node = nodesFirstLayer[node2Index];
-                    var link: Link = new Link(node1, node2, weight);
+                    let link: Link = new Link(node1, node2, weight);
                     links.push(link);
                 }
             }
@@ -46,13 +87,35 @@ export class AiNeuralNetwork {
         }
     }
 
-    public static creteNeuralNetwork(layers: Array<Array<Node>>, weight?: number): AiNeuralNetwork {
-        let links: Array<Link> = AiNeuralNetwork.createLinks(layers, weight);
+    public static createNeuralNetwork(layers: Array<Array<Node>>, initialWeight?: number): AiNeuralNetwork {
+        let links: Array<Link> = AiNeuralNetwork.createLinks(layers, initialWeight);
         for (let layerID in layers) {
             let layer = layers[layerID];
             AiNeuralNetwork.addNodesPositionXY(parseInt(layerID), layer);
         }
         return new AiNeuralNetwork(layers, links);
+    }
+
+    public calculateNeuralNetworkOutput() {
+        for (let i = 0; i < this._layers.length - 1; i++) {
+            let nodesSecondLayer = this._layers[i + 1];
+            for (let node2 of nodesSecondLayer) {
+                node2.value = 0;
+                for (let link of this._links) {
+                    if (node2 == link.node2) {
+                        node2.value = node2.value + (link.node1.value * link.weight);
+                    }
+                }
+            }
+        }
+    }
+
+    public getInputLayer(): Array<Node> {
+        return this._layers[0];
+    }
+
+    public getOutputLayer(): Array<Node> {
+        return this._layers[this._layers.length-1];
     }
 }
 
@@ -79,6 +142,26 @@ export class Node {
 
     set positionY(value: number) {
         this._positionY = value;
+    }
+}
+
+export class Ev3MotorOutputNode extends Node {
+
+    private readonly _port: string;
+    private readonly _type: string;
+
+    get port(): string {
+        return this._port;
+    }
+
+    get type(): string {
+        return this._type;
+    }
+
+    constructor (value: number, threshold: number, port: string, type: string ) {
+        super(value, threshold);
+        this._port = port;
+        this._type = type;
     }
 }
 
@@ -116,7 +199,6 @@ export class LinkUI extends EventTarget {
         this.drawSlider();
         this.addLinkListener();
     };
-
 
     private drawSlider() {
         let that = this;
@@ -218,11 +300,6 @@ export class Draggable {
 
 
     }
-
-    // public ondragend() {
-    //     $(that.draggingElement).data('line').stroke('#b5cb5f');
-    // }
-
 }
 
 export class AiNeuralNetworkUI {
@@ -233,8 +310,9 @@ export class AiNeuralNetworkUI {
     public static HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES = 170;
     public static VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 70;
 
-    private constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg) {
+    public constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg) {
         this.draggable = Draggable.create(svg);
+        this.drawNeuralNetwork();
     }
 
 
@@ -413,6 +491,4 @@ export class SVGUtils {
     private static calcDistance(p1, p2) {
         return Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
     }
-
-
 }

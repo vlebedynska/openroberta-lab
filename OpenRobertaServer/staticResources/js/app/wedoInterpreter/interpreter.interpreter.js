@@ -472,7 +472,7 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                         case C.CREATE_INPUT_NODE: {
                             let node = {
                                 threshold: s.pop(),
-                                externalSensor: s.pop()
+                                value: s.pop()
                             };
                             s.push(node);
                             break;

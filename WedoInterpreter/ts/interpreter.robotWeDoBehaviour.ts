@@ -5,6 +5,7 @@ import * as U from "interpreter.util";
 
 export class RobotWeDoBehaviour extends ARobotBehaviour {
 
+
     /*
      * represents the state of connected wedo devices with the following
      * structure: {<name of the device> { 1 : { tiltsensor : "0.0" }, 2 : {
@@ -37,6 +38,19 @@ export class RobotWeDoBehaviour extends ARobotBehaviour {
     }
 
     public processNeuralNetwork(inputLayer: any, outputLayer: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public createQLearningEnvironment(obstaclesList: any, startNode: any, finishNode: any): void {
+        throw new Error("Method not implemented.");
+    }
+    public setUpQLearningBehaviour(alpha: number, gamma: number, nu: number, rho: number): void {
+        throw new Error("Method not implemented.");
+    }
+    public runQLearner(): void {
+        throw new Error("Method not implemented.");
+    }
+    public drawOptimalPath(): void {
         throw new Error("Method not implemented.");
     }
 

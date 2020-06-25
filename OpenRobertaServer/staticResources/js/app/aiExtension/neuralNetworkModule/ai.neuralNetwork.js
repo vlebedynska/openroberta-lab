@@ -51,7 +51,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                 for (let node1Index in nodesFirstLayer) {
                     let node1 = nodesFirstLayer[node1Index];
                     for (let node2Index in nodesSecondLayer) {
-                        let node2 = nodesSecondLayer[node2Index];
+                        let node2 = nodesFirstLayer[node2Index];
                         let link = new Link(node1, node2, weight);
                         links.push(link);
                     }
@@ -159,19 +159,17 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         ;
         drawSlider() {
             let that = this;
-            let path = LinkUI.createPathForLink(this.link, this.svg)
-                .stroke(LinkUI.COLOR_DEFAULT);
+            let path = LinkUI.createPathForLink(this.link, this.svg);
             let circle = this.svg.circle()
                 .radius(8)
                 .fill('red')
                 .click(function () {
                 that.activateLink();
             });
-            this.slider = SVGSlider.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, LinkUI.STARTPOINT, path.length(), this.link.weight);
+            this.slider = SVGSlider.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, LinkUI.STARTPOINT, path.length);
             this.slider.addEventListener('sliderValueChanged', function (sliderValueData) {
-                that.link.weight = sliderValueData.detail;
+                that.link.weight = sliderValueData.detail.sliderValue;
             });
-            this.updateSliderPathOnWeightChange(this.link.weight);
             this.draggable.registerDraggableElement(circle);
         }
         static createPathForLink(link, svg) {
@@ -181,18 +179,17 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         }
         addLinkListener() {
             let that = this;
-            this.link.addEventListener('weightChanged', function (event) {
-                that.updateSliderPathOnWeightChange(event.detail);
+            this.link.addEventListener('weightChanged', function (value) {
+                let width = value.detail.value * 4 + 2;
+                that.slider.path.stroke({ width: width });
             });
-            this.slider.path
+            this.slider.path.stroke({ color: LinkUI.COLOR_INACTIVE, width: this.link.weight })
                 .mouseover(function () {
                 this.stroke(LinkUI.COLOR_ACTIVE);
-                console.log("Link mouseover");
             })
                 .mouseout(function () {
                 if (!that.isActivated) {
                     this.stroke(LinkUI.COLOR_INACTIVE);
-                    console.log("Link mouseout");
                 }
             })
                 .click(function () {
@@ -200,28 +197,21 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                 that.activateLink();
             });
         }
-        updateSliderPathOnWeightChange(weight) {
-            let width = weight * 4 + 2;
-            this.slider.path.stroke({ width: width });
-        }
         activateLink() {
             this.isActivated = true;
             this.slider.path.stroke(LinkUI.COLOR_ACTIVE).front();
             this.slider.sliderShape.front();
             let event = new CustomEvent('linkActivated');
-            console.log("Link aktiviert");
             this.dispatchEvent(event);
         }
         deactivateLink() {
             this.isActivated = false;
             this.slider.path.stroke(LinkUI.COLOR_INACTIVE);
-            console.log("Link deaktiviert");
         }
     }
     exports.LinkUI = LinkUI;
     LinkUI.COLOR_ACTIVE = 'black';
     LinkUI.COLOR_INACTIVE = '#b5cb5f';
-    LinkUI.COLOR_DEFAULT = '#b5cb5f';
     LinkUI.RANGE_MIN = 0;
     LinkUI.RANGE_MAX = 1;
     LinkUI.STARTPOINT = 0;
@@ -240,14 +230,12 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             this.area.mousemove(function (e) {
                 e.stopPropagation();
                 if (that.draggingElement != null) {
-                    that.draggingElement.dispatch('dragmove', e);
-                    console.log("dragmove");
+                    that.draggingElement.fire('dragmove');
                 }
             });
             $(document).mouseup(function (e) {
                 if (that.draggingElement != null) {
                     that.draggingElement.fire('dragend');
-                    console.log("dragend");
                     that.draggingElement = null;
                 }
             });
@@ -257,7 +245,6 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             element.mousedown(function () {
                 that.draggingElement = this;
                 that.draggingElement.fire('dragstart');
-                console.log("dragstart");
             });
         }
     }
@@ -289,26 +276,24 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             for (let link of links) {
                 let linkUI = new LinkUI(link, this.svg, this.draggable);
                 linkUI.addEventListener('linkActivated', function (event) {
-                    if (that.activeLinkUI != undefined) {
-                        that.activeLinkUI.deactivateLink();
-                    }
+                    that.activeLinkUI.deactivateLink();
                     that.activeLinkUI = this;
                 });
             }
         }
         static getNodeXY(nodePositionX, nodePositionY) {
-            let x = AiNeuralNetworkUI.LAYER_OFFSET_LEFT + AiNeuralNetworkUI.HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES * nodePositionX;
+            let x = AiNeuralNetworkUI.LAYER_OFFSET_LEFT + AiNeuralNetworkUI.HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES + nodePositionX;
             let y = AiNeuralNetworkUI.LAYER_OFFSET_TOP + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * nodePositionY;
             return { x: x, y: y };
         }
     }
     exports.AiNeuralNetworkUI = AiNeuralNetworkUI;
     AiNeuralNetworkUI.LAYER_OFFSET_TOP = 20;
-    AiNeuralNetworkUI.LAYER_OFFSET_LEFT = 50;
+    AiNeuralNetworkUI.LAYER_OFFSET_LEFT = 20;
     AiNeuralNetworkUI.HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES = 170;
     AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 70;
     class SVGSlider extends EventTarget {
-        constructor(_path, rangeMin, rangeMax, _sliderShape, startPoint = 0, endPoint = _path.length(), _sliderValue) {
+        constructor(_path, rangeMin, rangeMax, _sliderShape, startPoint = 0, endPoint = _path.length()) {
             super();
             this._path = _path;
             this.rangeMin = rangeMin;
@@ -316,8 +301,6 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             this._sliderShape = _sliderShape;
             this.startPoint = startPoint;
             this.endPoint = endPoint;
-            this._sliderValue = _sliderValue;
-            this.sliderValue = _sliderValue;
         }
         get path() {
             return this._path;
@@ -329,18 +312,16 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             return this._sliderValue;
         }
         set sliderValue(value) {
-            this._sliderValue = value;
+            this.sliderValue = value;
             let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
             this.sliderShape.cx(pointOnPath.x + 20).cy(pointOnPath.y);
             let event = new CustomEvent('sliderValueChanged', { detail: value });
-            console.log("slidervalue changed: " + value);
             this.dispatchEvent(event);
         }
-        static createSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint = path.length(), sliderValue = 0) {
-            let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint, sliderValue);
+        static createSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint = path.length) {
+            let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint());
             slider.sliderShape.on('dragmove', function (e) {
-                let mouseEvent = e.detail;
-                var m = path.root().point(mouseEvent.pageX, mouseEvent.pageY), p = SVGUtils.closestPoint(path.node, m);
+                var m = path.root().point(e.pageX, e.pageY), p = SVGUtils.closestPoint(path.node, m);
                 sliderShape.cx(p.x).cy(p.y);
                 let sliderShapeCenter = { x: sliderShape.cx(), y: sliderShape.cy() };
                 slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
@@ -354,7 +335,8 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         static createPath(svg, node1PositionX, node1PositionY, node2PositionX, node2PositionY) {
             return svg.path([
                 ['M', node1PositionX, node1PositionY],
-                ['L', node2PositionX, node2PositionY]
+                ['L', node2PositionX, node2PositionY],
+                ['z']
             ]);
         }
         static closestPoint(pathNode, point) {
@@ -386,7 +368,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             return dx * dx + dy * dy;
         }
         static getPositionOnPath(path, point, accuracy, fullWeight) {
-            let totalLength = path.node.getTotalLength();
+            let totalLength = path.length();
             let step = totalLength / accuracy;
             let t = 0;
             let currentDistance;

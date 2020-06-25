@@ -455,13 +455,13 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             let obstacle = {
                                 startNode: stmt[C.QLEARNING_STARTNODE],
                                 finishNode: stmt[C.QLEARNING_FINISHNODE]
-                            }
+                            };
                             s.push(obstacle);
                             break;
                         }
                         case C.CREATE_INPUT_NODE_COLOUR_SENSOR: {
                             let node = {
-                                externalSensor: s.pop(),
+                                value: s.pop(),
                                 threshold: stmt[C.THRESHOLD],
                                 colour: stmt[C.COLOUR]
                             };

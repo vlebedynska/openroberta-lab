@@ -6,18 +6,25 @@ import * as $ from "jquery";
 import {SVG} from "svgdotjs";
 import * as aiNNModule from "aiNeuralNetworkModule/source/ai.neuralNetwork";
 import {AiNeuralNetworkModule, Ev3MotorOutputNode} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
+import * as aiqlearning from "aiReinforcementLearningModule/ts/aiReinforcementLearningModule"
+import {QLearningAlgorithmModule} from "aiReinforcementLearningModule/ts/aiReinforcementLearningModule";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	private neuralNetworkModule: AiNeuralNetworkModule;
+	private readonly updateBackground: Function;
+	private readonly qLearningAlgorithmModule: QLearningAlgorithmModule;
 
-	constructor() {
+	constructor(updateBackground) {
 		super();
 		this.hardwareState.motors = {};
 		this.neuralNetworkModule = null;
+		this.updateBackground = updateBackground;
+		this.qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground);
+
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
 
-		U.loggingEnabled(true, true);
+		U.loggingEnabled(false, false);
 	}
 
 
@@ -429,7 +436,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		}
 		//set new Values in InputLayer
 		let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
-		for (let nodeID of inputLayer) {
+		for (let nodeID in inputLayer) {
 			let node = inputLayer[nodeID];
 			aiNeuralNetworkInputLayer[nodeID].value = node.value;
 		}
@@ -478,10 +485,32 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 			default:
 				throw node.colour + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
 		}
-		var colourChannelValue = node.externalSensor[colourChannel];
+		var colourChannelValue = node.value[colourChannel];
 		var inputValue = colourChannelValue/2.55;
-		node.externalSensor = inputValue;
+		node.value = inputValue;
 	}
+
+
+
+	//Reinforcement Learning
+
+
+	createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+		return this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+	}
+
+	setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+		this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+	}
+
+	runQLearner() {
+		return this.qLearningAlgorithmModule.runQLearner();
+	}
+
+	drawOptimalPath() {
+		this.qLearningAlgorithmModule.drawOptimalPath();
+	}
+
 
 	public close() {
 	}

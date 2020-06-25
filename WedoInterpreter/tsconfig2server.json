@@ -10,14 +10,14 @@
         "module": "amd",
         "baseUrl": "./ts",
         "paths": {
-            "xxxxinterpreter.*": ["*"],
-            "aiReinforcementLearningModule": ["./aiReinforcementLearningModule/ts/*"]
+            "interpreter.*": ["*"],
+            "aiReinforcementLearningModule": ["./aiReinforcementLearningModule/ts/*"],
+            "aiNeuralNetworkModule": ["./aiNeuralNetworkModule/source/*"]
         }
     },
     "exclude": [
         "**/node_modules",
         "**/interpreter.runStackMachineJson.ts",
-        "**/aiNeuralNetworkModule"
     ],
     "compileOnSave": true,
     "buildOnSave": true

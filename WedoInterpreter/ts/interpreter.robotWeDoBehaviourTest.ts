@@ -4,12 +4,7 @@ import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 
 export class RobotWeDoBehaviourTest extends ARobotBehaviour {
-    extractColourChannelAndNormalize(node: any): void {
-        throw new Error("Method not implemented.");
-    }
-    processNeuralNetwork(inputLayer: any, outputLayer: any): void {
-        throw new Error("Method not implemented.");
-    }
+
     private timers;
 
     constructor( opLog, debug ) {
@@ -196,4 +191,27 @@ export class RobotWeDoBehaviourTest extends ARobotBehaviour {
         const robotText = "> Assertion failed: " + _msg + " " + _left + " " + _op + " " + _right;
         U.info( ' assert action ' + robotText );
     }
+
+
+    public createQLearningEnvironment(obstaclesList: any, startNode: any, finishNode: any): void {
+        throw new Error("Method not implemented.");
+    }
+    public setUpQLearningBehaviour(alpha: number, gamma: number, nu: number, rho: number): void {
+        throw new Error("Method not implemented.");
+    }
+    public runQLearner(): void {
+        throw new Error("Method not implemented.");
+    }
+    public drawOptimalPath(): void {
+        throw new Error("Method not implemented.");
+    }
+    public extractColourChannelAndNormalize(node: any): void {
+        throw new Error("Method not implemented.");
+    }
+    public processNeuralNetwork(inputLayer: any, outputLayer: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+
+
 }

@@ -8,12 +8,6 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.timers['start'] = Date.now();
             U.loggingEnabled(opLog, debug);
         }
-        extractColourChannelAndNormalize(node) {
-            throw new Error("Method not implemented.");
-        }
-        processNeuralNetwork(inputLayer, outputLayer) {
-            throw new Error("Method not implemented.");
-        }
         clearDisplay() {
             U.debug('clear display');
         }
@@ -158,6 +152,24 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         assertAction(_msg, _left, _op, _right, _value) {
             const robotText = "> Assertion failed: " + _msg + " " + _left + " " + _op + " " + _right;
             U.info(' assert action ' + robotText);
+        }
+        createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+            throw new Error("Method not implemented.");
+        }
+        setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+            throw new Error("Method not implemented.");
+        }
+        runQLearner() {
+            throw new Error("Method not implemented.");
+        }
+        drawOptimalPath() {
+            throw new Error("Method not implemented.");
+        }
+        extractColourChannelAndNormalize(node) {
+            throw new Error("Method not implemented.");
+        }
+        processNeuralNetwork(inputLayer, outputLayer) {
+            throw new Error("Method not implemented.");
         }
     }
     exports.RobotWeDoBehaviourTest = RobotWeDoBehaviourTest;

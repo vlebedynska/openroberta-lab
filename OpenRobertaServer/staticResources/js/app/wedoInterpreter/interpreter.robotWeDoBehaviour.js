@@ -25,6 +25,18 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         processNeuralNetwork(inputLayer, outputLayer) {
             throw new Error("Method not implemented.");
         }
+        createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+            throw new Error("Method not implemented.");
+        }
+        setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+            throw new Error("Method not implemented.");
+        }
+        runQLearner() {
+            throw new Error("Method not implemented.");
+        }
+        drawOptimalPath() {
+            throw new Error("Method not implemented.");
+        }
         update(data) {
             U.info('update type:' + data.type + ' state:' + data.state + ' sensor:' + data.sensor + ' actor:' + data.actuator);
             if (data.target !== "wedo") {

@@ -1,7 +1,8 @@
 require.config({
     baseUrl : 'js/libs',
     paths : {
-        'ai.qlearning' : '../app/aiExtension/qLearningModule/aiReinforcementLearningModule',
+        'aiNeuralNetworkModule/source/ai.neuralNetwork' : '../app/wedoInterpreter/aiNeuralNetworkModule/source/ai.neuralNetwork',
+        'aiReinforcementLearningModule/ts/aiReinforcementLearningModule' : '../app/wedoInterpreter/aiReinforcementLearningModule/ts/aiReinforcementLearningModule',
         'svgdotjs' : 'svgdotjs/dist/svg.min',
         'codeflask' : 'codeflask/codeflask.min',
         'blockly' : '../../blockly/blockly_compressed',
@@ -132,7 +133,7 @@ require([ 'require', 'wrap', 'log', 'jquery', 'jquery-cookie', 'guiState.control
         'progDelete.controller', 'confDelete.controller', 'progShare.controller', 'menu.controller', 'multSim.controller', 'user.controller',
         'robot.controller', 'program.controller', 'progSim.controller', 'progCode.controller', 'progDelete.controller', 'progHelp.controller',
         'legal.controller', 'progInfo.controller', 'progRun.controller', 'configuration.controller', 'language.controller', 'socket.controller',
-        'progTutorial.controller', 'tutorialList.controller', 'volume-meter', 'user.model', 'webview.controller', 'sourceCodeEditor.controller', 'codeflask', 'svgdotjs', 'ai.qlearning'], function(
+        'progTutorial.controller', 'tutorialList.controller', 'volume-meter', 'user.model', 'webview.controller', 'sourceCodeEditor.controller', 'codeflask', 'svgdotjs'], function(
         require) {
     $ = require('jquery', 'jquery-cookie');
     WRAP = require('wrap');
@@ -168,7 +169,6 @@ require([ 'require', 'wrap', 'log', 'jquery', 'jquery-cookie', 'guiState.control
     sourceCodeEditorController = require('sourceCodeEditor.controller');
     codeflask = require('codeflask');
     $(document).ready(WRAP.fn3(init, 'page init'));
-    aiqlearning = require('ai.qlearning');
 });
 
 /**

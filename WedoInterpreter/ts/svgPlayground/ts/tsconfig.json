@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "../src",
+    "target": "es5",
+    "rootDir": ".",
+
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "files": [
+    "./aiReinforcementLearningModule.ts",
+    "./Clock.ts",
+    "./index.ts",
+    "./Player.ts",
+    "./Visualizer.ts"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": true
+}

@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "svgPlayground1.html",
   "dependencies": {
+    "@svgdotjs/svg.js": "^3.0.16",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",

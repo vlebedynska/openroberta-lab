@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { SvgLoader, SvgProxy } from "react-svgmt";
+import * as SVG from "@svgdotjs/svg.js";
 
 import "./styles.css";
 
@@ -15,12 +16,16 @@ import "./styles.css";
 //         </div>
 //     );
 // }
+// var SVG = require("@svgdotjs/svg.js");
+
 
 
 class Timer extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = { seconds: 0 };
+
     }
 
     tick() {

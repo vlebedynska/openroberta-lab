@@ -1,6 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import * as aiqlearning from "./aiReinforcementLearningModule"
-import {Obstacle, QLearningAlgorithmModule, QlearningAlgorithmParameters} from "./aiReinforcementLearningModule";
+import {Section, QLearningAlgorithmModule, QlearningAlgorithmParameters} from "./aiReinforcementLearningModule";
 
 var svg = SVG.SVG().addTo('body').size(300, 300)
 var rect = svg.rect(100, 100).attr({ fill: '#f06' })

@@ -4,18 +4,25 @@
     "target": "es5",
     "rootDir": ".",
 
-    "module": "commonjs",
+    "module": "amd",
     "moduleResolution": "node",
     "baseUrl": "./",
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015.promise"
+    ]
   },
   "files": [
     "./aiReinforcementLearningModule.ts",
     "./Clock.ts",
     "./index.ts",
     "./Player.ts",
-    "./Visualizer.ts"
+    "./Visualizer.ts",
+    "./Utils.ts"
   ],
   "compileOnSave": true,
   "buildOnSave": true

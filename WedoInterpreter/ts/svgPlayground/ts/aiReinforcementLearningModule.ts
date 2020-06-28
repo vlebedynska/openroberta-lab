@@ -1,5 +1,6 @@
 import * as SVG from "@svgdotjs/svg.js";
 import {Element, List} from "@svgdotjs/svg.js";
+import {Action} from "./models";
 // import * as $ from "jquery";
 
 export interface QlearningAlgorithmParameters {
@@ -15,7 +16,7 @@ export interface QlearningAlgorithmParameters {
     // qValueStore: QValueStore;
     episodes: number;
     timePerEpisode: number;
-    obstaclesList: Obstacle[];
+    obstaclesList: Action[];
 }
 
 
@@ -49,7 +50,7 @@ export class QLearningAlgorithmModule {
 
     }
 
-    createQLearningEnvironment(obstaclesList: Obstacle[], startNode: number, finishNode: number): number {
+    createQLearningEnvironment(obstaclesList: Action[], startNode: number, finishNode: number): number {
         this.startNode = startNode;
         this.finishNode = finishNode;
         let path: string = "./marsTopView.svg";
@@ -58,7 +59,7 @@ export class QLearningAlgorithmModule {
     }
 
 
-    loadSVG(filePath: string, obstaclesList: Obstacle[], finishNode: number) {
+    loadSVG(filePath: string, obstaclesList: Action[], finishNode: number) {
         let that = this;
         RlUtils.file_get_contents(filePath, function (text) {
             that.drawSVG(text);
@@ -150,14 +151,11 @@ export class QLearningAlgorithmModule {
     }
 }
 
-export interface Obstacle {
-    startNode: number,
-    finishNode: number
-}
+
 
 class RlUtils {
 
-    static generateStatesAndActionsFromSVG(svg: SVG.Svg, obstaclesList: Obstacle[], finishNode: number): number[][] {
+    static generateStatesAndActionsFromSVG(svg: SVG.Svg, obstaclesList: Action[], finishNode: number): number[][] {
         var statesAndActions: number[][] = [];
         var allPathes: List<Element> = svg.find('.cls-customPathColor');
         var obstaclesArray: string[] = [];
@@ -186,13 +184,7 @@ class RlUtils {
     }
 
 
-    static file_get_contents(uri, callback) {
-        fetch(uri).then(res =>
-            res.text()
-        ).then(text =>
-            callback(text)
-        );
-    }
+
 
 
     static hideAllPathsExeptTheOptimal(svg) {

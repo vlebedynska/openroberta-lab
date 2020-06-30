@@ -1,5 +1,5 @@
 export interface ProblemSource {
-    getSections(): Array<Action>;
+    getActions(): Array<Action>;
 }
 
 export interface Player {
@@ -24,12 +24,14 @@ export interface SectionState {
 }
 
 export interface QLearningStep {
-    rho: Rho;
-    nu: Nu;
-    qValueOld: number;
-    qValueNew: number;
-    state: number;
-    newState: number;
+    readonly rho: Rho;
+    readonly nu: Nu;
+    readonly qValueOld: number;
+    readonly qValueNew: number;
+    readonly state: number;
+    readonly newState: number;
+    readonly duration: number;
+    readonly stepNumber: number;
 }
 
 export enum Rho {
@@ -70,6 +72,7 @@ export interface ProblemState {
 export interface Clock {
     runningState: RunningState;
     speed: number;
+    time: number;
 }
 
 export enum RunningState {

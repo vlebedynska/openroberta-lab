@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2242.36 1482.43">
     <defs>
-        <linearGradient id="linear-gradient" x1="672.98" y1="515.95" x2="669.01" y2="686.08" gradientUnits="userSpaceOnUse">
+        <linearGradient id="herr" x1="672.98" y1="515.95" x2="669.01" y2="686.08" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#b3c96c"/>
             <stop offset="0.6" stop-color="#598880"/>
             <stop offset="0.75" stop-color="#568780"/>
@@ -9,14 +9,14 @@
             <stop offset="1" stop-color="#29747a"/>
             <stop offset="1" stop-color="#28747a"/>
         </linearGradient>
-        <linearGradient id="linear-gradient-2" x1="410.48" y1="282.69" x2="407.37" y2="416.28" xlink:href="#linear-gradient"/>
-        <linearGradient id="linear-gradient-3" x1="1387.9" y1="949.96" x2="1383.62" y2="1133.36" xlink:href="#linear-gradient"/>
-        <linearGradient id="linear-gradient-4" x1="1340" y1="421.96" x2="1336.81" y2="558.87" xlink:href="#linear-gradient"/>
+        <linearGradient id="linear-gradient-2" x1="410.48" y1="282.69" x2="407.37" y2="416.28" xlink:href="#herr-0"/>
+        <linearGradient id="linear-gradient-3" x1="1387.9" y1="949.96" x2="1383.62" y2="1133.36" xlink:href="#herr-0"/>
+        <linearGradient id="linear-gradient-4" x1="1340" y1="421.96" x2="1336.81" y2="558.87" xlink:href="#herr-0"/>
         <linearGradient id="linear-gradient-5" x1="950.21" y1="428.25" x2="945.34" y2="636.6" gradientTransform="translate(592.9 -541.27) rotate(45)"
-                        xlink:href="#linear-gradient"/>
-        <linearGradient id="linear-gradient-6" x1="1132.15" y1="951.79" x2="1127.62" y2="1145.87" xlink:href="#linear-gradient"/>
-        <linearGradient id="linear-gradient-7" x1="187.97" y1="430.02" x2="181.13" y2="722.95" xlink:href="#linear-gradient"/>
-        <linearGradient id="linear-gradient-8" x1="185.81" y1="1177.82" x2="183.46" y2="1278.87" xlink:href="#linear-gradient"/>
+                        xlink:href="#herr-0"/>
+        <linearGradient id="linear-gradient-6" x1="1132.15" y1="951.79" x2="1127.62" y2="1145.87" xlink:href="#herr-0"/>
+        <linearGradient id="linear-gradient-7" x1="187.97" y1="430.02" x2="181.13" y2="722.95" xlink:href="#herr-0"/>
+        <linearGradient id="linear-gradient-8" x1="185.81" y1="1177.82" x2="183.46" y2="1278.87" xlink:href="#herr-0"/>
         <linearGradient id="Test" x1="2020.94" y1="-63.16" x2="2209.29" y2="-63.16" gradientTransform="matrix(0.5, -0.02, -0.02, -0.47, 1042.24, 488.24)"
                         gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#fbd437"/>
@@ -215,7 +215,7 @@
                 <tspan x="23.45" y="43.2">aße</tspan>
             </text>
             <rect x="51.25" y="171.42" width="1610.02" height="1279.76" rx="140.49" fill="#dde0be"/>
-            <rect x="579.27" y="437.39" width="186.78" height="184.57" rx="27.8" fill="url(#linear-gradient)"/>
+            <rect x="579.27" y="437.39" width="186.78" height="184.57" rx="27.8" fill="url(#herr)"/>
             <rect x="306.13" y="221.67" width="208.21" height="143.59" rx="23.89" fill="url(#linear-gradient-2)"/>
             <rect x="1327.43" y="864.25" width="120.26" height="201.03" rx="33.65" fill="url(#linear-gradient-3)"/>
             <path d="M1297,507.5h148.67V421.65a63.13,63.13,0,0,0-63.12-63.13H1233.85v85.86A63.12,63.12,0,0,0,1297,507.5Z" transform="translate(2.04 -0.44)"

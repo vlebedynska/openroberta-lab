@@ -1,7 +1,8 @@
-import {Element, List, SVG, Svg} from "@svgdotjs/svg.js";
-import {Section} from "./aiReinforcementLearningModule";
+import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg} from "@svgdotjs/svg.js";
+import {Action, Player} from "./models";
 import {Utils} from "./Utils";
 import {ProblemSource} from "./models";
+
 
 //.size(3148 / 5, 1764 / 5).
 
@@ -44,16 +45,20 @@ export class Visualizer implements ProblemSource{
         return svg;
     }
 
-    public getSections(): Array<Section> {
-        let listOfPaths: Array<Section> = new Array<Section>();
+    public getActions(): Array<Action> {
+        let listOfPaths: Array<Action> = new Array<Action>();
 
         let allPaths: List<Element> = this.svg.find('g[id^="path-"]');
         allPaths.each(function (item) {
             let idName: string = item.attr("id");
             let tokens: string[] = idName.split("-");
             listOfPaths.push({
-                startNode: parseInt(tokens[1]),
-                finishNode: parseInt(tokens[2])
+                startState: {
+                    id: parseInt(tokens[1])
+                },
+                finishState: {
+                    id: parseInt(tokens[2])
+                }
             });
         });
         return listOfPaths;
@@ -78,7 +83,45 @@ export class Visualizer implements ProblemSource{
         };
     }
 
+    setPlayer(player: Player) {
+
+    }
+
+    processNotAllowedActions(notAllowedActions: Array<Action>) {
+        for (let notAllowedAction of notAllowedActions) {
+            let notAllowedPath: Shape = <Shape>this.svg.findOne('g[id^="path-"]' + notAllowedAction.startState.id + "-" + notAllowedAction.finishState.id + " path|line|polyline");
+            notAllowedPath.attr({
+                stroke: 'red',
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': 7,
+                'stroke-dasharray': '12 24'
+            })
+            this.setMarker(notAllowedPath);
+            //document.querySelector(notAllowedPath).innerHTML = ""
+        }
+    }
+
+    private setMarker(notAllowedPath: Path|Line|Polyline|any) {
+        try {
+            notAllowedPath.marker('start', 10, 10, function(add) {
+                add.circle(20).fill('#ff0000')
+            })
+
+            notAllowedPath.marker('end', 10, 10, function(add) {
+                add.circle(20).fill('#ff0000')
+            })
+        } catch (error) {
+            if (error instanceof TypeError) {
+                console.log("Unsupported type for the marker: " + error.message + ". Expected type: line, polyline or path. ")
+            }
+        }
+
+
+    }
 }
+
+
 
 
 export interface Size {

@@ -9,4 +9,10 @@ export class PlayerImpl implements Player{
     totalNumberOfEpisodes: number;
     totalTime: number;
 
+
+
+
+
+
+
 }

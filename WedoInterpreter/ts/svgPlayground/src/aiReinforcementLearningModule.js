@@ -46,7 +46,7 @@ define(["require", "exports", "@svgdotjs/svg.js"], function (require, exports, S
         QLearningAlgorithmModule.prototype.learningEnded = function (qValueStore, problem) {
         };
         QLearningAlgorithmModule.prototype.runQLearner = function () {
-            this.qValueStore = new QLearningAlgorithm().qLearner(this.svg, this.problem, this.episodes, 9007199254740991, this.alpha, this.gamma, this.rho, this.nu, this.learningEnded);
+            this.qValueStore = new QLearningAlgorithm().qLearnerStep(this.svg, this.problem, this.episodes, 9007199254740991, this.alpha, this.gamma, this.rho, this.nu, this.learningEnded);
             return this.episodes * this.timePerEpisode;
         };
         QLearningAlgorithmModule.prototype.drawOptimalPath = function () {
@@ -249,7 +249,7 @@ define(["require", "exports", "@svgdotjs/svg.js"], function (require, exports, S
     var QLearningAlgorithm = /** @class */ (function () {
         function QLearningAlgorithm() {
         }
-        QLearningAlgorithm.prototype.qLearner = function (svg, problem, episodes, timeLimit, alpha, gamma, rho, nu, callback) {
+        QLearningAlgorithm.prototype.qLearnerStep = function (svg, problem, episodes, timeLimit, alpha, gamma, rho, nu, callback) {
             var qValueStore = new QValueStore(problem.statesAndActions);
             var state = problem.getRandomState();
             var action;

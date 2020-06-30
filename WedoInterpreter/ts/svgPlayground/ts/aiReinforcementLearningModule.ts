@@ -1,6 +1,9 @@
 import * as SVG from "@svgdotjs/svg.js";
 import {Element, List} from "@svgdotjs/svg.js";
-import {Action} from "./models";
+import {Action, Player} from "./models";
+import {Size, Visualizer} from "./Visualizer";
+import {Utils} from "./Utils";
+import {PlayerImpl} from "./playerImpl";
 // import * as $ from "jquery";
 
 export interface QlearningAlgorithmParameters {
@@ -20,6 +23,7 @@ export interface QlearningAlgorithmParameters {
 }
 
 
+
 export class QLearningAlgorithmModule {
     svg: SVG.Svg;
     startNode: number;
@@ -33,8 +37,11 @@ export class QLearningAlgorithmModule {
     qValueStore: QValueStore;
     episodes: number;
     timePerEpisode: number;
+    htmlSelector: string;
+    size: Size;
+    pathToSvg: string;
 
-    constructor(updateBackground) {
+    constructorAlt(updateBackground) {
         this.svg = SVG.SVG();
         this.startNode = undefined;
         this.finishNode = undefined;
@@ -50,31 +57,48 @@ export class QLearningAlgorithmModule {
 
     }
 
-    createQLearningEnvironment(obstaclesList: Action[], startNode: number, finishNode: number): number {
-        this.startNode = startNode;
-        this.finishNode = finishNode;
-        let path: string = "./marsTopView.svg";
-        this.loadSVG(path, obstaclesList, finishNode);
+    constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
+        this.htmlSelector = htmlSelector;
+        this.size = size;
+        this.pathToSvg = pathToSvg;
+        this.problem = undefined;
+        this.qValueStore = undefined;
+    }
+
+
+    async createQLearningEnvironment(obstaclesList: Array<Obstacle>, startNode: number, finishNode: number): number {
+        let visualizer: Visualizer = await Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
+
+        //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
+        let notAllowedActions: Array<Action> = Utils.convertObstacleListToActionList(obstaclesList);
+        let startFinishStates: Action = Utils.convertStartFinishNodeToAction(startNode, finishNode);
+
+        let allActions: Array<Action> = visualizer.getActions();
+
+        //visualiser gets obstacle list and draws rocks on the way
+        visualizer.processNotAllowedActions(notAllowedActions);
+
+
+        //filter out all actions from obstacle lists -> work with the same list
+        allActions = Utils.filterOutNotAllowedActions(allActions, notAllowedActions);
+
+
+        //generate rewards & problem
+        let statesAndActions: Array<Array<number>> = RlUtils.generateRewardsAndProblem(allActions, startFinishStates);
+        this.problem = new ReinforcementProblem(statesAndActions);
+
+        let player: Player = new PlayerImpl();
+
+        //visualiser gets playersState -> visualiser übermitteln die Instantz von Player: setPlayer
+        visualizer.setPlayer(player);
+
+
+        // this.startNode = startNode;
+        // this.finishNode = finishNode;
+
         return 1000; //TODO
     }
 
-
-    loadSVG(filePath: string, obstaclesList: Action[], finishNode: number) {
-        let that = this;
-        RlUtils.file_get_contents(filePath, function (text) {
-            that.drawSVG(text);
-            let statesAndActions: number[][] = RlUtils.generateStatesAndActionsFromSVG(that.svg, obstaclesList, finishNode);
-            that.problem = new ReinforcementProblem(statesAndActions);
-        });
-
-    }
-
-    drawSVG(text: string) {
-        document.getElementById('qLearningBackgroundArea').innerText="";
-        this.svg = SVG.SVG().addTo('#qLearningBackgroundArea').size(3148 / 5, 1764 / 5).viewbox("0 0 3148 1764");
-        this.svg.svg(text);
-        this.svg.find('.cls-customPathColor').each(e => e.stroke({color: '#fcfcfc', opacity: 0.9, width: 0}));
-    }
 
 
     setUpQLearningBehaviour(alpha: number, gamma: number, nu:number, rho:number) {
@@ -84,9 +108,6 @@ export class QLearningAlgorithmModule {
         this.rho = rho;
     }
 
-    learningEnded(qValueStore, problem) {
-
-    }
 
     runQLearner(): number {
         this.qValueStore = new QLearningAlgorithm().qLearner(this.svg, this.problem, this.episodes, 9007199254740991, this.alpha, this.gamma, this.rho, this.nu, this.learningEnded)
@@ -155,35 +176,25 @@ export class QLearningAlgorithmModule {
 
 class RlUtils {
 
-    static generateStatesAndActionsFromSVG(svg: SVG.Svg, obstaclesList: Action[], finishNode: number): number[][] {
-        var statesAndActions: number[][] = [];
-        var allPathes: List<Element> = svg.find('.cls-customPathColor');
-        var obstaclesArray: string[] = [];
-        for (var obstacleItem in obstaclesList) {
-            let obstacle = obstaclesList[obstacleItem]
-            obstaclesArray.push(obstacle.startNode + "-" + obstacle.finishNode);
-        }
-        allPathes.each(function (item) {
-            // let obstaclePresent = false;
-            let idName: string = item.attr("id");
-            let tokens: string[] = idName.split("-");
-            let firstValue: number = parseInt(tokens[1]); //0
-            let secondValue: number = parseInt(tokens[2]); //1
-            if (statesAndActions[firstValue] == undefined) {
-                statesAndActions[firstValue] = [];
-            }
-            if (obstaclesArray.includes(firstValue + "-" + secondValue)) {
+    private static readonly REWARD_VALUE = 50;
+    private static readonly DEFAULT_REWARD_VALUE = 0;
 
-            } else if (secondValue == finishNode) {
-                statesAndActions[firstValue][secondValue] = 50;
-            } else {
-                statesAndActions[firstValue][secondValue] = 0;
+
+
+    static generateRewardsAndProblem(allActions: Array<Action>, startStateQLearner: Action): Array<Array<number>> {
+        let statesAndActions = new Array<Array<number>>();
+        for (let action of allActions) {
+            if (statesAndActions[action.startState.id] == undefined) {
+                statesAndActions[action.startState.id] = new Array<number>();
             }
-        })
+            let rewardValue = RlUtils.DEFAULT_REWARD_VALUE;
+            if (action.finishState.id == startStateQLearner.finishState.id) {
+                rewardValue = this.REWARD_VALUE;
+            }
+            statesAndActions[action.startState.id][action.finishState.id] = rewardValue;
+        }
         return statesAndActions;
     }
-
-
 
 
 
@@ -204,6 +215,7 @@ class RlUtils {
         return <SVG.Path>foundPath;
     }
 
+
 }
 
 
@@ -211,13 +223,13 @@ class RlUtils {
 
 //Utils
 
-enum ResultState {
+export enum ResultState {
     SUCCESS = 1,
     ERROR= 2
 }
 
 
-interface OptimalPathResult {
+export interface OptimalPathResult {
     optimalPath: number[];
     resultState: ResultState;
 }
@@ -390,4 +402,9 @@ class QLearningAlgorithm {
         }, 200);
         return qValueStore;
     }
+}
+
+export interface Obstacle {
+    startNode: number;
+    finishNode: number;
 }

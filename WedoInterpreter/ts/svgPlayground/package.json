@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "svgPlayground1.html",
+  "main": "test_RLModule.html",
   "dependencies": {
     "@svgdotjs/svg.js": "^3.0.16",
     "react": "16.13.1",
@@ -13,10 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+     "start":"./index.js"
   },
   "browserslist": {
     "production": [

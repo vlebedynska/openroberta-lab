@@ -1,4 +1,4 @@
-import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg} from "@svgdotjs/svg.js";
+import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg} from "svgdotjs";
 import {Action, Player} from "./models";
 import {Utils} from "./Utils";
 import {ProblemSource} from "./models";

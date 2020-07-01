@@ -1,4 +1,4 @@
-import * as SVG from "@svgdotjs/svg.js";
+import * as SVG from "svgdotjs";
 import * as aiqlearning from "./aiReinforcementLearningModule"
 import {QLearningAlgorithmModule, QlearningAlgorithmParameters} from "./aiReinforcementLearningModule";
 
@@ -14,7 +14,7 @@ var qLearningAlgorithmModule: QLearningAlgorithmModule =
         updateBackground,
         "#qLearningBackgroundArea",
         {width: 629, height: 352},
-        "./marsTopView.svg"
+        "../public/PopUPDesign_Minimal.svg"
     );
 
 
@@ -49,10 +49,15 @@ function drawOptimalPath() {
     qLearningAlgorithmModule.drawOptimalPath();
 }
 
-var pause: number = createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode);
-
-var timer = setTimeout(function (){
+createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
-    var pauseAfterRunningTheQlearner = runQLearner();
-    setTimeout(drawOptimalPath, pauseAfterRunningTheQlearner)
-}, pause);
+    runQLearner();
+
+});
+
+
+// var timer = setTimeout(function (){
+//     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
+//     var pauseAfterRunningTheQlearner = runQLearner();
+//     setTimeout(drawOptimalPath, pauseAfterRunningTheQlearner)
+// }, pause);

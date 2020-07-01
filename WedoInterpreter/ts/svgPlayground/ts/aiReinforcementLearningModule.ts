@@ -1,9 +1,10 @@
-import * as SVG from "@svgdotjs/svg.js";
-import {Element, List} from "@svgdotjs/svg.js";
-import {Action, Player} from "./models";
+import * as SVG from "svgdotjs";
+import {Element, List} from "svgdotjs";
+import {Action, Player, QLearningStep} from "./models";
 import {Size, Visualizer} from "./Visualizer";
 import {Utils} from "./Utils";
 import {PlayerImpl} from "./playerImpl";
+import {QLearningAlgorithm} from "qLearner";
 // import * as $ from "jquery";
 
 export interface QlearningAlgorithmParameters {
@@ -66,38 +67,37 @@ export class QLearningAlgorithmModule {
     }
 
 
-    async createQLearningEnvironment(obstaclesList: Array<Obstacle>, startNode: number, finishNode: number): number {
-        let visualizer: Visualizer = await Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
+     async createQLearningEnvironment(obstaclesList: Array<Obstacle>, startNode: number, finishNode: number) {
+         let visualizer: Visualizer = await Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
 
-        //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
-        let notAllowedActions: Array<Action> = Utils.convertObstacleListToActionList(obstaclesList);
-        let startFinishStates: Action = Utils.convertStartFinishNodeToAction(startNode, finishNode);
+         //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
+         let notAllowedActions: Array<Action> = Utils.convertObstacleListToActionList(obstaclesList);
+         let startFinishStates: Action = Utils.convertStartFinishNodeToAction(startNode, finishNode);
 
-        let allActions: Array<Action> = visualizer.getActions();
+         let allActions: Array<Action> = visualizer.getActions();
 
-        //visualiser gets obstacle list and draws rocks on the way
-        visualizer.processNotAllowedActions(notAllowedActions);
-
-
-        //filter out all actions from obstacle lists -> work with the same list
-        allActions = Utils.filterOutNotAllowedActions(allActions, notAllowedActions);
+         //visualiser gets obstacle list and draws rocks on the way
+         visualizer.processNotAllowedActions(notAllowedActions);
 
 
-        //generate rewards & problem
-        let statesAndActions: Array<Array<number>> = RlUtils.generateRewardsAndProblem(allActions, startFinishStates);
-        this.problem = new ReinforcementProblem(statesAndActions);
-
-        let player: Player = new PlayerImpl();
-
-        //visualiser gets playersState -> visualiser übermitteln die Instantz von Player: setPlayer
-        visualizer.setPlayer(player);
+         //filter out all actions from obstacle lists -> work with the same list
+         allActions = Utils.filterOutNotAllowedActions(allActions, notAllowedActions);
 
 
-        // this.startNode = startNode;
-        // this.finishNode = finishNode;
+         //generate rewards & problem
+         let statesAndActions: Array<Array<number>> = RlUtils.generateRewardsAndProblem(allActions, startFinishStates);
+         this.problem = new ReinforcementProblem(statesAndActions);
 
-        return 1000; //TODO
-    }
+         let player: Player = new PlayerImpl();
+
+         //visualiser gets playersState -> visualiser übermitteln die Instantz von Player: setPlayer
+         visualizer.setPlayer(player);
+
+
+         // this.startNode = startNode;
+         // this.finishNode = finishNode;
+
+     }
 
 
 
@@ -109,9 +109,13 @@ export class QLearningAlgorithmModule {
     }
 
 
-    runQLearner(): number {
-        this.qValueStore = new QLearningAlgorithm().qLearner(this.svg, this.problem, this.episodes, 9007199254740991, this.alpha, this.gamma, this.rho, this.nu, this.learningEnded)
-        return this.episodes * this.timePerEpisode;
+    runQLearner(): QLearningStep {
+        let qLearningStep: QLearningAlgorithm = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
+        let x: QLearningStep;
+        for (let i=0; i < this.episodes; i++) {
+            x = qLearningStep.qLearnerStep();
+        }
+        return x;
     }
 
     drawOptimalPath() {
@@ -337,73 +341,73 @@ class QValueStore {
         return {optimalPath, resultState};
     }
 }
-
-
-class QLearningAlgorithm {
-
-    qLearner(svg: SVG.Svg, problem: ReinforcementProblem, episodes: number, timeLimit: number, alpha: number, gamma: number, rho: number, nu: number, callback): QValueStore {
-        var qValueStore: QValueStore = new QValueStore(problem.statesAndActions);
-        var state: number = problem.getRandomState();
-        var action: number;
-        let previousPath: SVG.Path;
-        var timer = setInterval(function () {
-            var startTime: number = Date.now();
-            if (Math.random() < nu) {
-                state = problem.getRandomState();
-            }
-            var actions: number[] = problem.getAvailableActions(state);
-            if (Math.random() < rho) {
-                action = problem.takeOneOfActions(actions);
-            } else {
-                action = qValueStore.getBestAction(state, actions);
-            }
-            var rewardAndNewState: TakeActionResult = problem.takeAction(state, action);
-            var reward: number = rewardAndNewState.reward;
-            var newState: number = rewardAndNewState.newState;
-            var q: number = qValueStore.getQValue(state, action);
-            var newStateActions: number[] = problem.getAvailableActions(newState);
-            var maxQ: number = qValueStore.getQValue(newState, qValueStore.getBestAction(newState, newStateActions));
-            q = (1 - alpha) * q + alpha * (reward + gamma * maxQ);
-            if (previousPath !== undefined) {
-                previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
-            }
-            previousPath = RlUtils.findPathWithID(svg, state, newState);
-            let pathLength: number = previousPath.length();
-            let direction: number = state > newState ? -1 : 1;
-            previousPath.stroke({
-                color: '#8fdc5d',
-                dasharray: "" + pathLength + ", " + pathLength,
-                dashoffset: pathLength * direction,
-                width: q * 2 + 10
-            });
-            // let strokeData: SVG.StrokeData = previousPath.stroke();
-            // strokeData.color = "red";
-            // strokeData.dasharray = "" + pathLength + ", " + pathLength;
-            // strokeData.dashoffset = pathLength * direction;
-            // strokeData.width = q * 2 + 10
-
-            previousPath.animate(200).attr("stroke-dashoffset", "0");
-
-            // previousPath.animate({
-            //     duration: 400,
-            //     delay: 0,
-            //     when: 'now',
-            // }).attr("stroke-dashoffset", 0);
-            qValueStore.storeQValue(state, action, q);
-            console.log("state " + state + " > " + newState + "; reward " + reward + "; q " + q + "; maxQ " + maxQ);
-            state = newState;
-            timeLimit = timeLimit - (Date.now() - startTime);
-            episodes = episodes - 1;
-            if (!((timeLimit > 0) && (episodes > 0))) {
-                previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
-                clearInterval(timer);
-                callback(qValueStore, problem);
-            }
-        }, 200);
-        return qValueStore;
-    }
-}
-
+//
+//
+// class QLearningAlgorithm {
+//
+//     qLearner(svg: SVG.Svg, problem: ReinforcementProblem, episodes: number, timeLimit: number, alpha: number, gamma: number, rho: number, nu: number, callback): QValueStore {
+//         var qValueStore: QValueStore = new QValueStore(problem.statesAndActions);
+//         var state: number = problem.getRandomState();
+//         var action: number;
+//         let previousPath: SVG.Path;
+//         var timer = setInterval(function () {
+//             var startTime: number = Date.now();
+//             if (Math.random() < nu) {
+//                 state = problem.getRandomState();
+//             }
+//             var actions: number[] = problem.getAvailableActions(state);
+//             if (Math.random() < rho) {
+//                 action = problem.takeOneOfActions(actions);
+//             } else {
+//                 action = qValueStore.getBestAction(state, actions);
+//             }
+//             var rewardAndNewState: TakeActionResult = problem.takeAction(state, action);
+//             var reward: number = rewardAndNewState.reward;
+//             var newState: number = rewardAndNewState.newState;
+//             var q: number = qValueStore.getQValue(state, action);
+//             var newStateActions: number[] = problem.getAvailableActions(newState);
+//             var maxQ: number = qValueStore.getQValue(newState, qValueStore.getBestAction(newState, newStateActions));
+//             q = (1 - alpha) * q + alpha * (reward + gamma * maxQ);
+//             if (previousPath !== undefined) {
+//                 previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
+//             }
+//             previousPath = RlUtils.findPathWithID(svg, state, newState);
+//             let pathLength: number = previousPath.length();
+//             let direction: number = state > newState ? -1 : 1;
+//             previousPath.stroke({
+//                 color: '#8fdc5d',
+//                 dasharray: "" + pathLength + ", " + pathLength,
+//                 dashoffset: pathLength * direction,
+//                 width: q * 2 + 10
+//             });
+//             // let strokeData: SVG.StrokeData = previousPath.stroke();
+//             // strokeData.color = "red";
+//             // strokeData.dasharray = "" + pathLength + ", " + pathLength;
+//             // strokeData.dashoffset = pathLength * direction;
+//             // strokeData.width = q * 2 + 10
+//
+//             previousPath.animate(200).attr("stroke-dashoffset", "0");
+//
+//             // previousPath.animate({
+//             //     duration: 400,
+//             //     delay: 0,
+//             //     when: 'now',
+//             // }).attr("stroke-dashoffset", 0);
+//             qValueStore.storeQValue(state, action, q);
+//             console.log("state " + state + " > " + newState + "; reward " + reward + "; q " + q + "; maxQ " + maxQ);
+//             state = newState;
+//             timeLimit = timeLimit - (Date.now() - startTime);
+//             episodes = episodes - 1;
+//             if (!((timeLimit > 0) && (episodes > 0))) {
+//                 previousPath.stroke({color: '#f8f7f7', dasharray: "0"})
+//                 clearInterval(timer);
+//                 callback(qValueStore, problem);
+//             }
+//         }, 200);
+//         return qValueStore;
+//     }
+// }
+//
 export interface Obstacle {
     startNode: number;
     finishNode: number;

@@ -3,17 +3,22 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "test_RLModule.html",
+  "main": "index.html",
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.0.16",
+    "svgdotjs": "^3.0.16",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
     "react-svgmt": "1.1.11"
   },
-  "devDependencies": {},
+  "devDependencies": {
+
+  },
   "scripts": {
-     "start":"./index.js"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [

@@ -10,6 +10,8 @@ export interface Player {
     totalNumberOfEpisodes: number;
     currentTime: number;
     totalTime: number;
+    qLearningSteps: Array<QLearningStep>;
+    initialize(): void;
 }
 
 export interface StateStatus {

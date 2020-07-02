@@ -19,7 +19,7 @@ export interface QlearningAlgorithmParameters {
     rho: number;
     // qValueStore: QValueStore;
     episodes: number;
-    timePerEpisode: number;
+    totalTime: number;
     obstaclesList: Action[];
 }
 
@@ -41,22 +41,10 @@ export class QLearningAlgorithmModule {
     htmlSelector: string;
     size: Size;
     pathToSvg: string;
+    totalTime: number;
+    startFinishStates: Action;
+    player: Player;
 
-    constructorAlt(updateBackground) {
-        this.svg = SVG.SVG();
-        this.startNode = undefined;
-        this.finishNode = undefined;
-        this.problem = undefined;
-        this.alpha = undefined;
-        this.gamma = undefined;
-        this.nu = undefined;
-        this.rho = undefined;
-        this.qValueStore = undefined;
-        this.episodes = 150;
-        this.timePerEpisode = 200; //TODO - auch im QLearner anpassen
-        this.updateBackground = updateBackground;
-
-    }
 
     constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
         this.htmlSelector = htmlSelector;
@@ -64,6 +52,10 @@ export class QLearningAlgorithmModule {
         this.pathToSvg = pathToSvg;
         this.problem = undefined;
         this.qValueStore = undefined;
+        this.episodes = 150;
+        this.totalTime = 200;
+        this.startFinishStates = undefined;
+        this.player = undefined;
     }
 
 
@@ -72,7 +64,7 @@ export class QLearningAlgorithmModule {
 
          //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
          let notAllowedActions: Array<Action> = Utils.convertObstacleListToActionList(obstaclesList);
-         let startFinishStates: Action = Utils.convertStartFinishNodeToAction(startNode, finishNode);
+         this.startFinishStates = Utils.convertStartFinishNodeToAction(startNode, finishNode);
 
          let allActions: Array<Action> = visualizer.getActions();
 
@@ -85,13 +77,10 @@ export class QLearningAlgorithmModule {
 
 
          //generate rewards & problem
-         let statesAndActions: Array<Array<number>> = RlUtils.generateRewardsAndProblem(allActions, startFinishStates);
+         let statesAndActions: Array<Array<number>> = RlUtils.generateRewardsAndProblem(allActions, this.startFinishStates);
          this.problem = new ReinforcementProblem(statesAndActions);
 
-         let player: Player = new PlayerImpl();
 
-         //visualiser gets playersState -> visualiser übermitteln die Instantz von Player: setPlayer
-         visualizer.setPlayer(player);
 
 
          // this.startNode = startNode;
@@ -109,13 +98,14 @@ export class QLearningAlgorithmModule {
     }
 
 
-    runQLearner(): QLearningStep {
+    runQLearner(): void {
         let qLearningStep: QLearningAlgorithm = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
-        let x: QLearningStep;
+        let qLearningSteps: Array<QLearningStep> = new Array<QLearningStep>();
         for (let i=0; i < this.episodes; i++) {
-            x = qLearningStep.qLearnerStep();
+            qLearningSteps.push(qLearningStep.qLearnerStep());
         }
-        return x;
+        this.player = new PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
+        this.player.initialize();
     }
 
     drawOptimalPath() {

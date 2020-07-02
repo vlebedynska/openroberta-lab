@@ -14,9 +14,14 @@ export class QLearningAlgorithm extends EventTarget {
 
     constructor(problem: ReinforcementProblem, alpha: number, gamma: number, rho: number, nu: number) {
         super();
+        this.problem = problem;
         this.qValueStore = new QValueStore(problem.statesAndActions);
         this.state = this.problem.getRandomState();
         this.stepNumber = 0;
+        this.alpha = alpha;
+        this.gamma = gamma;
+        this.rho = rho;
+        this.nu = nu;
     }
 
     public qLearnerStep(): QLearningStep {
@@ -53,6 +58,7 @@ export class QLearningAlgorithm extends EventTarget {
         qValueNew = (1 - this.alpha) * qValueOld + this.alpha * (reward + this.gamma * maxQ);
 
         this.qValueStore.storeQValue(this.state, action, qValueNew);
+        console.log(this.qValueStore)
         console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
         this.state = newState;
         duration = Date.now() - startTime;

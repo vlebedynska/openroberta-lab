@@ -1,4 +1,4 @@
-define(["require", "exports", "svgdotjs", "./Visualizer", "./Utils", "./playerImpl", "qLearner"], function (require, exports, SVG, Visualizer_1, Utils_1, playerImpl_1, qLearner_1) {
+define(["require", "exports", "./Visualizer", "./Utils", "./playerImpl", "qLearner"], function (require, exports, Visualizer_1, Utils_1, playerImpl_1, qLearner_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class QLearningAlgorithmModule {
@@ -8,37 +8,24 @@ define(["require", "exports", "svgdotjs", "./Visualizer", "./Utils", "./playerIm
             this.pathToSvg = pathToSvg;
             this.problem = undefined;
             this.qValueStore = undefined;
-        }
-        constructorAlt(updateBackground) {
-            this.svg = SVG.SVG();
-            this.startNode = undefined;
-            this.finishNode = undefined;
-            this.problem = undefined;
-            this.alpha = undefined;
-            this.gamma = undefined;
-            this.nu = undefined;
-            this.rho = undefined;
-            this.qValueStore = undefined;
             this.episodes = 150;
-            this.timePerEpisode = 200; //TODO - auch im QLearner anpassen
-            this.updateBackground = updateBackground;
+            this.totalTime = 200;
+            this.startFinishStates = undefined;
+            this.player = undefined;
         }
         async createQLearningEnvironment(obstaclesList, startNode, finishNode) {
             let visualizer = await Visualizer_1.Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
             //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
             let notAllowedActions = Utils_1.Utils.convertObstacleListToActionList(obstaclesList);
-            let startFinishStates = Utils_1.Utils.convertStartFinishNodeToAction(startNode, finishNode);
+            this.startFinishStates = Utils_1.Utils.convertStartFinishNodeToAction(startNode, finishNode);
             let allActions = visualizer.getActions();
             //visualiser gets obstacle list and draws rocks on the way
             visualizer.processNotAllowedActions(notAllowedActions);
             //filter out all actions from obstacle lists -> work with the same list
             allActions = Utils_1.Utils.filterOutNotAllowedActions(allActions, notAllowedActions);
             //generate rewards & problem
-            let statesAndActions = RlUtils.generateRewardsAndProblem(allActions, startFinishStates);
+            let statesAndActions = RlUtils.generateRewardsAndProblem(allActions, this.startFinishStates);
             this.problem = new ReinforcementProblem(statesAndActions);
-            let player = new playerImpl_1.PlayerImpl();
-            //visualiser gets playersState -> visualiser übermitteln die Instantz von Player: setPlayer
-            visualizer.setPlayer(player);
             // this.startNode = startNode;
             // this.finishNode = finishNode;
         }
@@ -50,11 +37,12 @@ define(["require", "exports", "svgdotjs", "./Visualizer", "./Utils", "./playerIm
         }
         runQLearner() {
             let qLearningStep = new qLearner_1.QLearningAlgorithm(this.problem, this.alpha, this.gamma, this.rho, this.nu);
-            let x;
+            let qLearningSteps = new Array();
             for (let i = 0; i < this.episodes; i++) {
-                x = qLearningStep.qLearnerStep();
+                qLearningSteps.push(qLearningStep.qLearnerStep());
             }
-            return x;
+            this.player = new playerImpl_1.PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
+            this.player.initialize();
         }
         drawOptimalPath() {
             console.log(this.qValueStore);

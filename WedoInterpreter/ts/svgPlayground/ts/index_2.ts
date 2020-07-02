@@ -26,7 +26,7 @@ let qLearningParams: QlearningAlgorithmParameters = {
     nu: 0.5,
     rho: 0.6,
     startNode: 0,
-    timePerEpisode: 500,
+    totalTime: 500,
     updateBackground: updateBackground,
     obstaclesList: []
 }
@@ -52,12 +52,5 @@ function drawOptimalPath() {
 createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
     runQLearner();
-
 });
 
-
-// var timer = setTimeout(function (){
-//     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
-//     var pauseAfterRunningTheQlearner = runQLearner();
-//     setTimeout(drawOptimalPath, pauseAfterRunningTheQlearner)
-// }, pause);

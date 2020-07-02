@@ -1,150 +1,39 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { SvgLoader, SvgProxy } from "react-svgmt";
-import * as SVG from "@svgdotjs/svg.js";
-
-import "./styles.css";
-
-// function App() {
-//     const selectors = ["rect:nth-child(1)", "rect:nth-child(4)"];
-//     return (
-//         <div className="App">
-//             <SvgLoader width="100" height="100" path="/TestTime-01.svg">
-//                 <SvgProxy selector=".cls-2" />
-//
-//             </SvgLoader>
-//         </div>
-//     );
-// }
-// var SVG = require("@svgdotjs/svg.js");
-
-
-
-class Timer extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            seconds: 120,
-            action: {
-                startState: Math.floor(0),
-                finishState: Math.floor(1)
-            }
-        };
-
-
+define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], function (require, exports, SVG, aiqlearning) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var svg = SVG.SVG().addTo('body').size(300, 300);
+    var rect = svg.rect(100, 100).attr({ fill: '#f06' });
+    var updateBackground = function () {
+        console.log("Hallo");
+    };
+    var qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal.svg");
+    let qLearningParams = {
+        alpha: 0.9,
+        episodes: 150,
+        finishNode: 7,
+        gamma: 0.5,
+        nu: 0.5,
+        rho: 0.6,
+        startNode: 0,
+        totalTime: 500,
+        updateBackground: updateBackground,
+        obstaclesList: []
+    };
+    function createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+        return qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
     }
-
-    tick() {
-        let randomActionIndex = Math.floor(Math.random()*this.getActions().length);
-        let action = this.getActions()[randomActionIndex];
-        this.setState(state => ({
-            seconds: state.seconds - 1,
-            action: {
-                startState: action[0],
-                finishState: action[1]
-            }
-        }));
+    function setUpQLearningBehaviour(alpha, gamma, nu, rho) {
+        qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
     }
-
-    componentDidMount() {
-        this.interval = setInterval(() => this.tick(), 2000);
+    function runQLearner() {
+        return qLearningAlgorithmModule.runQLearner();
     }
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
+    function drawOptimalPath() {
+        qLearningAlgorithmModule.drawOptimalPath();
     }
-
-    getActions() {
-        let listOfPaths = [
-            [0,1], [1,0],
-            [1,2], [2,1],
-            [1,3], [3,1],
-            [2,3], [3,2],
-            [2,7], [7,2],
-            [2,5], [5,2],
-            [3,4], [4,3],
-            [4,6], [6,4],
-            [7,5], [5,7],
-            [5,6], [6,5],
-            [5,8], [8,8],
-            [6,8], [8,6],
-        ];
-        return listOfPaths;
-    }
-
-
-
-    render() {
-        return (
-            <div>
-                <h2>Seconds: {this.state.seconds}</h2>
-                <SvgLoader path="/PopUPDesign_Minimal.svg">
-                    <SvgProxy selector={'g[id^="path-"] line'} stroke="url(#Ripple_Viktoriya-0)" >
-                    </SvgProxy>
-                    <SvgProxy selector={'g[id^="path-"] path'} stroke="url(#Ripple_Viktoriya-0)" >
-                    </SvgProxy>
-
-                    <SvgProxy selector='#time text:nth-child(1)' stroke={"red"} >
-                        {""+this.state.seconds}
-                    </SvgProxy>
-                    <SvgProxy selector='#node-start text' >
-                        {""+this.props.startState}
-                    </SvgProxy>
-                    <SvgProxy selector='#node-finish text' >
-                        {""+this.props.finishState}
-                    </SvgProxy>
-                    <SvgProxy selector={'#path-'+this.state.action.startState+'-'+this.state.action.finishState+' line'} stroke="red" >
-                    </SvgProxy>
-                    <SvgProxy selector={'#path-'+this.state.action.startState+'-'+this.state.action.finishState+' path'} stroke="red" >
-                    </SvgProxy>
-                    <SvgProxy selector={'#node-'+this.state.action.startState+' path'} fill="#7ccaff">
-                    </SvgProxy>
-                    <SvgProxy selector={'#node-'+this.state.action.finishState+' path'} fill="#7ccaff">
-                    </SvgProxy>
-
-                    <SvgProxy selector={'#navi-pause'} fill="#7ccaff" onclick={function(){console.log("click!")}}>
-                    </SvgProxy>
-
-
-                </SvgLoader>
-            </div>
-
-        // <svg data-name="Layer 1" viewBox="0 0 289 229" {...this.props}>
-        //     <path
-        //         fill="#8dc63f"
-        //         stroke="#fff"
-        //         strokeMiterlimit={10}
-        //         d="M.5.5h288v228H.5z"
-        //     />
-        //     <text
-        //         transform="translate(69.5 108.1)"
-        //         fontSize={60}
-        //         fill="#231f20"
-        //         fontFamily="MyriadPro-Regular,Myriad Pro"
-        //     >
-        //         {this.state.seconds}
-        //     </text>
-        // </svg>
-        );
-    }
-}
-
-
-
-
-ReactDOM.render(
-    <Timer startState="5" finishState="8" />,
-    document.getElementById('root')
-
-);
-//
-//
-//
-//
-//
-// const rootElement = document.getElementById("root");
-// ReactDOM.render(<Timer />, rootElement);
-
-
-
+    createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
+        setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
+        runQLearner();
+    });
+});
+//# sourceMappingURL=index_2.js.map

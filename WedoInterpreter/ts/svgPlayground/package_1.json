@@ -5,15 +5,14 @@
   "keywords": [],
   "main": "index.html",
   "dependencies": {
-    "svgdotjs": "^3.0.16",
+    "create-react-app": "^3.4.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "react-svgmt": "1.1.11"
+    "react-svgmt": "1.1.11",
+    "svgdotjs": "^3.0.16"
   },
-  "devDependencies": {
-
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

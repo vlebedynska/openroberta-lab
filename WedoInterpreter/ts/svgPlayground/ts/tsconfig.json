@@ -5,7 +5,10 @@
     "rootDir": ".",
 
     "module": "amd",
-    "moduleResolution": "node",
+    "typeRoots" : ["../node_modules"],
+    "types": [
+      "node", "svgdotjs", "react"
+    ],
     "baseUrl": "./",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -17,10 +20,8 @@
       "es2015.promise"
     ],
     "paths": {
-      "*.ts": ["*"],
-      "*.jsx": ["*"]
-    },
-    "jsx": "react"
+      "*.ts": ["*"]
+    }
   },
 //  "files": [
 //    "./.*.ts"

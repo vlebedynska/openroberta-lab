@@ -21,6 +21,12 @@ require.config({
         'svgdotjs': {
             exports: 'SVG'
         },
+        'qLearnerView': {
+            deps: [
+                'react',
+                'react-dom'
+            ]
+        }
     }
 });
 

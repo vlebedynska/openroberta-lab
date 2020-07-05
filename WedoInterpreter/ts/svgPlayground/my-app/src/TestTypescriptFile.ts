@@ -1,7 +1,7 @@
 import React from "react";
 
 
-export class QLearningView extends React.Component<{},{}>{
+export class QLearningView extends React.Component<any,any>{
 
     public readonly eventDispatcher: EventTarget;
 

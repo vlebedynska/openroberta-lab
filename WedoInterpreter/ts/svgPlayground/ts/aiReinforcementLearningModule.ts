@@ -1,8 +1,7 @@
 import * as SVG from "svgdotjs";
-import {Element, List} from "svgdotjs";
 import {Action, Player, QLearningStep} from "./models";
-import {Size, Visualizer} from "./Visualizer";
-import {Utils} from "./Utils";
+import {Size, Visualizer} from "./visualizer";
+import {Utils} from "./utils";
 import {PlayerImpl} from "./playerImpl";
 import {QLearningAlgorithm} from "qLearner";
 // import * as $ from "jquery";
@@ -44,6 +43,7 @@ export class QLearningAlgorithmModule {
     totalTime: number;
     startFinishStates: Action;
     player: Player;
+    visualizer: Visualizer;
 
 
     constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
@@ -53,23 +53,23 @@ export class QLearningAlgorithmModule {
         this.problem = undefined;
         this.qValueStore = undefined;
         this.episodes = 150;
-        this.totalTime = 200;
+        this.totalTime = 200000;
         this.startFinishStates = undefined;
         this.player = undefined;
     }
 
 
      async createQLearningEnvironment(obstaclesList: Array<Obstacle>, startNode: number, finishNode: number) {
-         let visualizer: Visualizer = await Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
+         this.visualizer = await Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
 
          //convert data: obstacle list Array<Action>, start node, finishnode to actionInterface / array
          let notAllowedActions: Array<Action> = Utils.convertObstacleListToActionList(obstaclesList);
          this.startFinishStates = Utils.convertStartFinishNodeToAction(startNode, finishNode);
 
-         let allActions: Array<Action> = visualizer.getActions();
+         let allActions: Array<Action> = this.visualizer.getActions();
 
          //visualiser gets obstacle list and draws rocks on the way
-         visualizer.processNotAllowedActions(notAllowedActions);
+         this.visualizer.processNotAllowedActions(notAllowedActions);
 
 
          //filter out all actions from obstacle lists -> work with the same list
@@ -105,7 +105,7 @@ export class QLearningAlgorithmModule {
             qLearningSteps.push(qLearningStep.qLearnerStep());
         }
         this.player = new PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
-        this.player.initialize();
+        this.player.initialize(this.visualizer);
     }
 
     drawOptimalPath() {

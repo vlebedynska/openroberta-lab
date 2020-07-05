@@ -1,3 +1,5 @@
+import {Visualizer} from "visualizer";
+
 export interface ProblemSource {
     getActions(): Array<Action>;
 }
@@ -11,7 +13,7 @@ export interface Player {
     currentTime: number;
     totalTime: number;
     qLearningSteps: Array<QLearningStep>;
-    initialize(): void;
+    initialize(visualizer: Visualizer): void;
 }
 
 export interface StateStatus {

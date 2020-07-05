@@ -1,0 +1,11 @@
+.navi-button:hover :nth-child(n) {
+    fill: red;
+    filter: drop-shadow(0px 0px 15px red) invert(75%);
+    /*animation: mymove 1s normal;*/
+}
+
+@keyframes mymove {
+    /*100% {*/
+    /*    transform: translate(0px, -5px);*/
+    /*}*/
+}

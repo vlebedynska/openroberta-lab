@@ -3,11 +3,10 @@
     "outDir": "../src",
     "target": "es2017",
     "rootDir": ".",
-
     "module": "amd",
     "typeRoots" : ["../node_modules"],
     "types": [
-      "node", "svgdotjs", "react"
+      "node", "svgdotjs"
     ],
     "baseUrl": "./",
     "noUnusedLocals": false,
@@ -23,15 +22,6 @@
       "*.ts": ["*"]
     }
   },
-//  "files": [
-//    "./.*.ts"
-//    //    "./aiReinforcementLearningModule.ts",
-////    "./Clock.ts",
-////    "./index.ts",
-////    "./Player.ts",
-////    "./Visualizer.ts",
-////    "./Utils.ts"
-//  ],
   "compileOnSave": true,
   "buildOnSave": true
 }

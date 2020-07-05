@@ -1,0 +1,11 @@
+{
+  "name": "svgPlayground",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "index.html",
+  "dependencies": {
+    "svgdotjs": "^3.0.16"
+  },
+  "devDependencies": {}
+}

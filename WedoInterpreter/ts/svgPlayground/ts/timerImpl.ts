@@ -17,12 +17,17 @@ export class TimerImpl extends EventTarget implements Clock {
 
 
     private callTick() {
-        this.interval = setInterval(this.tick, 1000 / this._speed)
+        let that = this;
+        clearInterval(this.interval);
+        this.interval = setInterval(function () {
+            that.tick();
+        }, 1000 / that._speed);
     }
 
     private tick() {
         if (this._time > 0) {
             this._time--;
+            console.log("tick " + this._time);
             this.createAndDispatchEvent("tick");
         } else {
             this.stop();
@@ -30,19 +35,42 @@ export class TimerImpl extends EventTarget implements Clock {
     }
 
     public stop() {
-        this._time = 0;
-        this.createAndDispatchEvent("stop");
-        clearInterval(this.interval);
+        if (this.updateRunningState(RunningState.STOP)) {
+            this._time = 0;
+            clearInterval(this.interval);
+            this.createAndDispatchEvent("stop");
+        }
     }
 
     public pause() {
-        this.createAndDispatchEvent("pause");
-        clearInterval(this.interval);
+        if (this.updateRunningState(RunningState.PAUSE)){
+            clearInterval(this.interval);
+            this.createAndDispatchEvent("pause");
+        }
     }
 
-    public play() {
-        this.callTick();
-        this.createAndDispatchEvent("play");
+    public play(speed: number) {
+        let previousSpeed = this._speed;
+        if (previousSpeed != speed) {
+            this._speed = speed;
+            this.callTick();
+            console.log("Update speed " + previousSpeed + " > " + speed);
+        }
+        if (this.updateRunningState(RunningState.PLAY)) {
+            this.callTick();
+            this.createAndDispatchEvent("play");
+        }
+    }
+
+    private updateRunningState(runningState: RunningState): boolean {
+        let previousState = this._runningState;
+        if (this._runningState == runningState) {
+            console.log(this._runningState + " is already active.");
+            return false;
+        }
+        this._runningState = runningState;
+        console.log("Updated state " + RunningState[previousState] +" > "+ RunningState[runningState] + ".");
+        return true;
     }
 
 

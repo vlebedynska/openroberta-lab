@@ -1,26 +1,28 @@
-import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg} from "svgdotjs";
-import {Action, Player} from "./models";
-import {Utils} from "./Utils";
+import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg, Text} from "svgdotjs";
+import {Action, Player, QLearningStep} from "./models";
+import {Utils} from "./utils";
 import {ProblemSource} from "./models";
 
 
 //.size(3148 / 5, 1764 / 5).
 
-export class Visualizer implements ProblemSource{
+export class Visualizer extends EventTarget implements ProblemSource{
     private readonly svg: Svg;
 
     private constructor(svg: Svg) {
+        super();
         this.svg = svg;
     }
 
 
 
-    //
     public static createVisualizer(path: string,  htmlSelector: string, size: Size): Promise<Visualizer>{
         let visualizerPromise: Promise<Visualizer> = Visualizer.preload(path, htmlSelector)
             .then(function (svg: Svg) {
                 Visualizer.scaleSVGtoSize(svg, size);
-                return new Visualizer(svg);
+                let visualizer: Visualizer =  new Visualizer(svg);
+                visualizer.addEventListeners();
+                return visualizer;
             });
         return visualizerPromise;
     }
@@ -41,7 +43,7 @@ export class Visualizer implements ProblemSource{
         document.querySelector(htmlSelector).innerHTML = "";
         let svg: Svg = SVG().addTo(htmlSelector);
         svg.svg(text);
-        svg.viewbox(svg.attr("viewBox"));
+        svg.viewbox(svg.findOne('svg').attr("viewBox"));
         return svg;
     }
 
@@ -116,9 +118,70 @@ export class Visualizer implements ProblemSource{
                 console.log("Unsupported type for the marker: " + error.message + ". Expected type: line, polyline or path. ")
             }
         }
-
-
     }
+
+
+    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number){
+        console.log("gotStep! " + newQLearnerStep.stepNumber);
+        let nodeStart: Text = <Text>this.svg.findOne('#node-start-navi > text');
+        nodeStart.plain('' + newQLearnerStep.state);
+    }
+
+
+    private addEventListeners() {
+        let buttonSpeed1x: Element = <Element>this.svg.findOne('#navi-speed-normal');
+        let buttonSpeed2x: Element = <Element>this.svg.findOne('#navi-speed-2x');
+        let buttonSpeed3x: Element = <Element>this.svg.findOne('#navi-speed-3x');
+        let buttonPause: Element = <Element>this.svg.findOne("#navi-pause")
+        let buttonStop: Element = <Element>this.svg.findOne("#navi-stop")
+        let that = this;
+        buttonSpeed1x.click(function (e) {
+            that.startPlayer(1);
+        });
+        buttonSpeed1x.addClass("navi-button");
+
+
+        buttonSpeed2x.click(function (e) {
+            that.startPlayer(100)
+        });
+        buttonSpeed2x.addClass("navi-button")
+
+
+        buttonSpeed3x.click(function (e) {
+            that.startPlayer(1000)
+        });
+        buttonSpeed3x.addClass("navi-button")
+
+
+        buttonStop.click(function (e) {
+            that.stopPlayer()
+        })
+        buttonStop.addClass("navi-button")
+
+        buttonPause.click(function (e) {
+            that.pausePlayer()
+        })
+        buttonPause.addClass("navi-button")
+    }
+
+    private startPlayer(speed: number) {
+        console.log("playerStarted!");
+        this.dispatchEvent(new CustomEvent<number>("playerStarted", {
+                detail: speed
+            })
+        );
+    }
+
+    private stopPlayer() {
+        this.dispatchEvent(new CustomEvent("playerStopped"))
+    }
+
+    private pausePlayer() {
+        this.dispatchEvent(new CustomEvent("playerPaused"))
+    }
+
+
+
 }
 
 

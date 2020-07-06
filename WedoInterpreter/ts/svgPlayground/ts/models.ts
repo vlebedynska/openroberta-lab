@@ -39,8 +39,8 @@ export interface QLearningStep {
 }
 
 export enum Rho {
-    EXPLOIT,
-    EXPLORE
+    EXPLOIT = "nutze das Wissen aus",
+    EXPLORE = "erkunde"
 }
 
 export enum Nu {

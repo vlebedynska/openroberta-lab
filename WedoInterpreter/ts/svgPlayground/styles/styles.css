@@ -4,6 +4,26 @@
     /*animation: mymove 1s normal;*/
 }
 
+.node-active {
+    fill: #61dafb !important;
+}
+
+.node-visited {
+    fill: darkolivegreen;
+}
+
+.line-active {
+    stroke: red;
+}
+
+.path-active {
+    stroke: red;
+}
+
+.line-path-inactive {
+    stroke: url(#Ripple_Viktoriya-0);
+}
+
 @keyframes mymove {
     /*100% {*/
     /*    transform: translate(0px, -5px);*/

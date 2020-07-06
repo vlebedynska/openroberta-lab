@@ -52,7 +52,7 @@ export class QLearningAlgorithmModule {
         this.pathToSvg = pathToSvg;
         this.problem = undefined;
         this.qValueStore = undefined;
-        this.episodes = 150;
+        this.episodes = 10000;
         this.totalTime = 200000;
         this.startFinishStates = undefined;
         this.player = undefined;
@@ -175,14 +175,14 @@ class RlUtils {
 
 
 
-    static generateRewardsAndProblem(allActions: Array<Action>, startStateQLearner: Action): Array<Array<number>> {
+    static generateRewardsAndProblem(allActions: Array<Action>, startFinishState: Action): Array<Array<number>> {
         let statesAndActions = new Array<Array<number>>();
         for (let action of allActions) {
             if (statesAndActions[action.startState.id] == undefined) {
                 statesAndActions[action.startState.id] = new Array<number>();
             }
             let rewardValue = RlUtils.DEFAULT_REWARD_VALUE;
-            if (action.finishState.id == startStateQLearner.finishState.id) {
+            if (action.finishState.id == startFinishState.finishState.id) {
                 rewardValue = this.REWARD_VALUE;
             }
             statesAndActions[action.startState.id][action.finishState.id] = rewardValue;

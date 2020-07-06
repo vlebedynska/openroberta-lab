@@ -31,13 +31,14 @@ export class QLearningAlgorithm extends EventTarget {
         let startTime: number = Date.now();
         let qValueOld: number;
         let qValueNew: number;
-        let state: number = this.state;
         let newState: number;
         let duration: number;
 
         if (nu == Nu.RANDOM_STATE) {
             this.state = this.problem.getRandomState();
         }
+
+        let state: number = this.state;
 
         let actions: number[] = this.problem.getAvailableActions(this.state);
         switch (rho) {
@@ -167,10 +168,9 @@ class ReinforcementProblem {
     getAvailableActions(state: number): number[] {
         var availableActions: number[] = [];
         var actions: number[] = this.statesAndActions[state];
-        var actionIndex: string;
-        for (actionIndex in actions) {
-            if (actions[actionIndex] !== undefined) {
-                availableActions.push(parseInt(actionIndex));
+        for (let action of actions) {
+            if (action !== undefined) {
+                availableActions.push(action);
             }
         }
         return availableActions;

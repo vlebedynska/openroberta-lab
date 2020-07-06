@@ -8,10 +8,18 @@ import {ProblemSource} from "./models";
 
 export class Visualizer extends EventTarget implements ProblemSource{
     private readonly svg: Svg;
+    private nodeStartOnMap: Element;
+    private nodeFinishOnMap: Element;
+    private path: Path;
+    private line: Line;
 
     private constructor(svg: Svg) {
         super();
         this.svg = svg;
+        this.nodeStartOnMap = undefined;
+        this.nodeFinishOnMap = undefined;
+        this.path = undefined;
+        this.line = undefined;
     }
 
 
@@ -121,10 +129,62 @@ export class Visualizer extends EventTarget implements ProblemSource{
     }
 
 
-    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number){
+    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number, totalQLearningSteps: number){
         console.log("gotStep! " + newQLearnerStep.stepNumber);
+
+        if (this.nodeStartOnMap) {
+            this.nodeStartOnMap.removeClass("node-active").addClass("node-visited")
+        }
+
+        if (this.nodeFinishOnMap) {
+            this.nodeFinishOnMap.removeClass("node-active").addClass("node-visited")
+        }
+
+        if (this.line) {
+            this.line.removeClass("line-active")
+        }
+
+        if (this.path) {
+            this.path.removeClass("path-active")
+        }
+
+        let episodeTotal: Text = <Text>this.svg.findOne('#episode > text:nth-child(2)');
+        episodeTotal.plain('' + totalQLearningSteps);
+
+        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        episodeCurrent.plain('' + newQLearnerStep.stepNumber);
+
+        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)');
+        timeCurrent.plain('' + currentTime);
+
         let nodeStart: Text = <Text>this.svg.findOne('#node-start-navi > text');
         nodeStart.plain('' + newQLearnerStep.state);
+
+        this.nodeStartOnMap = <Path>this.svg.findOne('#node-'+newQLearnerStep.state + ' > path');
+        this.nodeStartOnMap.addClass("node-active");
+
+        this.line = <Line>this.svg.findOne('#path-'+ newQLearnerStep.state + '-' + newQLearnerStep.newState + ' > line')
+        if(this.line){
+            this.line.addClass("line-active")
+        }
+
+        this.path = <Path>this.svg.findOne('#path-'+ newQLearnerStep.state + '-' + newQLearnerStep.newState + ' > path')
+        if(this.path){
+            this.path.addClass("path-active")
+        }
+
+
+
+        let rho: Text = <Text>this.svg.findOne('#explore_exploit > text');
+        rho.plain('' + newQLearnerStep.rho);
+
+        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-'+newQLearnerStep.newState  + ' > path');
+        this.nodeFinishOnMap.addClass("node-active");
+
+        let nodeEnd: Text = <Text>this.svg.findOne('#node-finish-navi > text');
+        nodeEnd.plain('' + newQLearnerStep.newState);
+
+
     }
 
 

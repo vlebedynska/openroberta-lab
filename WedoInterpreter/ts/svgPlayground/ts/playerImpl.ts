@@ -31,7 +31,7 @@ export class PlayerImpl extends EventTarget implements Player{
         console.log("Tick " + currentTime);
         this.currentEpisodeNumber++;
         let newQlearnerStep: QLearningStep = this.qLearningSteps[this.currentEpisodeNumber]
-        this.visualizer.onQLearningStep(newQlearnerStep, currentTime);
+        this.visualizer.onQLearningStep(newQlearnerStep, currentTime, this.qLearningSteps.length);
     }
 
     initialize(visualizer: Visualizer): void {

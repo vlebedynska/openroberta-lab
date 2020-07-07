@@ -160,32 +160,55 @@ export class Visualizer extends EventTarget implements ProblemSource{
         let nodeStart: Text = <Text>this.svg.findOne('#node-start-navi > text');
         nodeStart.plain('' + newQLearnerStep.state);
 
-        this.nodeStartOnMap = <Path>this.svg.findOne('#node-'+newQLearnerStep.state + ' > path');
-        this.nodeStartOnMap.addClass("node-active");
+        this.visualiseActionOnMap(newQLearnerStep.state, newQLearnerStep.newState);
 
-        this.line = <Line>this.svg.findOne('#path-'+ newQLearnerStep.state + '-' + newQLearnerStep.newState + ' > line')
-        if(this.line){
-            this.line.addClass("line-active")
-        }
 
-        this.path = <Path>this.svg.findOne('#path-'+ newQLearnerStep.state + '-' + newQLearnerStep.newState + ' > path')
-        if(this.path){
-            this.path.addClass("path-active")
-        }
+
+        // this.line.stroke({
+        //     dasharray: "" +  + ", " + pathLength,
+        //     dashoffset: pathLength * direction,
+        // })
+        // this.line.animate(200).attr("stroke-dashoffset", "0");
+
+
 
 
 
         let rho: Text = <Text>this.svg.findOne('#explore_exploit > text');
         rho.plain('' + newQLearnerStep.rho);
 
-        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-'+newQLearnerStep.newState  + ' > path');
-        this.nodeFinishOnMap.addClass("node-active");
 
         let nodeEnd: Text = <Text>this.svg.findOne('#node-finish-navi > text');
         nodeEnd.plain('' + newQLearnerStep.newState);
 
 
     }
+
+    private visualiseActionOnMap(state: number, newState: number ) {
+        this.nodeStartOnMap = <Path>this.svg.findOne('#node-'+state + ' > path');
+        this.nodeStartOnMap.addClass("node-active");
+
+        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-'+ newState  + ' > path');
+        this.nodeFinishOnMap.addClass("node-active");
+
+        let shape: Shape = <Shape>this.svg.findOne('#path-'+ state + '-' + newState + ' > [line][path][polyline]');
+        let shapeLength: number = Utils.calcShapeLength(shape);
+
+        let shapeClone = shape.clone();
+
+        shapeClone.addTo(this.svg);
+        shapeClone.addClass("shape-active")
+        shapeClone.stroke({
+            dasharray: 5 + ", " + 25,
+            dashoffset: shapeLength,
+            linecap: "round"
+        })
+        shapeClone.animate(800).attr("stroke-dashoffset", "0")
+        // shapeClone.remove()
+
+    }
+
+
 
 
     private addEventListeners() {

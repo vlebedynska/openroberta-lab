@@ -6,14 +6,14 @@ define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], fu
     var updateBackground = function () {
         console.log("Hallo");
     };
-    var qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal.svg");
+    var qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal_2.svg");
     let qLearningParams = {
-        alpha: 0.9,
+        alpha: 0.5,
         episodes: 150,
         finishNode: 7,
-        gamma: 0.5,
-        nu: 0.5,
-        rho: 0.6,
+        gamma: 0.8,
+        nu: 0.9,
+        rho: 0.5,
         startNode: 0,
         totalTime: 500,
         updateBackground: updateBackground,

@@ -52,8 +52,8 @@ export class QLearningAlgorithmModule {
         this.pathToSvg = pathToSvg;
         this.problem = undefined;
         this.qValueStore = undefined;
-        this.episodes = 10000;
-        this.totalTime = 200000;
+        this.episodes = 500;
+        this.totalTime = 300;
         this.startFinishStates = undefined;
         this.player = undefined;
     }

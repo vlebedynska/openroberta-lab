@@ -31,13 +31,15 @@ export class PlayerImpl extends EventTarget implements Player{
         console.log("Tick " + currentTime);
         this.currentEpisodeNumber++;
         let newQlearnerStep: QLearningStep = this.qLearningSteps[this.currentEpisodeNumber]
-        this.visualizer.onQLearningStep(newQlearnerStep, currentTime, this.qLearningSteps.length);
+        this.visualizer.onQLearningStep(newQlearnerStep, currentTime);
     }
 
     initialize(visualizer: Visualizer): void {
         this.currentEpisodeNumber = -1;
         this.visualizer = visualizer;
         let that = this;
+        this.visualizer.setInitialValuesOnMap(this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length);
+
         this.visualizer.addEventListener("playerStarted", function (e: CustomEvent<number>) {
             that.play(e.detail)
         });

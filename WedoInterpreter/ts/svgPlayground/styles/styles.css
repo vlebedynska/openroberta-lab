@@ -9,11 +9,15 @@
 }
 
 .node-visited {
-    fill: darkolivegreen;
+    fill: #4f786e;
+}
+
+.node-not-visited {
+    fill: #e72552;
 }
 
 .shape-active {
-    stroke: red;
+    stroke: gold;
 }
 
 .path-active {

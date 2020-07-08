@@ -1293,7 +1293,7 @@
         </g>
         <g id="node-start">
             <path d="M2070.35,407.69c0,16.64-30.14,64.11-30.14,64.11s-30.14-47.47-30.14-64.11a30.14,30.14,0,1,1,60.28,0Z" transform="translate(2.04 -0.44)"
-                  fill="#4f786e"/>
+                  fill="#e72552"/>
             <circle cx="2042.25" cy="408.22" r="18.72" fill="#f2f2f0"/>
             <text transform="translate(2035.14 415.81)" font-size="19.16" font-family="Noteworthy-Bold, Noteworthy" font-weight="700">0</text>
         </g>
@@ -1382,13 +1382,13 @@
         </g>
         <g id="node-0">
             <path d="M218.5,156.93c0,16.65-30.14,64.11-30.14,64.11s-30.14-47.46-30.14-64.11a30.14,30.14,0,1,1,60.28,0Z" transform="translate(2.04 -0.44)"
-                  fill="#7ccaff"/>
+                  fill="#e72552"/>
             <circle cx="190.4" cy="157.47" r="18.72" fill="#f2f2f0"/>
             <text transform="translate(182.86 165.06)" font-size="19.16" font-family="Noteworthy-Bold, Noteworthy" font-weight="700">0</text>
         </g>
         <g id="node-1">
             <path d="M291.48,595.59c0,16.65-30.14,64.12-30.14,64.12s-30.14-47.47-30.14-64.12a30.14,30.14,0,0,1,60.28,0Z" transform="translate(2.04 -0.44)"
-                  fill="#7ccaff"/>
+                  fill="#e72552"/>
             <circle cx="263.38" cy="596.13" r="18.72" fill="#f2f2f0"/>
             <text transform="translate(259.36 603.76)" font-size="19.16" font-family="Noteworthy-Bold, Noteworthy" font-weight="700">1</text>
         </g>

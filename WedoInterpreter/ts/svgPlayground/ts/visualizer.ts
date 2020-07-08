@@ -1,17 +1,26 @@
-import {Dom, Element, Line, List, Path, Polyline, Shape, SVG, Svg, Text} from "svgdotjs";
-import {Action, Player, QLearningStep} from "./models";
+import {Dom, easing, Element, Line, List, Path, Polyline, Runner, Shape, SVG, Svg, Text, Timeline} from "svgdotjs";
+import {Action, Player, ProblemState, QLearningStep} from "./models";
 import {Utils} from "./utils";
 import {ProblemSource} from "./models";
 
 
 //.size(3148 / 5, 1764 / 5).
 
-export class Visualizer extends EventTarget implements ProblemSource{
+export class Visualizer extends EventTarget implements ProblemSource {
     private readonly svg: Svg;
     private nodeStartOnMap: Element;
     private nodeFinishOnMap: Element;
     private path: Path;
     private line: Line;
+    private previousShape: Shape;
+    private previousOpacity: number;
+    private startStateID: number;
+    private finishStateID: number;
+    private nodeStartInNaviText: Text;
+    private nodeFinishInNaviText: Text;
+    private nodeStartInNaviColour: Text;
+    private nodeFinishInNaviColour: Text;
+
 
     private constructor(svg: Svg) {
         super();
@@ -20,15 +29,20 @@ export class Visualizer extends EventTarget implements ProblemSource{
         this.nodeFinishOnMap = undefined;
         this.path = undefined;
         this.line = undefined;
+        this.previousShape = undefined;
+        this.previousOpacity = 1;
+        this.startStateID = undefined;
+        this.finishStateID = undefined;
+        this.nodeStartInNaviText = undefined;
+        this.nodeFinishInNaviText = undefined;
     }
 
 
-
-    public static createVisualizer(path: string,  htmlSelector: string, size: Size): Promise<Visualizer>{
+    public static createVisualizer(path: string, htmlSelector: string, size: Size): Promise<Visualizer> {
         let visualizerPromise: Promise<Visualizer> = Visualizer.preload(path, htmlSelector)
             .then(function (svg: Svg) {
                 Visualizer.scaleSVGtoSize(svg, size);
-                let visualizer: Visualizer =  new Visualizer(svg);
+                let visualizer: Visualizer = new Visualizer(svg);
                 visualizer.addEventListeners();
                 return visualizer;
             });
@@ -93,9 +107,6 @@ export class Visualizer extends EventTarget implements ProblemSource{
         };
     }
 
-    setPlayer(player: Player) {
-
-    }
 
     processNotAllowedActions(notAllowedActions: Array<Action>) {
         for (let notAllowedAction of notAllowedActions) {
@@ -112,13 +123,13 @@ export class Visualizer extends EventTarget implements ProblemSource{
         }
     }
 
-    private setMarker(notAllowedPath: Path|Line|Polyline|any) {
+    private setMarker(notAllowedPath: Path | Line | Polyline | any) {
         try {
-            notAllowedPath.marker('start', 10, 10, function(add) {
+            notAllowedPath.marker('start', 10, 10, function (add) {
                 add.circle(20).fill('#ff0000')
             })
 
-            notAllowedPath.marker('end', 10, 10, function(add) {
+            notAllowedPath.marker('end', 10, 10, function (add) {
                 add.circle(20).fill('#ff0000')
             })
         } catch (error) {
@@ -129,7 +140,52 @@ export class Visualizer extends EventTarget implements ProblemSource{
     }
 
 
-    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number, totalQLearningSteps: number){
+    //set inital values on map and in the navi
+    public setInitialValuesOnMap(startStateID: number, finishStateID: number, totalTime: number, totalQLearningSteps: number) {
+        this.startStateID = startStateID;
+        this.finishStateID = finishStateID;
+        this.setStartAndFinishState(this.startStateID, this.finishStateID);
+        this.setTotalNumberOfEpisodes(totalQLearningSteps);
+        this.setTotalTime(totalTime);
+
+        let nodeStartNavi: Text = <Text>this.svg.findOne('#node-start-navi text');
+        nodeStartNavi.plain('');
+
+        let rho: Text = <Text>this.svg.findOne('#explore_exploit text');
+        rho.plain('');
+
+
+        let nodeEndNavi: Text = <Text>this.svg.findOne('#node-finish-navi text');
+        nodeEndNavi.plain('');
+
+
+        // this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length
+    }
+
+
+    private setStartAndFinishState(startStateID: number, finishStateID: number) {
+        this.nodeStartInNaviText = <Text>this.svg.findOne('#node-start  text');
+        this.nodeStartInNaviText.plain('' + startStateID);
+        this.nodeStartInNaviColour = <Text>this.svg.findOne('#node-start path').addClass("node-not-visited")
+
+        this.nodeFinishInNaviText = <Text>this.svg.findOne('#node-finish text');
+        this.nodeFinishInNaviText.plain('' + finishStateID);
+        this.nodeFinishInNaviColour = <Text>this.svg.findOne('#node-finish path').addClass("node-not-visited")
+    }
+
+    private setTotalTime(totalTime: number) {
+        let formattedTime: String = Utils.convertNumberToSeconds(totalTime);
+        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)');
+        timeCurrent.plain('' + formattedTime);
+    }
+
+    private setTotalNumberOfEpisodes(totalQLearningSteps: number) {
+        let episodeTotal: Text = <Text>this.svg.findOne('#episode > text:nth-child(2)');
+        episodeTotal.plain('' + totalQLearningSteps);
+    }
+
+
+    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number) {
         console.log("gotStep! " + newQLearnerStep.stepNumber);
 
         if (this.nodeStartOnMap) {
@@ -148,67 +204,100 @@ export class Visualizer extends EventTarget implements ProblemSource{
             this.path.removeClass("path-active")
         }
 
-        let episodeTotal: Text = <Text>this.svg.findOne('#episode > text:nth-child(2)');
-        episodeTotal.plain('' + totalQLearningSteps);
+        if (this.nodeStartOnMap == this.nodeStartInNaviText) {
+            this.nodeStartInNaviColour.removeClass("node-active").addClass("node-visited")
+        }
 
-        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
-        episodeCurrent.plain('' + newQLearnerStep.stepNumber);
-
-        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)');
-        timeCurrent.plain('' + currentTime);
-
-        let nodeStart: Text = <Text>this.svg.findOne('#node-start-navi > text');
-        nodeStart.plain('' + newQLearnerStep.state);
-
-        this.visualiseActionOnMap(newQLearnerStep.state, newQLearnerStep.newState);
+        if (this.nodeFinishOnMap == this.nodeFinishInNaviText) {
+            this.nodeFinishInNaviColour.removeClass("node-active").addClass("node-visited")
+        }
 
 
-
-        // this.line.stroke({
-        //     dasharray: "" +  + ", " + pathLength,
-        //     dashoffset: pathLength * direction,
-        // })
-        // this.line.animate(200).attr("stroke-dashoffset", "0");
+        console.log("first measure " + Date.now())
+        Visualizer.delay(50)
+            .then(() => this.showCurrentTime(currentTime))
+            .then(() => Visualizer.delay(700))
+            .then(() => this.showCurrentEpisode(newQLearnerStep));
 
 
 
 
 
-        let rho: Text = <Text>this.svg.findOne('#explore_exploit > text');
+        let nodeStartNavi: Text = <Text>this.svg.findOne('#node-start-navi text');
+        nodeStartNavi.plain('' + newQLearnerStep.state);
+
+
+        this.visualiseActionOnMap(newQLearnerStep.state, newQLearnerStep.newState, newQLearnerStep.qValueNew, 100);
+
+        let rho: Text = <Text>this.svg.findOne('#explore_exploit text');
         rho.plain('' + newQLearnerStep.rho);
 
 
-        let nodeEnd: Text = <Text>this.svg.findOne('#node-finish-navi > text');
-        nodeEnd.plain('' + newQLearnerStep.newState);
+        let nodeEndNavi: Text = <Text>this.svg.findOne('#node-finish-navi text');
+        nodeEndNavi.plain('' + newQLearnerStep.newState);
 
 
     }
 
-    private visualiseActionOnMap(state: number, newState: number ) {
-        this.nodeStartOnMap = <Path>this.svg.findOne('#node-'+state + ' > path');
+    private showCurrentEpisode(newQLearnerStep: QLearningStep) {
+        console.log("Dalay ist zu Ende " + Date.now())
+        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        episodeCurrent.plain('' + newQLearnerStep.stepNumber);
+    }
+
+    private showCurrentTime(currentTime: number) {
+        console.log("The new q Learnig step " + Date.now())
+        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)')
+        timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
+    }
+
+    private visualiseActionOnMap(state: number, newState: number, qValue: number, maxQValue: number) {
+
+        if (state == this.startStateID || newState == this.startStateID) {
+            this.nodeStartInNaviColour.removeClass("node-not-visited").addClass("node-active");
+        }
+        if (state == this.finishStateID || newState == this.finishStateID) {
+            this.nodeFinishInNaviColour.removeClass("node-not-visited").addClass("node-active");
+        }
+
+
+        this.nodeStartOnMap = <Path>this.svg.findOne('#node-' + state + ' path');
         this.nodeStartOnMap.addClass("node-active");
 
-        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-'+ newState  + ' > path');
+        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-' + newState + ' path');
         this.nodeFinishOnMap.addClass("node-active");
 
-        let shape: Shape = <Shape>this.svg.findOne('#path-'+ state + '-' + newState + ' > [line][path][polyline]');
-        let shapeLength: number = Utils.calcShapeLength(shape);
+        let shapeGroupId = '#path-' + state + '-' + newState;
+        let shapes = this.svg.find(shapeGroupId + ' > path' + "," + shapeGroupId + " line");
+        if (shapes.length != 1) {
+            console.warn("shape not found or ambiguous");
+            return;
+        }
 
+        let shape: Shape = <Shape>shapes[0];
+        let shapeLength: number = Utils.calcShapeLength(shape);
         let shapeClone = shape.clone();
 
         shapeClone.addTo(this.svg);
         shapeClone.addClass("shape-active")
         shapeClone.stroke({
-            dasharray: 5 + ", " + 25,
+            dasharray: 5 + ", " + 35,
             dashoffset: shapeLength,
-            linecap: "round"
+            linecap: "round",
         })
-        shapeClone.animate(800).attr("stroke-dashoffset", "0")
-        // shapeClone.remove()
+
+        shapeClone.animate(800, '>').attr("stroke-dashoffset", "0");
+
+        setTimeout(function () {
+            shapeClone.remove();
+            shape.stroke({opacity: -(1 / maxQValue) * qValue + 1});
+        }, 1000);
 
     }
 
-
+    private static delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
 
     private addEventListeners() {
@@ -264,10 +353,7 @@ export class Visualizer extends EventTarget implements ProblemSource{
     }
 
 
-
 }
-
-
 
 
 export interface Size {

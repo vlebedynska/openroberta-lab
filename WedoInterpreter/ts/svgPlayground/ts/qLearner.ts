@@ -84,6 +84,11 @@ export class QLearningAlgorithm extends EventTarget {
 
         return qLearningStep;
     }
+
+    public findOptimalPath(startState: number, finishState: number): OptimalPathResult {
+        console.log(this.qValueStore);
+        return this.qValueStore.createOptimalPath(startState, startState, this.problem);
+    }
 }
 
 

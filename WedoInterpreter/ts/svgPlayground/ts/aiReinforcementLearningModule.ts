@@ -44,6 +44,7 @@ export class QLearningAlgorithmModule {
     startFinishStates: Action;
     player: Player;
     visualizer: Visualizer;
+    qLearner: QLearningAlgorithm;
 
 
     constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
@@ -56,6 +57,7 @@ export class QLearningAlgorithmModule {
         this.totalTime = 300;
         this.startFinishStates = undefined;
         this.player = undefined;
+        this.qLearner = undefined;
     }
 
 
@@ -99,71 +101,36 @@ export class QLearningAlgorithmModule {
 
 
     runQLearner(): void {
-        let qLearningStep: QLearningAlgorithm = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
+        this.qLearner = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
         let qLearningSteps: Array<QLearningStep> = new Array<QLearningStep>();
         for (let i=0; i < this.episodes; i++) {
-            qLearningSteps.push(qLearningStep.qLearnerStep());
+            qLearningSteps.push(this.qLearner.qLearnerStep());
         }
         this.player = new PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
         this.player.initialize(this.visualizer);
     }
 
+
+
+
+
+
     drawOptimalPath() {
-        console.log(this.qValueStore);
-        var optimalPathResult: OptimalPathResult = this.qValueStore.createOptimalPath(this.startNode, this.finishNode, this.problem);
-        this.drawOptimalPathIntern(optimalPathResult);
-        var copyOfSVG: SVG.Svg = this.svg.clone();
-        RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-        var learnedImageHTML = copyOfSVG.svg();
-        var learnedImage = window.btoa(learnedImageHTML);
-        var temp: string = 'data:image/svg+xml;base64,' + learnedImage;
-        this.updateBackground(9, temp);
+        let optimalPathResult: OptimalPathResult = this.qLearner.findOptimalPath(this.startFinishStates.startState.id, this.startFinishStates.finishState.id);
+        // if (path.resultState == ResultState.ERROR) {
+        //     console.log("...")
+        this.visualizer.drawPath(optimalPathResult.optimalPath);
+
+
+
+        // var copyOfSVG: SVG.Svg = this.svg.clone();
+        // RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
+        // var learnedImageHTML = copyOfSVG.svg();
+        // var learnedImage = window.btoa(learnedImageHTML);
+        // var temp: string = 'data:image/svg+xml;base64,' + learnedImage;
+        // this.updateBackground(9, temp);
     }
 
-    drawOptimalPathIntern(optimalPathResult) {
-        if (optimalPathResult.resultState == ResultState.ERROR) {
-            console.log("...")
-        } else {
-            var combinedPath: SVG.Path;
-            for (var qValue in optimalPathResult.optimalPath) {
-                var firstValue: number = optimalPathResult.optimalPath[parseInt(qValue)];
-                var secondValue: number = optimalPathResult.optimalPath[parseInt(qValue) + 1];
-                if (secondValue !== null) {
-                    try {
-                        // combinedPathTestPurpose = RlUtils.findPathWithID(this.svg, firstValue, secondValue);
-                        // combinedPathTestPurpose.addTo(this.svg);
-                        // combinedPathTestPurpose.stroke({width: 20, color: '#1ad274'})
-
-                        if (combinedPath == undefined) {
-                            var combinedPath: SVG.Path = RlUtils.findPathWithID(this.svg, firstValue, secondValue);
-                        } else {
-                            var temp: SVG.PathArray = RlUtils.findPathWithID(this.svg, firstValue, secondValue).array();
-                            // temp.stroke({linecap: 'round'})
-                            temp.splice(0, 1);
-                            combinedPath.array().push(...temp)
-                            combinedPath.plot(combinedPath.array());
-                        }
-                    } catch (error) {
-                        console.log(combinedPath);
-                    }
-                }
-            }
-            combinedPath.addTo(this.svg);
-            combinedPath.removeClass('cls-customPathColor');
-            combinedPath.addClass('pink-flower')
-            combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round'})
-                .fill('none');
-
-            var pathCopyBlack: SVG.Path = combinedPath.clone();
-            pathCopyBlack.addTo(this.svg);
-            pathCopyBlack.removeClass('cls-customPathColor')
-            pathCopyBlack.addClass('pink-flower')
-            pathCopyBlack.stroke({width: 30, color: '#000000'})
-                .fill('none');
-            console.log(combinedPath.array())
-        }
-
-    }
 }
 
 
@@ -196,18 +163,7 @@ class RlUtils {
         svg.find('.cls-customPathColor').hide();
     }
 
-    /**
-     *
-     * @param svg
-     * @param firstValue
-     * @param secondValue
-     * @return foundPath in {@link svg} or null if not found
-     */
-    static findPathWithID(svg, firstValue, secondValue): SVG.Path{
-        const linkIDPrefix = "path-";
-        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue)
-        return <SVG.Path>foundPath;
-    }
+
 
 
 }
@@ -224,7 +180,7 @@ export enum ResultState {
 
 
 export interface OptimalPathResult {
-    optimalPath: number[];
+    optimalPath: Array<number>;
     resultState: ResultState;
 }
 

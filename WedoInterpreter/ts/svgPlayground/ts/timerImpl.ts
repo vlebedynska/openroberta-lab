@@ -7,22 +7,33 @@ export class TimerImpl extends EventTarget implements Clock {
     private _speed: number;
     private _time: number;
     private interval: NodeJS.Timeout;
+    private isRunning: boolean;
 
     constructor(speed: number, time: number) {
         super();
         this._runningState = RunningState.STOP;
         this._speed = speed;
         this._time = time;
+        this.isRunning = false;
     }
 
 
-    private callTick() {
+    private callTick(force?: boolean) {
         let that = this;
-        clearInterval(this.interval);
-        this.interval = setInterval(function () {
-            that.tick();
+        if (this.isRunning && !force) {
+            return;
+        }
+        this.isRunning = true;
+        this.tick();
+        this.interval = setTimeout(function () {
+            if (that._runningState == RunningState.PLAY) {
+                that.callTick(true);
+            } else {
+                that.isRunning = false;
+            }
         }, 1000 / that._speed);
     }
+
 
     private tick() {
         if (this._time > 0) {
@@ -34,33 +45,38 @@ export class TimerImpl extends EventTarget implements Clock {
         }
     }
 
+
     public stop() {
         if (this.updateRunningState(RunningState.STOP)) {
             this._time = 0;
-            clearInterval(this.interval);
             this.createAndDispatchEvent("stop");
         }
     }
 
     public pause() {
-        if (this.updateRunningState(RunningState.PAUSE)){
-            clearInterval(this.interval);
+        if (this.updateRunningState(RunningState.PAUSE)) {
             this.createAndDispatchEvent("pause");
         }
+    }
+
+    public playOneTick(speed: number) {
+        this.play(speed);
+        this.pause();
     }
 
     public play(speed: number) {
         let previousSpeed = this._speed;
         if (previousSpeed != speed) {
             this._speed = speed;
-            this.callTick();
             console.log("Update speed " + previousSpeed + " > " + speed);
         }
         if (this.updateRunningState(RunningState.PLAY)) {
             this.callTick();
             this.createAndDispatchEvent("play");
         }
+
     }
+
 
     private updateRunningState(runningState: RunningState): boolean {
         let previousState = this._runningState;
@@ -69,14 +85,17 @@ export class TimerImpl extends EventTarget implements Clock {
             return false;
         }
         this._runningState = runningState;
-        console.log("Updated state " + RunningState[previousState] +" > "+ RunningState[runningState] + ".");
+        console.log("Updated state " + RunningState[previousState] + " > " + RunningState[runningState] + ".");
         return true;
     }
 
 
     private createAndDispatchEvent(typeArg: string) {
-        this.dispatchEvent(new CustomEvent<number>(typeArg, {
-            detail: this.time
+        this.dispatchEvent(new CustomEvent<{ time: number, executionDuration: number }>(typeArg, {
+            detail: {
+                'time': this.time,
+                'executionDuration': 1000 / this._speed
+            }
         }))
     }
 

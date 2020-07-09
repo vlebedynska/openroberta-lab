@@ -23,15 +23,19 @@ export class PlayerImpl extends EventTarget implements Player{
         this.startState = startFinishStates.startState;
         this.finishState = startFinishStates.finishState;
         this.timer = new TimerImpl(0, totalTime);
-        this.timer.addEventListener("tick", (e) => this.onTimerTick((<CustomEvent<number>>e).detail) )
+        this.timer.addEventListener("tick", (e) =>
+            this.onTimerTick(
+                (<CustomEvent<{time: number, executionDuration: number}>>e).detail.time,
+                (<CustomEvent<{time: number, executionDuration: number}>>e).detail.executionDuration)
+        );
     }
 
 
-    onTimerTick(currentTime: number) {
+    onTimerTick(currentTime: number, executionDuration: number) {
         console.log("Tick " + currentTime);
         this.currentEpisodeNumber++;
         let newQlearnerStep: QLearningStep = this.qLearningSteps[this.currentEpisodeNumber]
-        this.visualizer.onQLearningStep(newQlearnerStep, currentTime);
+        this.visualizer.onQLearningStep(newQlearnerStep, currentTime, executionDuration);
     }
 
     initialize(visualizer: Visualizer): void {
@@ -49,6 +53,11 @@ export class PlayerImpl extends EventTarget implements Player{
         this.visualizer.addEventListener("playerPaused", function () {
             that.pause();
         })
+
+        this.visualizer.addEventListener("playerStartedForOneStep", function (e: CustomEvent<number>) {
+            that.startForOneStep(e.detail);
+        })
+
     }
 
     private play(speed: number) {
@@ -62,4 +71,9 @@ export class PlayerImpl extends EventTarget implements Player{
     private pause() {
         this.timer.pause();
     }
+
+    private startForOneStep(speed: number) {
+        this.timer.playOneTick(speed);
+    }
+
 }

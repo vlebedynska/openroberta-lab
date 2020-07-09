@@ -1,7 +1,23 @@
-import {Dom, easing, Element, Line, List, Path, Polyline, Runner, Shape, SVG, Svg, Text, Timeline} from "svgdotjs";
+import {
+    Dom,
+    easing,
+    Element,
+    Line,
+    List,
+    Path,
+    PathArray, PathCommand,
+    Polyline,
+    Runner,
+    Shape,
+    SVG,
+    Svg,
+    Text,
+    Timeline
+} from "svgdotjs";
 import {Action, Player, ProblemState, QLearningStep} from "./models";
 import {Utils} from "./utils";
 import {ProblemSource} from "./models";
+import {OptimalPathResult, ResultState} from "aiReinforcementLearningModule.ts.ts";
 
 
 //.size(3148 / 5, 1764 / 5).
@@ -20,6 +36,9 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private nodeFinishInNaviText: Text;
     private nodeStartInNaviColour: Text;
     private nodeFinishInNaviColour: Text;
+    private nodeFinishNaviBar: Text;
+    private nodeStartNaviBar: Text;
+    private rho: Text;
 
 
     private constructor(svg: Svg) {
@@ -35,6 +54,9 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.finishStateID = undefined;
         this.nodeStartInNaviText = undefined;
         this.nodeFinishInNaviText = undefined;
+        this.nodeFinishNaviBar = undefined;
+        this.nodeStartNaviBar = undefined;
+        this.rho = undefined;
     }
 
 
@@ -148,15 +170,18 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.setTotalNumberOfEpisodes(totalQLearningSteps);
         this.setTotalTime(totalTime);
 
-        let nodeStartNavi: Text = <Text>this.svg.findOne('#node-start-navi text');
-        nodeStartNavi.plain('');
-
-        let rho: Text = <Text>this.svg.findOne('#explore_exploit text');
-        rho.plain('');
+        let setInitialEpisode: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        setInitialEpisode.plain('');
 
 
-        let nodeEndNavi: Text = <Text>this.svg.findOne('#node-finish-navi text');
-        nodeEndNavi.plain('');
+        this.nodeStartNaviBar = <Text>this.svg.findOne('#node-start-navi text');
+        this.nodeStartNaviBar.plain('');
+
+        this.rho = <Text>this.svg.findOne('#explore_exploit text');
+        this.rho.plain('');
+
+        this.nodeFinishNaviBar = <Text>this.svg.findOne('#node-finish-navi text');
+        this.nodeFinishNaviBar.plain('');
 
 
         // this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length
@@ -166,11 +191,11 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private setStartAndFinishState(startStateID: number, finishStateID: number) {
         this.nodeStartInNaviText = <Text>this.svg.findOne('#node-start  text');
         this.nodeStartInNaviText.plain('' + startStateID);
-        this.nodeStartInNaviColour = <Text>this.svg.findOne('#node-start path').addClass("node-not-visited")
+        this.nodeStartInNaviColour = <Text>this.svg.findOne('#node-start path');
 
         this.nodeFinishInNaviText = <Text>this.svg.findOne('#node-finish text');
         this.nodeFinishInNaviText.plain('' + finishStateID);
-        this.nodeFinishInNaviColour = <Text>this.svg.findOne('#node-finish path').addClass("node-not-visited")
+        this.nodeFinishInNaviColour = <Text>this.svg.findOne('#node-finish path');
     }
 
     private setTotalTime(totalTime: number) {
@@ -185,9 +210,107 @@ export class Visualizer extends EventTarget implements ProblemSource {
     }
 
 
-    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number) {
+    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number, executionDuration: number) {
         console.log("gotStep! " + newQLearnerStep.stepNumber);
 
+
+        console.log("first measure " + Date.now())
+
+        Visualizer.delay(0)
+            .then(() => this.showCurrentTime(currentTime))
+            .then(() => Visualizer.delay(0))
+            .then(() => this.showCurrentEpisode(newQLearnerStep))
+            .then(() => Visualizer.delay(0.1 * executionDuration))
+            .then(() => this.showCurrentStartNode(newQLearnerStep.state, newQLearnerStep.newState))
+            .then(() => Visualizer.delay(0))
+            .then(() => this.showCurrentRho(newQLearnerStep.rho))
+            .then(() => Visualizer.delay(0.1 * executionDuration))
+            .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, newQLearnerStep.state, newQLearnerStep.newState, newQLearnerStep.qValueNew, 100))
+            .then(() => Visualizer.delay(0))
+            .then(() => this.showCurrentFinishNode(newQLearnerStep.state, newQLearnerStep.newState))
+            .then(() => Visualizer.delay(0.6 * executionDuration))
+            .then(() => this.resetAllValues(newQLearnerStep.state, newQLearnerStep.newState));
+
+    }
+
+
+    private static delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+
+    private showCurrentTime(currentTime: number) {
+        console.log("The new q Learnig step " + Date.now())
+        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)')
+        timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
+    }
+
+    private showCurrentEpisode(newQLearnerStep: QLearningStep) {
+        console.log("Dalay ist zu Ende " + Date.now())
+        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        episodeCurrent.plain('' + newQLearnerStep.stepNumber);
+    }
+
+    private showCurrentStartNode(state: number, newState: number) {
+        this.nodeStartNaviBar.plain('' + state);
+
+        if (state == this.startStateID || newState == this.startStateID) {
+            this.nodeStartInNaviColour.addClass("node-active");
+        }
+
+        this.nodeStartOnMap = <Path>this.svg.findOne('#node-' + state + ' path');
+        this.nodeStartOnMap.addClass("node-active");
+    }
+
+
+    private showCurrentRho(currentRho: string) {
+        this.rho.plain('' + currentRho);
+    }
+
+    private showCurrentStroke(duration: number, timeout: number, state: number, newState: number, qValue: number, maxQValue: number) {
+        let shapeGroupId = '#path-' + state + '-' + newState;
+        let shapes = this.svg.find(shapeGroupId + ' > path' + "," + shapeGroupId + " line");
+        if (shapes.length != 1) {
+            console.warn("shape not found or ambiguous");
+            return;
+        }
+
+        let shape: Shape = <Shape>shapes[0];
+        let shapeLength: number = Utils.calcShapeLength(shape);
+        let shapeClone = shape.clone();
+
+        shapeClone.stroke({opacity: 1});
+        shapeClone.addTo(this.svg);
+        shapeClone.addClass("shape-active")
+        shapeClone.stroke({
+            dasharray: 5 + ", " + 35,
+            dashoffset: shapeLength,
+            linecap: "round",
+        })
+
+        shapeClone.animate(duration, '>').attr("stroke-dashoffset", "0");
+
+        setTimeout(function () {
+            shapeClone.remove();
+            shape.stroke({opacity: -(1 / maxQValue) * qValue + 1});
+        }, timeout);
+
+    }
+
+    private showCurrentFinishNode(state: number, newState: number,) {
+        if (state == this.finishStateID || newState == this.finishStateID) {
+            this.nodeFinishInNaviColour.addClass("node-active");
+        }
+
+        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-' + newState + ' path');
+        this.nodeFinishOnMap.addClass("node-active");
+
+        this.nodeFinishNaviBar.plain('' + newState);
+
+    }
+
+
+    private resetAllValues(state: number, newState: number) {
         if (this.nodeStartOnMap) {
             this.nodeStartOnMap.removeClass("node-active").addClass("node-visited")
         }
@@ -204,111 +327,37 @@ export class Visualizer extends EventTarget implements ProblemSource {
             this.path.removeClass("path-active")
         }
 
-        if (this.nodeStartOnMap == this.nodeStartInNaviText) {
+        if (state == this.startStateID || newState == this.startStateID) {
             this.nodeStartInNaviColour.removeClass("node-active").addClass("node-visited")
         }
 
-        if (this.nodeFinishOnMap == this.nodeFinishInNaviText) {
+        if (state == this.finishStateID || newState == this.finishStateID) {
             this.nodeFinishInNaviColour.removeClass("node-active").addClass("node-visited")
         }
 
-
-        console.log("first measure " + Date.now())
-        Visualizer.delay(50)
-            .then(() => this.showCurrentTime(currentTime))
-            .then(() => Visualizer.delay(700))
-            .then(() => this.showCurrentEpisode(newQLearnerStep));
-
-
-
-
-
-        let nodeStartNavi: Text = <Text>this.svg.findOne('#node-start-navi text');
-        nodeStartNavi.plain('' + newQLearnerStep.state);
-
-
-        this.visualiseActionOnMap(newQLearnerStep.state, newQLearnerStep.newState, newQLearnerStep.qValueNew, 100);
-
-        let rho: Text = <Text>this.svg.findOne('#explore_exploit text');
-        rho.plain('' + newQLearnerStep.rho);
-
-
-        let nodeEndNavi: Text = <Text>this.svg.findOne('#node-finish-navi text');
-        nodeEndNavi.plain('' + newQLearnerStep.newState);
-
-
-    }
-
-    private showCurrentEpisode(newQLearnerStep: QLearningStep) {
-        console.log("Dalay ist zu Ende " + Date.now())
-        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
-        episodeCurrent.plain('' + newQLearnerStep.stepNumber);
-    }
-
-    private showCurrentTime(currentTime: number) {
-        console.log("The new q Learnig step " + Date.now())
-        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)')
-        timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
-    }
-
-    private visualiseActionOnMap(state: number, newState: number, qValue: number, maxQValue: number) {
-
-        if (state == this.startStateID || newState == this.startStateID) {
-            this.nodeStartInNaviColour.removeClass("node-not-visited").addClass("node-active");
-        }
-        if (state == this.finishStateID || newState == this.finishStateID) {
-            this.nodeFinishInNaviColour.removeClass("node-not-visited").addClass("node-active");
-        }
-
-
-        this.nodeStartOnMap = <Path>this.svg.findOne('#node-' + state + ' path');
-        this.nodeStartOnMap.addClass("node-active");
-
-        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-' + newState + ' path');
-        this.nodeFinishOnMap.addClass("node-active");
-
-        let shapeGroupId = '#path-' + state + '-' + newState;
-        let shapes = this.svg.find(shapeGroupId + ' > path' + "," + shapeGroupId + " line");
-        if (shapes.length != 1) {
-            console.warn("shape not found or ambiguous");
-            return;
-        }
-
-        let shape: Shape = <Shape>shapes[0];
-        let shapeLength: number = Utils.calcShapeLength(shape);
-        let shapeClone = shape.clone();
-
-        shapeClone.addTo(this.svg);
-        shapeClone.addClass("shape-active")
-        shapeClone.stroke({
-            dasharray: 5 + ", " + 35,
-            dashoffset: shapeLength,
-            linecap: "round",
-        })
-
-        shapeClone.animate(800, '>').attr("stroke-dashoffset", "0");
-
-        setTimeout(function () {
-            shapeClone.remove();
-            shape.stroke({opacity: -(1 / maxQValue) * qValue + 1});
-        }, 1000);
-
-    }
-
-    private static delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        this.nodeStartNaviBar.plain('');
+        this.rho.plain('');
+        this.nodeFinishNaviBar.plain('');
     }
 
 
     private addEventListeners() {
+        let buttonStepInto: Element = <Element>this.svg.findOne("#navi-step-for-step-button");
         let buttonSpeed1x: Element = <Element>this.svg.findOne('#navi-speed-normal');
         let buttonSpeed2x: Element = <Element>this.svg.findOne('#navi-speed-2x');
         let buttonSpeed3x: Element = <Element>this.svg.findOne('#navi-speed-3x');
         let buttonPause: Element = <Element>this.svg.findOne("#navi-pause")
         let buttonStop: Element = <Element>this.svg.findOne("#navi-stop")
         let that = this;
+
+        buttonStepInto.click(function (e) {
+            that.startPlayerForOneTick(0.1);
+        });
+        buttonStepInto.addClass("navi-button")
+
+
         buttonSpeed1x.click(function (e) {
-            that.startPlayer(1);
+            that.startPlayer(0.5);
         });
         buttonSpeed1x.addClass("navi-button");
 
@@ -336,6 +385,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         buttonPause.addClass("navi-button")
     }
 
+
     private startPlayer(speed: number) {
         console.log("playerStarted!");
         this.dispatchEvent(new CustomEvent<number>("playerStarted", {
@@ -351,6 +401,66 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private pausePlayer() {
         this.dispatchEvent(new CustomEvent("playerPaused"))
     }
+
+    private startPlayerForOneTick(speed: number) {
+        this.dispatchEvent(new CustomEvent("playerStartedForOneStep", {
+                detail: speed
+            })
+        );
+    }
+
+
+    public drawPath(actions: Array<number>) {
+        let combinedPath: Path = undefined;
+        for (let actionIndex in actions) {
+            let firstAction: number = actions[parseInt(actionIndex)];
+            let secondAction: number = actions[parseInt(actionIndex) + 1];
+            let actionPath = Visualizer.findPathWithID(this.svg, firstAction, secondAction)
+            if (secondAction !== null) {
+                try {
+                    if (combinedPath == undefined) {
+                        combinedPath = actionPath;
+                    } else {
+                        let currentPathArray: PathArray = actionPath.array() //get array of path pieces
+                        let currentPathArrayWithoutMovetto: PathCommand[]=  currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
+                        combinedPath.array().push(...currentPathArrayWithoutMovetto)
+                        combinedPath.plot(combinedPath.array());
+                    }
+                } catch (error) {
+                    console.log(combinedPath);
+                }
+            }
+        }
+        combinedPath.addTo(this.svg);
+        combinedPath.addClass('line-follower-outside');
+        // combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round'})
+        //     .fill('none');
+
+        let combinedPathCopy: Path = combinedPath.clone();
+        combinedPathCopy.addTo(this.svg);
+        combinedPathCopy.addClass('line-follower-inside')
+        // combinedPathCopy.stroke({width: 30, color: '#000000'})
+        //     .fill('none');
+        console.log(combinedPath.array())
+
+    }
+
+
+
+    /**
+     *
+     * @param svg
+     * @param firstValue
+     * @param secondValue
+     * @return foundPath in {@link svg} or null if not found
+     */
+    static findPathWithID(svg, firstValue, secondValue): Path{
+        const linkIDPrefix = "path-";
+        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue)
+        return <Path>foundPath;
+    }
+
+
 
 
 }

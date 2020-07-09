@@ -28,8 +28,20 @@
     stroke: url(#Ripple_Viktoriya-0);
 }
 
-@keyframes mymove {
-    /*100% {*/
-    /*    transform: translate(0px, -5px);*/
-    /*}*/
+.line-follower-outside {
+    stroke-width: 80;
+    color: #ffffff;
+    stroke-opacity: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
 }
+
+.line-follower-inside {
+    stroke-width: 30;
+    color: #000000;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+

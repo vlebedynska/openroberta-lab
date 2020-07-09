@@ -52,5 +52,6 @@ function drawOptimalPath() {
 createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
     runQLearner();
+    drawOptimalPath();
 });
 

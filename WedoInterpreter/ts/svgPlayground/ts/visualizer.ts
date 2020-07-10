@@ -132,7 +132,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     processNotAllowedActions(notAllowedActions: Array<Action>) {
         for (let notAllowedAction of notAllowedActions) {
-            let notAllowedPath: Shape = <Shape>this.svg.findOne('g[id^="path-"]' + notAllowedAction.startState.id + "-" + notAllowedAction.finishState.id + " path|line|polyline");
+            let notAllowedPath: Path = <Path>this.svg.findOne("#path-" + notAllowedAction.startState.id + "-" + notAllowedAction.finishState.id + " path");
             notAllowedPath.attr({
                 stroke: 'red',
                 'stroke-linecap': 'round',
@@ -147,12 +147,12 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     private setMarker(notAllowedPath: Path | Line | Polyline | any) {
         try {
-            notAllowedPath.marker('start', 10, 10, function (add) {
-                add.circle(20).fill('#ff0000')
+            notAllowedPath.marker('start', 5, 5, function (add) {
+                add.circle(5).fill('#ff0000')
             })
 
-            notAllowedPath.marker('end', 10, 10, function (add) {
-                add.circle(20).fill('#ff0000')
+            notAllowedPath.marker('end', 5, 5, function (add) {
+                add.circle(5).fill('#ff0000')
             })
         } catch (error) {
             if (error instanceof TypeError) {
@@ -210,7 +210,10 @@ export class Visualizer extends EventTarget implements ProblemSource {
     }
 
 
-    onQLearningStep(newQLearnerStep: QLearningStep, currentTime: number, executionDuration: number) {
+    onQLearningStep(newQLearnerStepDataAndPath: {qLearnerStepData: QLearningStep, optimalPath: Array<number>}, currentTime: number, executionDuration: number) {
+
+        let newQLearnerStep = newQLearnerStepDataAndPath.qLearnerStepData;
+
         console.log("gotStep! " + newQLearnerStep.stepNumber);
 
 
@@ -229,6 +232,8 @@ export class Visualizer extends EventTarget implements ProblemSource {
             .then(() => Visualizer.delay(0))
             .then(() => this.showCurrentFinishNode(newQLearnerStep.state, newQLearnerStep.newState))
             .then(() => Visualizer.delay(0.6 * executionDuration))
+            .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
+            .then(() => Visualizer.delay(0))
             .then(() => this.resetAllValues(newQLearnerStep.state, newQLearnerStep.newState));
 
     }
@@ -308,6 +313,17 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.nodeFinishNaviBar.plain('' + newState);
 
     }
+
+
+
+    private showCurrentOptimalPath(optimalPath: Array<number>) {
+        let currentOptimalPath: Text = <Text>this.svg.findOne('#navi-optimal-path > text:nth-child(2)');
+        let result: string = optimalPath != undefined ? optimalPath.join(' - ') : 'noch nicht gefunden';
+        currentOptimalPath.plain(result);
+    }
+
+
+
 
 
     private resetAllValues(state: number, newState: number) {
@@ -416,14 +432,14 @@ export class Visualizer extends EventTarget implements ProblemSource {
             let firstAction: number = actions[parseInt(actionIndex)];
             let secondAction: number = actions[parseInt(actionIndex) + 1];
             let actionPath = Visualizer.findPathWithID(this.svg, firstAction, secondAction)
-            if (secondAction !== null) {
+            if (secondAction !== undefined) {
                 try {
                     if (combinedPath == undefined) {
                         combinedPath = actionPath;
                     } else {
                         let currentPathArray: PathArray = actionPath.array() //get array of path pieces
                         let currentPathArrayWithoutMovetto: PathCommand[]=  currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
-                        combinedPath.array().push(...currentPathArrayWithoutMovetto)
+                        combinedPath.array().push(...currentPathArray)
                         combinedPath.plot(combinedPath.array());
                     }
                 } catch (error) {
@@ -456,7 +472,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
      */
     static findPathWithID(svg, firstValue, secondValue): Path{
         const linkIDPrefix = "path-";
-        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue)
+        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue + " path ")
         return <Path>foundPath;
     }
 

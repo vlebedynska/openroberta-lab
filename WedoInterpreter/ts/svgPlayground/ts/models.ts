@@ -1,4 +1,5 @@
 import {Visualizer} from "visualizer";
+import {TimerImpl} from "timerImpl.ts.ts";
 
 export interface ProblemSource {
     getActions(): Array<Action>;
@@ -12,7 +13,8 @@ export interface Player {
     totalNumberOfEpisodes: number;
     currentTime: number;
     totalTime: number;
-    qLearningSteps: Array<QLearningStep>;
+    qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>;
+    timer: TimerImpl;
     initialize(visualizer: Visualizer): void;
 }
 

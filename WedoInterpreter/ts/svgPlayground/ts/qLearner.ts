@@ -86,8 +86,7 @@ export class QLearningAlgorithm extends EventTarget {
     }
 
     public findOptimalPath(startState: number, finishState: number): OptimalPathResult {
-        console.log(this.qValueStore);
-        return this.qValueStore.createOptimalPath(startState, startState, this.problem);
+        return this.qValueStore.createOptimalPath(startState, finishState, this.problem);
     }
 }
 
@@ -135,10 +134,12 @@ class QValueStore {
         actions[action] = value; // === this.qMatrix[state][action] = value;
     }
 
+
+    //TODO Optimize calculating of the best path
     createOptimalPath(startState: number, endState: number, problem: ReinforcementProblem): OptimalPathResult {
-        var optimalPath: number[] = [startState];
-        var currentState: number = startState;
-        var resultState: ResultState = ResultState.SUCCESS;
+        let optimalPath: number[] = [startState];
+        let currentState: number = startState;
+        let resultState: ResultState = ResultState.SUCCESS;
         while (currentState !== endState) {
             var nextState: number = this.getBestAction(currentState, problem.getAvailableActions(currentState));
             currentState = nextState;

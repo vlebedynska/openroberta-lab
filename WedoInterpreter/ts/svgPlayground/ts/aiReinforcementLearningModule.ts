@@ -19,12 +19,14 @@ export interface QlearningAlgorithmParameters {
     // qValueStore: QValueStore;
     episodes: number;
     totalTime: number;
-    obstaclesList: Action[];
+    obstaclesList: Array<Obstacle>;
+        //Action[];
 }
 
 
 
 export class QLearningAlgorithmModule {
+
     svg: SVG.Svg;
     startNode: number;
     updateBackground: any;
@@ -45,6 +47,7 @@ export class QLearningAlgorithmModule {
     player: Player;
     visualizer: Visualizer;
     qLearner: QLearningAlgorithm;
+    private _drawOptimalPathResult: boolean;
 
 
     constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
@@ -58,6 +61,7 @@ export class QLearningAlgorithmModule {
         this.startFinishStates = undefined;
         this.player = undefined;
         this.qLearner = undefined;
+        this._drawOptimalPathResult = undefined;
     }
 
 
@@ -102,12 +106,15 @@ export class QLearningAlgorithmModule {
 
     runQLearner(): void {
         this.qLearner = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
-        let qLearningSteps: Array<QLearningStep> = new Array<QLearningStep>();
+        let qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}> = new Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>();
         for (let i=0; i < this.episodes; i++) {
-            qLearningSteps.push(this.qLearner.qLearnerStep());
+            qLearningSteps.push({
+                qLearnerStepData: this.qLearner.qLearnerStep(),
+                optimalPath: this.qLearner.findOptimalPath(this.startFinishStates.startState.id, this.startFinishStates.finishState.id).optimalPath});
         }
         this.player = new PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
         this.player.initialize(this.visualizer);
+
     }
 
 
@@ -116,10 +123,17 @@ export class QLearningAlgorithmModule {
 
 
     drawOptimalPath() {
-        let optimalPathResult: OptimalPathResult = this.qLearner.findOptimalPath(this.startFinishStates.startState.id, this.startFinishStates.finishState.id);
-        // if (path.resultState == ResultState.ERROR) {
-        //     console.log("...")
-        this.visualizer.drawPath(optimalPathResult.optimalPath);
+        let that = this;
+        this.player.timer.addEventListener("stop", function () {
+            let optimalPathResult: OptimalPathResult = that.qLearner.findOptimalPath(that.startFinishStates.startState.id, that.startFinishStates.finishState.id);
+            if (optimalPathResult.resultState == ResultState.ERROR) {
+                console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
+            }
+            that.visualizer.drawPath(optimalPathResult.optimalPath);
+
+        })
+
+
 
 
 
@@ -130,6 +144,23 @@ export class QLearningAlgorithmModule {
         // var temp: string = 'data:image/svg+xml;base64,' + learnedImage;
         // this.updateBackground(9, temp);
     }
+
+
+
+
+
+
+
+    get drawOptimalPathResult(): boolean {
+        return this._drawOptimalPathResult;
+    }
+
+    set drawOptimalPathResult(value: boolean) {
+        this._drawOptimalPathResult = value;
+    }
+
+
+
 
 }
 
@@ -353,6 +384,7 @@ class QValueStore {
 //         return qValueStore;
 //     }
 // }
+
 //
 export interface Obstacle {
     startNode: number;

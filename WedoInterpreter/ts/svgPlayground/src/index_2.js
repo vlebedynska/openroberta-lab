@@ -1,8 +1,8 @@
-define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], function (require, exports, SVG, aiqlearning) {
+define(["require", "exports", "./aiReinforcementLearningModule"], function (require, exports, aiqlearning) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var svg = SVG.SVG().addTo('body').size(300, 300);
-    var rect = svg.rect(100, 100).attr({ fill: '#f06' });
+    // var svg = SVG.SVG().addTo('body').size(300, 300)
+    // var rect = svg.rect(100, 100).attr({ fill: '#f06' })
     var updateBackground = function () {
         console.log("Hallo");
     };
@@ -10,7 +10,7 @@ define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], fu
     let qLearningParams = {
         alpha: 0.5,
         episodes: 150,
-        finishNode: 7,
+        finishNode: 6,
         gamma: 0.8,
         nu: 0.9,
         rho: 0.5,
@@ -18,6 +18,8 @@ define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], fu
         totalTime: 500,
         updateBackground: updateBackground,
         obstaclesList: []
+        // {startNode: 1, finishNode:2}
+        // [{startState: {id:1}, finishState: {id:2}}]
     };
     function createQLearningEnvironment(obstaclesList, startNode, finishNode) {
         return qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
@@ -34,6 +36,7 @@ define(["require", "exports", "svgdotjs", "./aiReinforcementLearningModule"], fu
     createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
         setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
         runQLearner();
+        drawOptimalPath();
     });
 });
 //# sourceMappingURL=index_2.js.map

@@ -2,8 +2,8 @@ import * as SVG from "svgdotjs";
 import * as aiqlearning from "./aiReinforcementLearningModule"
 import {QLearningAlgorithmModule, QlearningAlgorithmParameters} from "./aiReinforcementLearningModule";
 
-var svg = SVG.SVG().addTo('body').size(300, 300)
-var rect = svg.rect(100, 100).attr({ fill: '#f06' })
+// var svg = SVG.SVG().addTo('body').size(300, 300)
+// var rect = svg.rect(100, 100).attr({ fill: '#f06' })
 
 var updateBackground: Function = function () {
     console.log("Hallo");
@@ -21,7 +21,7 @@ var qLearningAlgorithmModule: QLearningAlgorithmModule =
 let qLearningParams: QlearningAlgorithmParameters = {
     alpha: 0.5,
     episodes: 150,
-    finishNode: 7,
+    finishNode: 6,
     gamma: 0.8,
     nu: 0.9,
     rho: 0.5,
@@ -29,6 +29,8 @@ let qLearningParams: QlearningAlgorithmParameters = {
     totalTime: 500,
     updateBackground: updateBackground,
     obstaclesList: []
+// {startNode: 1, finishNode:2}
+        // [{startState: {id:1}, finishState: {id:2}}]
 }
 
 

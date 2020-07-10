@@ -3,6 +3,7 @@ import {TimerImpl} from "./timerImpl";
 import {Visualizer} from "./visualizer";
 
 export class PlayerImpl extends EventTarget implements Player{
+
     currentEpisodeNumber: number;
     currentTime: number;
     finishState: ProblemState;
@@ -10,12 +11,12 @@ export class PlayerImpl extends EventTarget implements Player{
     startState: ProblemState;
     totalNumberOfEpisodes: number;
     totalTime: number;
-    qLearningSteps: Array<QLearningStep>;
+    qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>;
     timer: TimerImpl;
     visualizer: Visualizer;
 
 
-    constructor(qLearningSteps: Array<QLearningStep>, totalTime: number, totalNumberOfEpisodes: number, startFinishStates: Action) {
+    constructor(qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>, totalTime: number, totalNumberOfEpisodes: number, startFinishStates: Action) {
         super();
         this.qLearningSteps = qLearningSteps;
         this.totalTime = totalTime;
@@ -34,7 +35,7 @@ export class PlayerImpl extends EventTarget implements Player{
     onTimerTick(currentTime: number, executionDuration: number) {
         console.log("Tick " + currentTime);
         this.currentEpisodeNumber++;
-        let newQlearnerStep: QLearningStep = this.qLearningSteps[this.currentEpisodeNumber]
+        let newQlearnerStep: {qLearnerStepData: QLearningStep, optimalPath: Array<number>} = this.qLearningSteps[this.currentEpisodeNumber]
         this.visualizer.onQLearningStep(newQlearnerStep, currentTime, executionDuration);
     }
 
@@ -75,5 +76,6 @@ export class PlayerImpl extends EventTarget implements Player{
     private startForOneStep(speed: number) {
         this.timer.playOneTick(speed);
     }
+
 
 }

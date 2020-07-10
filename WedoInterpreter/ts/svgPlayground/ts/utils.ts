@@ -43,8 +43,16 @@ export class Utils {
     }
 
     public static filterOutNotAllowedActions(allActions: Array<Action>, notAllowedActions: Array<Action>): Array<Action> {
-        return allActions.filter(f => !notAllowedActions.includes(f));
+        let filtered: Array<Action> = allActions.filter((el) => {
+            return !notAllowedActions.some((f) => {
+                return f.startState.id === el.startState.id && f.finishState.id === el.finishState.id;
+            });
+        });
+        return filtered;
     }
+
+
+
 
     public static calcShapeLength(shape: Shape): number {
         switch (shape.constructor) {

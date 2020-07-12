@@ -3,27 +3,31 @@ import { State } from "interpreter.state";
 import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 import * as $ from "jquery";
-import {SVG} from "svgdotjs";
-import * as aiNNModule from "aiNeuralNetworkModule/source/ai.neuralNetwork";
 import {AiNeuralNetworkModule, Ev3MotorOutputNode} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
-import * as aiqlearning from "aiReinforcementLearningModule/ts/aiReinforcementLearningModule"
-import {QLearningAlgorithmModule} from "aiReinforcementLearningModule/ts/aiReinforcementLearningModule";
+import {QLearningAlgorithmModule} from "interpreter.svgPlayground/ts/aiReinforcementLearningModule";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	private neuralNetworkModule: AiNeuralNetworkModule;
 	private readonly updateBackground: Function;
 	private readonly qLearningAlgorithmModule: QLearningAlgorithmModule;
+	private promise;
 
 	constructor(updateBackground) {
 		super();
 		this.hardwareState.motors = {};
 		this.neuralNetworkModule = null;
 		this.updateBackground = updateBackground;
-		this.qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground);
+		this.qLearningAlgorithmModule =
+			new QLearningAlgorithmModule(
+				updateBackground,
+				"#qLearningBackgroundArea",
+				{width: 800, height: 800},
+				"/js/app/simulation/simBackgrounds/PopUPDesign_Minimal_2.svg"
+			);
 
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
-
+		this.promise = undefined;
 		U.loggingEnabled(false, false);
 	}
 
@@ -495,16 +499,25 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	//Reinforcement Learning
 
 
+
+
+
 	createQLearningEnvironment(obstaclesList, startNode, finishNode) {
-		return this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+		this.promise = this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+		return 0;
 	}
 
 	setUpQLearningBehaviour(alpha, gamma, nu, rho) {
-		this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+		this.promise = this.promise.then(r => {
+			this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+		});
 	}
 
 	runQLearner() {
-		return this.qLearningAlgorithmModule.runQLearner();
+		this.promise.then( resolve => {
+			this.qLearningAlgorithmModule.runQLearner();
+		});
+		return 99999990;
 	}
 
 	drawOptimalPath() {

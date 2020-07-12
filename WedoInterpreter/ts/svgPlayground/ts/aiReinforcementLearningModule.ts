@@ -1,10 +1,9 @@
 import * as SVG from "svgdotjs";
-import {Action, Player, QLearningStep} from "./models";
-import {Size, Visualizer} from "./visualizer";
-import {Utils} from "./utils";
-import {PlayerImpl} from "./playerImpl";
+import {Action, Player, QLearningStep} from "models";
+import {Size, Visualizer} from "visualizer";
+import {Utils} from "utils";
+import {PlayerImpl} from "playerImpl";
 import {QLearningAlgorithm} from "qLearner";
-// import * as $ from "jquery";
 
 export interface QlearningAlgorithmParameters {
     // svg: SVG.Svg;

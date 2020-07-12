@@ -1,4 +1,4 @@
-import {Clock, RunningState} from "./models";
+import {Clock, RunningState} from "models";
 
 export class TimerImpl extends EventTarget implements Clock {
 
@@ -6,7 +6,7 @@ export class TimerImpl extends EventTarget implements Clock {
     private _runningState: RunningState;
     private _speed: number;
     private _time: number;
-    private interval: NodeJS.Timeout;
+    private interval;
     private isRunning: boolean;
 
     constructor(speed: number, time: number) {

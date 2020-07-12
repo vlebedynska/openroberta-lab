@@ -1,4 +1,4 @@
-define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "aiNeuralNetworkModule/source/ai.neuralNetwork", "aiReinforcementLearningModule/ts/aiReinforcementLearningModule"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, ai_neuralNetwork_1, aiqlearning) {
+define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "aiNeuralNetworkModule/source/ai.neuralNetwork", "aiReinforcementLearningModule"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, ai_neuralNetwork_1, aiReinforcementLearningModule_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class RobotMbedBehaviour extends interpreter_aRobotBehaviour_1.ARobotBehaviour {
@@ -10,8 +10,10 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.motors = {};
             this.neuralNetworkModule = null;
             this.updateBackground = updateBackground;
-            this.qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground);
+            this.qLearningAlgorithmModule =
+                new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/PopUPDesign_Minimal_2.svg");
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
+            this.promise = undefined;
             U.loggingEnabled(false, false);
         }
         getSample(s, name, sensor, port, mode) {
@@ -433,13 +435,19 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
         //Reinforcement Learning
         createQLearningEnvironment(obstaclesList, startNode, finishNode) {
-            return this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+            this.promise = this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+            return 0;
         }
         setUpQLearningBehaviour(alpha, gamma, nu, rho) {
-            this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+            this.promise = this.promise.then(r => {
+                this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+            });
         }
         runQLearner() {
-            return this.qLearningAlgorithmModule.runQLearner();
+            this.promise.then(resolve => {
+                this.qLearningAlgorithmModule.runQLearner();
+            });
+            return 0;
         }
         drawOptimalPath() {
             this.qLearningAlgorithmModule.drawOptimalPath();

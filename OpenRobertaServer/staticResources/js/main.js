@@ -1,6 +1,14 @@
 require.config({
     baseUrl : 'js/libs',
     paths : {
+        'aiReinforcementLearningModule': '../app/wedoInterpreter/svgPlayground/ts/aiReinforcementLearningModule',
+        'index_2':'../app/wedoInterpreter/svgPlayground/ts/index_2',
+        'visualizer': '../app/wedoInterpreter/svgPlayground/ts/visualizer',
+        'utils':'../app/wedoInterpreter/svgPlayground/ts/utils',
+        'playerImpl':'../app/wedoInterpreter/svgPlayground/ts/playerImpl',
+        'models':'../app/wedoInterpreter/svgPlayground/ts/models',
+        'qLearner':'../app/wedoInterpreter/svgPlayground/ts/qLearner',
+        'timerImpl':'../app/wedoInterpreter/svgPlayground/ts/timerImpl',
         'aiNeuralNetworkModule/source/ai.neuralNetwork' : '../app/wedoInterpreter/aiNeuralNetworkModule/source/ai.neuralNetwork',
         'aiReinforcementLearningModule/ts/aiReinforcementLearningModule' : '../app/wedoInterpreter/aiReinforcementLearningModule/ts/aiReinforcementLearningModule',
         'svgdotjs' : 'svgdotjs/dist/svg.min',
@@ -133,7 +141,8 @@ require([ 'require', 'wrap', 'log', 'jquery', 'jquery-cookie', 'guiState.control
         'progDelete.controller', 'confDelete.controller', 'progShare.controller', 'menu.controller', 'multSim.controller', 'user.controller',
         'robot.controller', 'program.controller', 'progSim.controller', 'progCode.controller', 'progDelete.controller', 'progHelp.controller',
         'legal.controller', 'progInfo.controller', 'progRun.controller', 'configuration.controller', 'language.controller', 'socket.controller',
-        'progTutorial.controller', 'tutorialList.controller', 'volume-meter', 'user.model', 'webview.controller', 'sourceCodeEditor.controller', 'codeflask', 'svgdotjs'], function(
+        'progTutorial.controller', 'tutorialList.controller', 'volume-meter', 'user.model', 'webview.controller', 'sourceCodeEditor.controller', 'codeflask',
+        'svgdotjs', 'aiReinforcementLearningModule'], function( //VO
         require) {
     $ = require('jquery', 'jquery-cookie');
     WRAP = require('wrap');
@@ -168,6 +177,7 @@ require([ 'require', 'wrap', 'log', 'jquery', 'jquery-cookie', 'guiState.control
     webviewController = require('webview.controller');
     sourceCodeEditorController = require('sourceCodeEditor.controller');
     codeflask = require('codeflask');
+    //aiReinforcementLearningModule = require('aiReinforcementLearningModule');
     $(document).ready(WRAP.fn3(init, 'page init'));
 });
 
@@ -204,6 +214,7 @@ function init() {
         progRunController.init();
         menuController.init();
         tutorialController.init();
+        //aiReinforcementLearningModule.init();
 
         // immediately remove old cookies TODO remove this and jquery-cookie after 30 days
         var cookies = $.cookie();

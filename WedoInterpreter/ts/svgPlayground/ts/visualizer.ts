@@ -14,13 +14,10 @@ import {
     Text,
     Timeline
 } from "svgdotjs";
-import {Action, Player, ProblemState, QLearningStep} from "./models";
-import {Utils} from "./utils";
-import {ProblemSource} from "./models";
-import {OptimalPathResult, ResultState} from "aiReinforcementLearningModule.ts.ts";
+import {Action, Player, ProblemState, QLearningStep} from "models";
+import {Utils} from "utils";
+import {ProblemSource} from "models";
 
-
-//.size(3148 / 5, 1764 / 5).
 
 export class Visualizer extends EventTarget implements ProblemSource {
     private readonly svg: Svg;

@@ -1,6 +1,4 @@
-import * as SVG from "svgdotjs";
-import * as aiqlearning from "./aiReinforcementLearningModule"
-import {QLearningAlgorithmModule, QlearningAlgorithmParameters} from "./aiReinforcementLearningModule";
+import {QLearningAlgorithmModule, QlearningAlgorithmParameters} from "aiReinforcementLearningModule";
 
 // var svg = SVG.SVG().addTo('body').size(300, 300)
 // var rect = svg.rect(100, 100).attr({ fill: '#f06' })
@@ -10,7 +8,7 @@ var updateBackground: Function = function () {
 };
 
 var qLearningAlgorithmModule: QLearningAlgorithmModule =
-    new aiqlearning.QLearningAlgorithmModule(
+    new QLearningAlgorithmModule(
         updateBackground,
         "#qLearningBackgroundArea",
         {width: 629, height: 352},

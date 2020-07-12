@@ -1,5 +1,5 @@
-import {Nu, QLearningStep, Rho} from "./models";
-import {OptimalPathResult, ResultState} from "./aiReinforcementLearningModule";
+import {Nu, QLearningStep, Rho} from "models";
+import {OptimalPathResult, ResultState} from "aiReinforcementLearningModule";
 
 export class QLearningAlgorithm extends EventTarget {
     private readonly qValueStore: QValueStore;

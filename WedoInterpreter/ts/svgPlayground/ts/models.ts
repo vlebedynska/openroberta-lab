@@ -1,5 +1,5 @@
 import {Visualizer} from "visualizer";
-import {TimerImpl} from "timerImpl.ts.ts";
+import {TimerImpl} from "timerImpl";
 
 export interface ProblemSource {
     getActions(): Array<Action>;

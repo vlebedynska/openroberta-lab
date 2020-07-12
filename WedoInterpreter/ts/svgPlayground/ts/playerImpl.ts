@@ -1,6 +1,6 @@
-import {Action, Player, ProblemState, QLearningStep} from "./models";
-import {TimerImpl} from "./timerImpl";
-import {Visualizer} from "./visualizer";
+import {Action, Player, ProblemState, QLearningStep} from "models";
+import {TimerImpl} from "timerImpl";
+import {Visualizer} from "visualizer";
 
 export class PlayerImpl extends EventTarget implements Player{
 

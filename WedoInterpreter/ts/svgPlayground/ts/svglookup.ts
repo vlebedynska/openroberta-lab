@@ -1,31 +1,36 @@
 import {Element, Path, Svg, Text} from "svgdotjs";
 
-class Svglookup {
+export class Svglookup {
 
-    private readonly selectors: Map<string, string>;
     private readonly svglookuptable: Map<string, Element>;
     private readonly svg: Svg;
 
-    constructor(selectors: Map<string, string>, svg: Svg) {
-        this.selectors = selectors;
+    constructor(svg: Svg) {
         this.svg = svg;
         this.svglookuptable = new Map<string, Element>();
     }
 
+    public getElement(key: string): Element{
+        this.checkAndUpdateLookupTable(key);
+        return this.svglookuptable.get(key);
+    }
+
+
     public getTextElement(key: string): Text {
-        if (!this.svglookuptable.has(key)) {
-            let selector: string = this.selectors.get(key);
-            let element: Element = <Element>this.svg.findOne(selector);
-            this.svglookuptable.set(key, element)
-        }
-        return <Text>this.svglookuptable.get(key);
+        return <Text>this.getElement(key);
     }
 
     public getPathElement(key: string): Path{
-        return
+        return <Path>this.getElement(key);
+    }
+    
+
+    private checkAndUpdateLookupTable(key: string) {
+        if (!this.svglookuptable.has(key)) {
+            let element: Element = <Element>this.svg.findOne(key);
+            this.svglookuptable.set(key, element)
+        }
     }
 
-    public getElement(key: string): Element{
-        return
-    }
+
 }

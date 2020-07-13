@@ -11,6 +11,7 @@ require.config({
         'models':'src/models',
         'qLearner':'src/qLearner',
         'timerImpl':'src/timerImpl',
+        'svglookup': 'src/svglookup'
     },
     shim : {
         'svgdotjs': {

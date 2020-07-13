@@ -1,4 +1,4 @@
-define(["require", "exports", "./aiReinforcementLearningModule"], function (require, exports, aiqlearning) {
+define(["require", "exports", "aiReinforcementLearningModule"], function (require, exports, aiReinforcementLearningModule_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // var svg = SVG.SVG().addTo('body').size(300, 300)
@@ -6,7 +6,7 @@ define(["require", "exports", "./aiReinforcementLearningModule"], function (requ
     var updateBackground = function () {
         console.log("Hallo");
     };
-    var qLearningAlgorithmModule = new aiqlearning.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal_2.svg");
+    var qLearningAlgorithmModule = new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal_2.svg");
     let qLearningParams = {
         alpha: 0.5,
         episodes: 150,

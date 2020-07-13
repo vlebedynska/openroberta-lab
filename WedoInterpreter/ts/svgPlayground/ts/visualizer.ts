@@ -17,6 +17,7 @@ import {
 import {Action, Player, ProblemState, QLearningStep} from "models";
 import {Utils} from "utils";
 import {ProblemSource} from "models";
+import {Svglookup} from "svglookup";
 
 
 export class Visualizer extends EventTarget implements ProblemSource {
@@ -36,6 +37,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private nodeFinishNaviBar: Text;
     private nodeStartNaviBar: Text;
     private rho: Text;
+    private svgLookup: Svglookup;
 
 
     private constructor(svg: Svg) {
@@ -54,6 +56,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.nodeFinishNaviBar = undefined;
         this.nodeStartNaviBar = undefined;
         this.rho = undefined;
+        this.svgLookup = new Svglookup(svg);
     }
 
 
@@ -129,7 +132,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     processNotAllowedActions(notAllowedActions: Array<Action>) {
         for (let notAllowedAction of notAllowedActions) {
-            let notAllowedPath: Path = <Path>this.svg.findOne("#path-" + notAllowedAction.startState.id + "-" + notAllowedAction.finishState.id + " path");
+            let notAllowedPath: Path = this.findPathWithID(notAllowedAction.startState.id, notAllowedAction.finishState.id);
             notAllowedPath.attr({
                 stroke: 'red',
                 'stroke-linecap': 'round',
@@ -167,17 +170,17 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.setTotalNumberOfEpisodes(totalQLearningSteps);
         this.setTotalTime(totalTime);
 
-        let setInitialEpisode: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        let setInitialEpisode: Text = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
         setInitialEpisode.plain('');
 
 
-        this.nodeStartNaviBar = <Text>this.svg.findOne('#node-start-navi text');
+        this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
         this.nodeStartNaviBar.plain('');
 
-        this.rho = <Text>this.svg.findOne('#explore_exploit text');
+        this.rho = this.svgLookup.getTextElement('#explore_exploit text');
         this.rho.plain('');
 
-        this.nodeFinishNaviBar = <Text>this.svg.findOne('#node-finish-navi text');
+        this.nodeFinishNaviBar = this.svgLookup.getTextElement('#node-finish-navi text');
         this.nodeFinishNaviBar.plain('');
 
 
@@ -186,23 +189,23 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private setStartAndFinishState(startStateID: number, finishStateID: number) {
-        this.nodeStartInNaviText = <Text>this.svg.findOne('#node-start  text');
+        this.nodeStartInNaviText = this.svgLookup.getTextElement('#node-start  text');
         this.nodeStartInNaviText.plain('' + startStateID);
-        this.nodeStartInNaviColour = <Text>this.svg.findOne('#node-start path');
+        this.nodeStartInNaviColour = this.svgLookup.getTextElement('#node-start path');
 
-        this.nodeFinishInNaviText = <Text>this.svg.findOne('#node-finish text');
+        this.nodeFinishInNaviText = this.svgLookup.getTextElement('#node-finish text');
         this.nodeFinishInNaviText.plain('' + finishStateID);
-        this.nodeFinishInNaviColour = <Text>this.svg.findOne('#node-finish path');
+        this.nodeFinishInNaviColour = this.svgLookup.getTextElement('#node-finish path');
     }
 
     private setTotalTime(totalTime: number) {
         let formattedTime: String = Utils.convertNumberToSeconds(totalTime);
-        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)');
+        let timeCurrent: Text = this.svgLookup.getTextElement('#time > text:nth-child(1)');
         timeCurrent.plain('' + formattedTime);
     }
 
     private setTotalNumberOfEpisodes(totalQLearningSteps: number) {
-        let episodeTotal: Text = <Text>this.svg.findOne('#episode > text:nth-child(2)');
+        let episodeTotal: Text = this.svgLookup.getTextElement('#episode > text:nth-child(2)');
         episodeTotal.plain('' + totalQLearningSteps);
     }
 
@@ -243,13 +246,13 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     private showCurrentTime(currentTime: number) {
         console.log("The new q Learnig step " + Date.now())
-        let timeCurrent: Text = <Text>this.svg.findOne('#time > text:nth-child(1)')
+        let timeCurrent: Text = this.svgLookup.getTextElement('#time > text:nth-child(1)')
         timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
     }
 
     private showCurrentEpisode(newQLearnerStep: QLearningStep) {
         console.log("Dalay ist zu Ende " + Date.now())
-        let episodeCurrent: Text = <Text>this.svg.findOne('#episode > text:nth-child(3)');
+        let episodeCurrent: Text = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
         episodeCurrent.plain('' + newQLearnerStep.stepNumber);
     }
 
@@ -260,7 +263,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
             this.nodeStartInNaviColour.addClass("node-active");
         }
 
-        this.nodeStartOnMap = <Path>this.svg.findOne('#node-' + state + ' path');
+        this.nodeStartOnMap = this.svgLookup.getPathElement('#node-' + state + ' path');
         this.nodeStartOnMap.addClass("node-active");
     }
 
@@ -270,33 +273,26 @@ export class Visualizer extends EventTarget implements ProblemSource {
     }
 
     private showCurrentStroke(duration: number, timeout: number, state: number, newState: number, qValue: number, maxQValue: number) {
-        let shapeGroupId = '#path-' + state + '-' + newState;
-        let shapes = this.svg.find(shapeGroupId + ' > path' + "," + shapeGroupId + " line");
-        if (shapes.length != 1) {
-            console.warn("shape not found or ambiguous");
-            return;
-        }
+        let path: Path = this.findPathWithID(state, newState);
 
-        let shape: Shape = <Shape>shapes[0];
-        let shapeLength: number = Utils.calcShapeLength(shape);
-        let shapeClone = shape.clone();
+        let pathLength: number = path.length();
+        let pathClone = path.clone();
 
-        shapeClone.stroke({opacity: 1});
-        shapeClone.addTo(this.svg);
-        shapeClone.addClass("shape-active")
-        shapeClone.stroke({
+        pathClone.stroke({opacity: 1});
+        pathClone.addTo(this.svg);
+        pathClone.addClass("shape-active")
+        pathClone.stroke({
             dasharray: 5 + ", " + 35,
-            dashoffset: shapeLength,
+            dashoffset: pathLength,
             linecap: "round",
         })
 
-        shapeClone.animate(duration, '>').attr("stroke-dashoffset", "0");
+        pathClone.animate(duration, '>').attr("stroke-dashoffset", "0");
 
         setTimeout(function () {
-            shapeClone.remove();
-            shape.stroke({opacity: -(1 / maxQValue) * qValue + 1});
+            pathClone.remove();
+            path.stroke({opacity: -(1 / maxQValue) * qValue + 1});
         }, timeout);
-
     }
 
     private showCurrentFinishNode(state: number, newState: number,) {
@@ -304,7 +300,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
             this.nodeFinishInNaviColour.addClass("node-active");
         }
 
-        this.nodeFinishOnMap = <Path>this.svg.findOne('#node-' + newState + ' path');
+        this.nodeFinishOnMap = this.svgLookup.getPathElement('#node-' + newState + ' path');
         this.nodeFinishOnMap.addClass("node-active");
 
         this.nodeFinishNaviBar.plain('' + newState);
@@ -314,7 +310,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private showCurrentOptimalPath(optimalPath: Array<number>) {
-        let currentOptimalPath: Text = <Text>this.svg.findOne('#navi-optimal-path > text:nth-child(2)');
+        let currentOptimalPath: Text = this.svgLookup.getTextElement('#navi-optimal-path > text:nth-child(2)');
         let result: string = optimalPath != undefined ? optimalPath.join(' - ') : 'noch nicht gefunden';
         currentOptimalPath.plain(result);
     }
@@ -355,12 +351,12 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private addEventListeners() {
-        let buttonStepInto: Element = <Element>this.svg.findOne("#navi-step-for-step-button");
-        let buttonSpeed1x: Element = <Element>this.svg.findOne('#navi-speed-normal');
-        let buttonSpeed2x: Element = <Element>this.svg.findOne('#navi-speed-2x');
-        let buttonSpeed3x: Element = <Element>this.svg.findOne('#navi-speed-3x');
-        let buttonPause: Element = <Element>this.svg.findOne("#navi-pause")
-        let buttonStop: Element = <Element>this.svg.findOne("#navi-stop")
+        let buttonStepInto: Element = this.svgLookup.getElement("#navi-step-for-step-button");
+        let buttonSpeed1x: Element = this.svgLookup.getElement('#navi-speed-normal');
+        let buttonSpeed2x: Element = this.svgLookup.getElement('#navi-speed-2x');
+        let buttonSpeed3x: Element = this.svgLookup.getElement('#navi-speed-3x');
+        let buttonPause: Element = this.svgLookup.getElement("#navi-pause");
+        let buttonStop: Element = this.svgLookup.getElement("#navi-stop");
         let that = this;
 
         buttonStepInto.click(function (e) {
@@ -428,7 +424,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         for (let actionIndex in actions) {
             let firstAction: number = actions[parseInt(actionIndex)];
             let secondAction: number = actions[parseInt(actionIndex) + 1];
-            let actionPath = Visualizer.findPathWithID(this.svg, firstAction, secondAction)
+            let actionPath = this.findPathWithID(firstAction, secondAction)
             if (secondAction !== undefined) {
                 try {
                     if (combinedPath == undefined) {
@@ -467,13 +463,11 @@ export class Visualizer extends EventTarget implements ProblemSource {
      * @param secondValue
      * @return foundPath in {@link svg} or null if not found
      */
-    static findPathWithID(svg, firstValue, secondValue): Path{
-        const linkIDPrefix = "path-";
-        var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue + " path ")
-        return <Path>foundPath;
+    private findPathWithID(firstValue, secondValue): Path{
+        let selector: string = "#path-" + firstValue + "-" + secondValue + " path "
+        var foundPath: Path = this.svgLookup.getPathElement(selector)
+        return foundPath;
     }
-
-
 
 
 }

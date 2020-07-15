@@ -123,7 +123,7 @@ export class Interpreter {
                         break;
                     }
                     case C.RUN_Q_LEARNER: {
-                        return n.runQLearner();
+                        n.runQLearner();
                     }
                     case C.Q_LEARNING_DRAW_OPTIMAL_PATH: {
                         n.drawOptimalPath();

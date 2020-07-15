@@ -99,7 +99,6 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
 
     function updateBackground(num, source) {
         imgObjectList[num] = new Image(1000, 500);
-        imgObjectList[num].src = source;
         imgObjectList[num].onload = function () {
             setTimeout(function () {
                 setBackground(num, setBackground);
@@ -107,6 +106,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
             , 100);
             //initScene();
         };
+        imgObjectList[num].src = source;
     }
 
     exports.updateBackground = updateBackground;

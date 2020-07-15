@@ -439,18 +439,28 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             return 0;
         }
         setUpQLearningBehaviour(alpha, gamma, nu, rho) {
-            this.promise = this.promise.then(r => {
-                this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
-            });
+            this.promise = this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+            // this.promise = this.promise.then(r => {
+            // 	this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+            // });
         }
         runQLearner() {
-            this.promise.then(resolve => {
-                this.qLearningAlgorithmModule.runQLearner();
-            });
-            return 0;
+            this.promise = this.qLearningAlgorithmModule.runQLearner();
+            this.setBlocking(true);
+            // 	this.promise.then( resolve => {
+            // 	this.qLearningAlgorithmModule.runQLearner();
+            // });
+            // this.promise.then(resolve => {this.setBlocking(true);} )
+            // this.setBlocking(true);
+            // .then(resolve => )
         }
         drawOptimalPath() {
-            this.qLearningAlgorithmModule.drawOptimalPath();
+            this.promise.then(resolve => {
+                this.qLearningAlgorithmModule.drawOptimalPath()
+                    .then(() => {
+                    this.setBlocking(false);
+                });
+            });
         }
         close() {
         }

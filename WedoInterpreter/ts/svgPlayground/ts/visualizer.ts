@@ -21,7 +21,9 @@ import {Svglookup} from "svglookup";
 
 
 export class Visualizer extends EventTarget implements ProblemSource {
-    private readonly svg: Svg;
+
+
+    private readonly _svg: Svg;
     private nodeStartOnMap: Element;
     private nodeFinishOnMap: Element;
     private path: Path;
@@ -38,11 +40,14 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private nodeStartNaviBar: Text;
     private rho: Text;
     private svgLookup: Svglookup;
+    private newQLearnerStepData: QLearningStep;
+    private currentOptimalPathArray: Array<number>;
+    private currentOptimalPath: Path;
 
 
     private constructor(svg: Svg) {
         super();
-        this.svg = svg;
+        this._svg = svg;
         this.nodeStartOnMap = undefined;
         this.nodeFinishOnMap = undefined;
         this.path = undefined;
@@ -57,6 +62,11 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.nodeStartNaviBar = undefined;
         this.rho = undefined;
         this.svgLookup = new Svglookup(svg);
+        this.newQLearnerStepData = undefined;
+    }
+
+    public get svg(): Svg {
+        return this._svg;
     }
 
 
@@ -94,7 +104,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
     public getActions(): Array<Action> {
         let listOfPaths: Array<Action> = new Array<Action>();
 
-        let allPaths: List<Element> = this.svg.find('g[id^="path-"]');
+        let allPaths: List<Element> = this._svg.find('g[id^="path-"]');
         allPaths.each(function (item) {
             let idName: string = item.attr("id");
             let tokens: string[] = idName.split("-");
@@ -212,9 +222,10 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     onQLearningStep(newQLearnerStepDataAndPath: {qLearnerStepData: QLearningStep, optimalPath: Array<number>}, currentTime: number, executionDuration: number) {
 
-        let newQLearnerStep = newQLearnerStepDataAndPath.qLearnerStepData;
+        this.newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
+        // this.checkAndUpdateOptimalPath(newQLearnerStepDataAndPath.optimalPath);
 
-        console.log("gotStep! " + newQLearnerStep.stepNumber);
+        console.log("gotStep! " + this.newQLearnerStepData.stepNumber);
 
 
         console.log("first measure " + Date.now())
@@ -222,19 +233,19 @@ export class Visualizer extends EventTarget implements ProblemSource {
         Visualizer.delay(0)
             .then(() => this.showCurrentTime(currentTime))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentEpisode(newQLearnerStep))
+            .then(() => this.showCurrentEpisode(this.newQLearnerStepData))
             .then(() => Visualizer.delay(0.1 * executionDuration))
-            .then(() => this.showCurrentStartNode(newQLearnerStep.state, newQLearnerStep.newState))
+            .then(() => this.showCurrentStartNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentRho(newQLearnerStep.rho))
+            .then(() => this.showCurrentRho(this.newQLearnerStepData.rho))
             .then(() => Visualizer.delay(0.1 * executionDuration))
-            .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, newQLearnerStep.state, newQLearnerStep.newState, newQLearnerStep.qValueNew, 100))
+            .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, this.newQLearnerStepData.state, this.newQLearnerStepData.newState, this.newQLearnerStepData.qValueNew, 100))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentFinishNode(newQLearnerStep.state, newQLearnerStep.newState))
+            .then(() => this.showCurrentFinishNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
             .then(() => Visualizer.delay(0.6 * executionDuration))
             .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
             .then(() => Visualizer.delay(0))
-            .then(() => this.resetAllValues(newQLearnerStep.state, newQLearnerStep.newState));
+            .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
 
     }
 
@@ -279,7 +290,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         let pathClone = path.clone();
 
         pathClone.stroke({opacity: 1});
-        pathClone.addTo(this.svg);
+        pathClone.addTo(this._svg);
         pathClone.addClass("shape-active")
         pathClone.stroke({
             dasharray: 5 + ", " + 35,
@@ -310,6 +321,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private showCurrentOptimalPath(optimalPath: Array<number>) {
+        this.checkAndUpdateOptimalPath(optimalPath);
         let currentOptimalPath: Text = this.svgLookup.getTextElement('#navi-optimal-path > text:nth-child(2)');
         let result: string = optimalPath != undefined ? optimalPath.join(' - ') : 'noch nicht gefunden';
         currentOptimalPath.plain(result);
@@ -419,19 +431,19 @@ export class Visualizer extends EventTarget implements ProblemSource {
     }
 
 
-    public drawPath(actions: Array<number>) {
+    public getCombinedPath(): Path {
         let combinedPath: Path = undefined;
-        for (let actionIndex in actions) {
-            let firstAction: number = actions[parseInt(actionIndex)];
-            let secondAction: number = actions[parseInt(actionIndex) + 1];
-            let actionPath = this.findPathWithID(firstAction, secondAction)
+        for (let actionIndex in this.currentOptimalPathArray) {
+            let firstAction: number = this.currentOptimalPathArray[parseInt(actionIndex)];
+            let secondAction: number = this.currentOptimalPathArray[parseInt(actionIndex) + 1];
             if (secondAction !== undefined) {
+            let actionPath = this.findPathWithID(firstAction, secondAction);
                 try {
                     if (combinedPath == undefined) {
-                        combinedPath = actionPath;
+                        combinedPath = actionPath.clone();
                     } else {
-                        let currentPathArray: PathArray = actionPath.array() //get array of path pieces
-                        let currentPathArrayWithoutMovetto: PathCommand[]=  currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
+                        let currentPathArray: Array<PathCommand> = actionPath.array().clone() //get array of path pieces
+                        currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
                         combinedPath.array().push(...currentPathArray)
                         combinedPath.plot(combinedPath.array());
                     }
@@ -440,20 +452,10 @@ export class Visualizer extends EventTarget implements ProblemSource {
                 }
             }
         }
-        combinedPath.addTo(this.svg);
-        combinedPath.addClass('line-follower-outside');
-        // combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round'})
-        //     .fill('none');
-
-        let combinedPathCopy: Path = combinedPath.clone();
-        combinedPathCopy.addTo(this.svg);
-        combinedPathCopy.addClass('line-follower-inside')
-        // combinedPathCopy.stroke({width: 30, color: '#000000'})
-        //     .fill('none');
-        console.log(combinedPath.array())
+        this.currentOptimalPath = combinedPath;
+        return combinedPath;
 
     }
-
 
 
     /**
@@ -461,13 +463,66 @@ export class Visualizer extends EventTarget implements ProblemSource {
      * @param svg
      * @param firstValue
      * @param secondValue
-     * @return foundPath in {@link svg} or null if not found
+     * @return foundPath in {@link _svg} or null if not found
      */
     private findPathWithID(firstValue, secondValue): Path{
         let selector: string = "#path-" + firstValue + "-" + secondValue + " path "
         var foundPath: Path = this.svgLookup.getPathElement(selector)
         return foundPath;
     }
+
+
+
+    private checkAndUpdateOptimalPath(optimalPath: Array<number>) {
+        if(this.currentOptimalPathArray == undefined || this.currentOptimalPathArray.join("-") != optimalPath.join("-")) {
+            this.currentOptimalPathArray = optimalPath;
+            this.drawCurrentOptimalPathOnMap();
+        }
+    }
+
+
+    public drawFinalOptimalPath() {
+        let combinedPath = this.getCombinedPath();
+        combinedPath.addTo(this._svg);
+        combinedPath.addClass('line-follower-outside');
+        let pathLength = combinedPath.length();
+
+        combinedPath.stroke( {
+            dasharray: pathLength + ", " + pathLength,
+            dashoffset: pathLength})
+        combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
+
+        let combinedPathCopy: Path = combinedPath.clone();
+        combinedPathCopy.addTo(this._svg);
+        combinedPathCopy.addClass('line-follower-inside');
+        combinedPathCopy.stroke( {
+            dasharray: pathLength + ", " + pathLength,
+            dashoffset: pathLength})
+        combinedPathCopy.animate(6000, '>').attr("stroke-dashoffset", "0");
+
+        console.log(combinedPath.array())
+        console.log(combinedPath.array())
+    }
+
+
+
+
+
+    private drawCurrentOptimalPathOnMap() {
+        if(this.currentOptimalPath != undefined) {
+            this.currentOptimalPath.remove();
+        }
+        let combinedPath = this.getCombinedPath()
+        combinedPath.addTo(this._svg);
+        combinedPath.addClass("current-optimal-path-on-map");
+        let pathLength = combinedPath.length();
+        combinedPath.stroke( {
+            dasharray: pathLength + ", " + pathLength,
+            dashoffset: pathLength})
+        combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
+    }
+
+
 
 
 }

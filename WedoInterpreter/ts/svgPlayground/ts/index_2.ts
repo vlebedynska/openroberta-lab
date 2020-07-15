@@ -1,4 +1,5 @@
-import {QLearningAlgorithmModule, QlearningAlgorithmParameters} from "aiReinforcementLearningModule";
+import {QLearningAlgorithmModule} from "aiReinforcementLearningModule";
+import {QlearningAlgorithmParameters} from "models";
 
 // var svg = SVG.SVG().addTo('body').size(300, 300)
 // var rect = svg.rect(100, 100).attr({ fill: '#f06' })

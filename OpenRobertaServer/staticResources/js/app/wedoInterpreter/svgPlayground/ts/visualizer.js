@@ -1,11 +1,10 @@
-define(["require", "exports", "svgdotjs", "utils"], function (require, exports, svgdotjs_1, utils_1) {
+define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (require, exports, svgdotjs_1, utils_1, svglookup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    //.size(3148 / 5, 1764 / 5).
     class Visualizer extends EventTarget {
         constructor(svg) {
             super();
-            this.svg = svg;
+            this._svg = svg;
             this.nodeStartOnMap = undefined;
             this.nodeFinishOnMap = undefined;
             this.path = undefined;
@@ -19,6 +18,11 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
             this.nodeFinishNaviBar = undefined;
             this.nodeStartNaviBar = undefined;
             this.rho = undefined;
+            this.svgLookup = new svglookup_1.Svglookup(svg);
+            this.newQLearnerStepData = undefined;
+        }
+        get svg() {
+            return this._svg;
         }
         static createVisualizer(path, htmlSelector, size) {
             let visualizerPromise = Visualizer.preload(path, htmlSelector)
@@ -49,7 +53,7 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
         }
         getActions() {
             let listOfPaths = new Array();
-            let allPaths = this.svg.find('g[id^="path-"]');
+            let allPaths = this._svg.find('g[id^="path-"]');
             allPaths.each(function (item) {
                 let idName = item.attr("id");
                 let tokens = idName.split("-");
@@ -83,7 +87,7 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
         }
         processNotAllowedActions(notAllowedActions) {
             for (let notAllowedAction of notAllowedActions) {
-                let notAllowedPath = this.svg.findOne("#path-" + notAllowedAction.startState.id + "-" + notAllowedAction.finishState.id + " path");
+                let notAllowedPath = this.findPathWithID(notAllowedAction.startState.id, notAllowedAction.finishState.id);
                 notAllowedPath.attr({
                     stroke: 'red',
                     'stroke-linecap': 'round',
@@ -117,65 +121,66 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
             this.setStartAndFinishState(this.startStateID, this.finishStateID);
             this.setTotalNumberOfEpisodes(totalQLearningSteps);
             this.setTotalTime(totalTime);
-            let setInitialEpisode = this.svg.findOne('#episode > text:nth-child(3)');
+            let setInitialEpisode = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
             setInitialEpisode.plain('');
-            this.nodeStartNaviBar = this.svg.findOne('#node-start-navi text');
+            this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
             this.nodeStartNaviBar.plain('');
-            this.rho = this.svg.findOne('#explore_exploit text');
+            this.rho = this.svgLookup.getTextElement('#explore_exploit text');
             this.rho.plain('');
-            this.nodeFinishNaviBar = this.svg.findOne('#node-finish-navi text');
+            this.nodeFinishNaviBar = this.svgLookup.getTextElement('#node-finish-navi text');
             this.nodeFinishNaviBar.plain('');
             // this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length
         }
         setStartAndFinishState(startStateID, finishStateID) {
-            this.nodeStartInNaviText = this.svg.findOne('#node-start  text');
+            this.nodeStartInNaviText = this.svgLookup.getTextElement('#node-start  text');
             this.nodeStartInNaviText.plain('' + startStateID);
-            this.nodeStartInNaviColour = this.svg.findOne('#node-start path');
-            this.nodeFinishInNaviText = this.svg.findOne('#node-finish text');
+            this.nodeStartInNaviColour = this.svgLookup.getTextElement('#node-start path');
+            this.nodeFinishInNaviText = this.svgLookup.getTextElement('#node-finish text');
             this.nodeFinishInNaviText.plain('' + finishStateID);
-            this.nodeFinishInNaviColour = this.svg.findOne('#node-finish path');
+            this.nodeFinishInNaviColour = this.svgLookup.getTextElement('#node-finish path');
         }
         setTotalTime(totalTime) {
             let formattedTime = utils_1.Utils.convertNumberToSeconds(totalTime);
-            let timeCurrent = this.svg.findOne('#time > text:nth-child(1)');
+            let timeCurrent = this.svgLookup.getTextElement('#time > text:nth-child(1)');
             timeCurrent.plain('' + formattedTime);
         }
         setTotalNumberOfEpisodes(totalQLearningSteps) {
-            let episodeTotal = this.svg.findOne('#episode > text:nth-child(2)');
+            let episodeTotal = this.svgLookup.getTextElement('#episode > text:nth-child(2)');
             episodeTotal.plain('' + totalQLearningSteps);
         }
         onQLearningStep(newQLearnerStepDataAndPath, currentTime, executionDuration) {
-            let newQLearnerStep = newQLearnerStepDataAndPath.qLearnerStepData;
-            console.log("gotStep! " + newQLearnerStep.stepNumber);
+            this.newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
+            // this.checkAndUpdateOptimalPath(newQLearnerStepDataAndPath.optimalPath);
+            console.log("gotStep! " + this.newQLearnerStepData.stepNumber);
             console.log("first measure " + Date.now());
             Visualizer.delay(0)
                 .then(() => this.showCurrentTime(currentTime))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentEpisode(newQLearnerStep))
+                .then(() => this.showCurrentEpisode(this.newQLearnerStepData))
                 .then(() => Visualizer.delay(0.1 * executionDuration))
-                .then(() => this.showCurrentStartNode(newQLearnerStep.state, newQLearnerStep.newState))
+                .then(() => this.showCurrentStartNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentRho(newQLearnerStep.rho))
+                .then(() => this.showCurrentRho(this.newQLearnerStepData.rho))
                 .then(() => Visualizer.delay(0.1 * executionDuration))
-                .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, newQLearnerStep.state, newQLearnerStep.newState, newQLearnerStep.qValueNew, 100))
+                .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, this.newQLearnerStepData.state, this.newQLearnerStepData.newState, this.newQLearnerStepData.qValueNew, 100))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentFinishNode(newQLearnerStep.state, newQLearnerStep.newState))
+                .then(() => this.showCurrentFinishNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
                 .then(() => Visualizer.delay(0.6 * executionDuration))
                 .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.resetAllValues(newQLearnerStep.state, newQLearnerStep.newState));
+                .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
         }
         static delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         showCurrentTime(currentTime) {
             console.log("The new q Learnig step " + Date.now());
-            let timeCurrent = this.svg.findOne('#time > text:nth-child(1)');
+            let timeCurrent = this.svgLookup.getTextElement('#time > text:nth-child(1)');
             timeCurrent.plain('' + utils_1.Utils.convertNumberToSeconds(currentTime));
         }
         showCurrentEpisode(newQLearnerStep) {
             console.log("Dalay ist zu Ende " + Date.now());
-            let episodeCurrent = this.svg.findOne('#episode > text:nth-child(3)');
+            let episodeCurrent = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
             episodeCurrent.plain('' + newQLearnerStep.stepNumber);
         }
         showCurrentStartNode(state, newState) {
@@ -183,46 +188,41 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
             if (state == this.startStateID || newState == this.startStateID) {
                 this.nodeStartInNaviColour.addClass("node-active");
             }
-            this.nodeStartOnMap = this.svg.findOne('#node-' + state + ' path');
+            this.nodeStartOnMap = this.svgLookup.getPathElement('#node-' + state + ' path');
             this.nodeStartOnMap.addClass("node-active");
         }
         showCurrentRho(currentRho) {
             this.rho.plain('' + currentRho);
         }
         showCurrentStroke(duration, timeout, state, newState, qValue, maxQValue) {
-            let shapeGroupId = '#path-' + state + '-' + newState;
-            let shapes = this.svg.find(shapeGroupId + ' > path' + "," + shapeGroupId + " line");
-            if (shapes.length != 1) {
-                console.warn("shape not found or ambiguous");
-                return;
-            }
-            let shape = shapes[0];
-            let shapeLength = utils_1.Utils.calcShapeLength(shape);
-            let shapeClone = shape.clone();
-            shapeClone.stroke({ opacity: 1 });
-            shapeClone.addTo(this.svg);
-            shapeClone.addClass("shape-active");
-            shapeClone.stroke({
+            let path = this.findPathWithID(state, newState);
+            let pathLength = path.length();
+            let pathClone = path.clone();
+            pathClone.stroke({ opacity: 1 });
+            pathClone.addTo(this._svg);
+            pathClone.addClass("shape-active");
+            pathClone.stroke({
                 dasharray: 5 + ", " + 35,
-                dashoffset: shapeLength,
+                dashoffset: pathLength,
                 linecap: "round",
             });
-            shapeClone.animate(duration, '>').attr("stroke-dashoffset", "0");
+            pathClone.animate(duration, '>').attr("stroke-dashoffset", "0");
             setTimeout(function () {
-                shapeClone.remove();
-                shape.stroke({ opacity: -(1 / maxQValue) * qValue + 1 });
+                pathClone.remove();
+                path.stroke({ opacity: -(1 / maxQValue) * qValue + 1 });
             }, timeout);
         }
         showCurrentFinishNode(state, newState) {
             if (state == this.finishStateID || newState == this.finishStateID) {
                 this.nodeFinishInNaviColour.addClass("node-active");
             }
-            this.nodeFinishOnMap = this.svg.findOne('#node-' + newState + ' path');
+            this.nodeFinishOnMap = this.svgLookup.getPathElement('#node-' + newState + ' path');
             this.nodeFinishOnMap.addClass("node-active");
             this.nodeFinishNaviBar.plain('' + newState);
         }
         showCurrentOptimalPath(optimalPath) {
-            let currentOptimalPath = this.svg.findOne('#navi-optimal-path > text:nth-child(2)');
+            this.checkAndUpdateOptimalPath(optimalPath);
+            let currentOptimalPath = this.svgLookup.getTextElement('#navi-optimal-path > text:nth-child(2)');
             let result = optimalPath != undefined ? optimalPath.join(' - ') : 'noch nicht gefunden';
             currentOptimalPath.plain(result);
         }
@@ -250,12 +250,12 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
             this.nodeFinishNaviBar.plain('');
         }
         addEventListeners() {
-            let buttonStepInto = this.svg.findOne("#navi-step-for-step-button");
-            let buttonSpeed1x = this.svg.findOne('#navi-speed-normal');
-            let buttonSpeed2x = this.svg.findOne('#navi-speed-2x');
-            let buttonSpeed3x = this.svg.findOne('#navi-speed-3x');
-            let buttonPause = this.svg.findOne("#navi-pause");
-            let buttonStop = this.svg.findOne("#navi-stop");
+            let buttonStepInto = this.svgLookup.getElement("#navi-step-for-step-button");
+            let buttonSpeed1x = this.svgLookup.getElement('#navi-speed-normal');
+            let buttonSpeed2x = this.svgLookup.getElement('#navi-speed-2x');
+            let buttonSpeed3x = this.svgLookup.getElement('#navi-speed-3x');
+            let buttonPause = this.svgLookup.getElement("#navi-pause");
+            let buttonStop = this.svgLookup.getElement("#navi-stop");
             let that = this;
             buttonStepInto.click(function (e) {
                 that.startPlayerForOneTick(0.1);
@@ -299,20 +299,20 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
                 detail: speed
             }));
         }
-        drawPath(actions) {
+        getCombinedPath() {
             let combinedPath = undefined;
-            for (let actionIndex in actions) {
-                let firstAction = actions[parseInt(actionIndex)];
-                let secondAction = actions[parseInt(actionIndex) + 1];
-                let actionPath = Visualizer.findPathWithID(this.svg, firstAction, secondAction);
+            for (let actionIndex in this.currentOptimalPathArray) {
+                let firstAction = this.currentOptimalPathArray[parseInt(actionIndex)];
+                let secondAction = this.currentOptimalPathArray[parseInt(actionIndex) + 1];
                 if (secondAction !== undefined) {
+                    let actionPath = this.findPathWithID(firstAction, secondAction);
                     try {
                         if (combinedPath == undefined) {
-                            combinedPath = actionPath;
+                            combinedPath = actionPath.clone();
                         }
                         else {
-                            let currentPathArray = actionPath.array(); //get array of path pieces
-                            let currentPathArrayWithoutMovetto = currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
+                            let currentPathArray = actionPath.array().clone(); //get array of path pieces
+                            currentPathArray.splice(0, 1); // cut off the first piece of path (Movetto) to seemless combination of passes
                             combinedPath.array().push(...currentPathArray);
                             combinedPath.plot(combinedPath.array());
                         }
@@ -322,28 +322,61 @@ define(["require", "exports", "svgdotjs", "utils"], function (require, exports, 
                     }
                 }
             }
-            combinedPath.addTo(this.svg);
-            combinedPath.addClass('line-follower-outside');
-            // combinedPath.stroke({width: 80, color: '#ffffff', opacity: 1, linecap: 'round', linejoin: 'round'})
-            //     .fill('none');
-            let combinedPathCopy = combinedPath.clone();
-            combinedPathCopy.addTo(this.svg);
-            combinedPathCopy.addClass('line-follower-inside');
-            // combinedPathCopy.stroke({width: 30, color: '#000000'})
-            //     .fill('none');
-            console.log(combinedPath.array());
+            this.currentOptimalPath = combinedPath;
+            return combinedPath;
         }
         /**
          *
          * @param svg
          * @param firstValue
          * @param secondValue
-         * @return foundPath in {@link svg} or null if not found
+         * @return foundPath in {@link _svg} or null if not found
          */
-        static findPathWithID(svg, firstValue, secondValue) {
-            const linkIDPrefix = "path-";
-            var foundPath = svg.findOne('#' + linkIDPrefix + firstValue + "-" + secondValue + " path ");
+        findPathWithID(firstValue, secondValue) {
+            let selector = "#path-" + firstValue + "-" + secondValue + " path ";
+            var foundPath = this.svgLookup.getPathElement(selector);
             return foundPath;
+        }
+        checkAndUpdateOptimalPath(optimalPath) {
+            if (this.currentOptimalPathArray == undefined || this.currentOptimalPathArray.join("-") != optimalPath.join("-")) {
+                this.currentOptimalPathArray = optimalPath;
+                this.drawCurrentOptimalPathOnMap();
+            }
+        }
+        drawFinalOptimalPath() {
+            let combinedPath = this.getCombinedPath();
+            combinedPath.addTo(this._svg);
+            combinedPath.addClass('line-follower-outside');
+            let pathLength = combinedPath.length();
+            combinedPath.stroke({
+                dasharray: pathLength + ", " + pathLength,
+                dashoffset: pathLength
+            });
+            combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
+            let combinedPathCopy = combinedPath.clone();
+            combinedPathCopy.addTo(this._svg);
+            combinedPathCopy.addClass('line-follower-inside');
+            combinedPathCopy.stroke({
+                dasharray: pathLength + ", " + pathLength,
+                dashoffset: pathLength
+            });
+            combinedPathCopy.animate(6000, '>').attr("stroke-dashoffset", "0");
+            console.log(combinedPath.array());
+            console.log(combinedPath.array());
+        }
+        drawCurrentOptimalPathOnMap() {
+            if (this.currentOptimalPath != undefined) {
+                this.currentOptimalPath.remove();
+            }
+            let combinedPath = this.getCombinedPath();
+            combinedPath.addTo(this._svg);
+            combinedPath.addClass("current-optimal-path-on-map");
+            let pathLength = combinedPath.length();
+            combinedPath.stroke({
+                dasharray: pathLength + ", " + pathLength,
+                dashoffset: pathLength
+            });
+            combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
         }
     }
     exports.Visualizer = Visualizer;

@@ -45,3 +45,10 @@
     fill: none;
 }
 
+.current-optimal-path-on-map {
+    stroke: palegreen;
+    stroke-width: 5;
+    stroke-linecap: round;
+    opacity: 1;
+ 
+}

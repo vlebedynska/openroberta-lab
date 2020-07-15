@@ -1,4 +1,4 @@
-define(["require", "exports", "models", "aiReinforcementLearningModule"], function (require, exports, models_1, aiReinforcementLearningModule_1) {
+define(["require", "exports", "models"], function (require, exports, models_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class QLearningAlgorithm extends EventTarget {
@@ -77,15 +77,15 @@ define(["require", "exports", "models", "aiReinforcementLearningModule"], functi
             }
         }
         getQValue(state, action) {
-            var actions = this.qMatrix[state];
+            let actions = this.qMatrix[state];
             return actions[action]; //associatedQValue
         }
         getBestAction(state, availableActions) {
-            var actionsQMatrix = this.qMatrix[state];
-            var bestActionValue = -1;
-            var bestAction;
-            for (var actionIndex in actionsQMatrix) {
-                var action = actionsQMatrix[actionIndex];
+            let actionsQMatrix = this.qMatrix[state];
+            let bestActionValue = -1;
+            let bestAction;
+            for (let actionIndex in actionsQMatrix) {
+                let action = actionsQMatrix[actionIndex];
                 if (action != undefined && availableActions.includes(parseInt(actionIndex)) && action > bestActionValue) {
                     bestActionValue = actionsQMatrix[actionIndex];
                     bestAction = parseInt(actionIndex);
@@ -97,20 +97,20 @@ define(["require", "exports", "models", "aiReinforcementLearningModule"], functi
             let actions = this.qMatrix[state];
             actions[action] = value; // === this.qMatrix[state][action] = value;
         }
-        //TODO Optimize calculating of the best path
         createOptimalPath(startState, endState, problem) {
             let optimalPath = [startState];
             let currentState = startState;
-            let resultState = aiReinforcementLearningModule_1.ResultState.SUCCESS;
+            let resultState = models_1.ResultState.SUCCESS;
             while (currentState !== endState) {
-                var nextState = this.getBestAction(currentState, problem.getAvailableActions(currentState));
-                currentState = nextState;
-                if (optimalPath.includes(currentState)) {
+                let nextState = this.getBestAction(currentState, problem.getAvailableActions(currentState));
+                if (optimalPath.includes(nextState)) {
+                    optimalPath.push(nextState);
                     console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
-                    resultState = aiReinforcementLearningModule_1.ResultState.ERROR;
+                    resultState = models_1.ResultState.ERROR;
                     break;
                 }
                 optimalPath.push(nextState);
+                currentState = nextState;
             }
             return { optimalPath, resultState };
         }
@@ -124,21 +124,22 @@ define(["require", "exports", "models", "aiReinforcementLearningModule"], functi
             }
         }
         getRandomState() {
-            var indexOfState = Math.floor(Math.random() * this.states.length);
+            let indexOfState = Math.floor(Math.random() * this.states.length);
             return this.states[indexOfState];
         }
         getAvailableActions(state) {
-            var availableActions = [];
-            var actions = this.statesAndActions[state];
-            for (let action of actions) {
-                if (action !== undefined) {
-                    availableActions.push(action);
+            let availableActions = [];
+            let actions = this.statesAndActions[state];
+            let actionIndex;
+            for (actionIndex in actions) {
+                if (actions[actionIndex] !== undefined) {
+                    availableActions.push(parseInt(actionIndex));
                 }
             }
             return availableActions;
         }
         takeAction(state, action) {
-            var actions = this.statesAndActions[state];
+            let actions = this.statesAndActions[state];
             return {
                 "reward": actions[action],
                 "newState": action
@@ -149,4 +150,27 @@ define(["require", "exports", "models", "aiReinforcementLearningModule"], functi
             return actions[action];
         }
     }
+    exports.ReinforcementProblem = ReinforcementProblem;
+    class RlUtils {
+        static generateRewardsAndProblem(allActions, startFinishState) {
+            let statesAndActions = new Array();
+            for (let action of allActions) {
+                if (statesAndActions[action.startState.id] == undefined) {
+                    statesAndActions[action.startState.id] = new Array();
+                }
+                let rewardValue = RlUtils.DEFAULT_REWARD_VALUE;
+                if (action.finishState.id == startFinishState.finishState.id) {
+                    rewardValue = this.REWARD_VALUE;
+                }
+                statesAndActions[action.startState.id][action.finishState.id] = rewardValue;
+            }
+            return statesAndActions;
+        }
+        static hideAllPathsExeptTheOptimal(svg) {
+            svg.find('.cls-customPathColor').hide();
+        }
+    }
+    exports.RlUtils = RlUtils;
+    RlUtils.REWARD_VALUE = 50;
+    RlUtils.DEFAULT_REWARD_VALUE = 0;
 });

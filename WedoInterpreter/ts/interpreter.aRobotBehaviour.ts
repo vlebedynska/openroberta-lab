@@ -68,7 +68,7 @@ export abstract class ARobotBehaviour {
     abstract extractColourChannelAndNormalize(node: any): void;
     abstract createQLearningEnvironment(obstaclesList: any, startNode: any, finishNode: any): void;
     abstract setUpQLearningBehaviour(alpha: number, gamma: number, nu: number, rho: number): void;
-    abstract runQLearner(): void;
+    abstract runQLearner();
     abstract drawOptimalPath(): void;
     abstract close(): void;
 }

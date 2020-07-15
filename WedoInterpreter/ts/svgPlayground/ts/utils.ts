@@ -1,5 +1,4 @@
-import {Obstacle} from "aiReinforcementLearningModule";
-import {Action, ProblemSource, ProblemState} from "models";
+import {Action, Obstacle, ProblemSource, ProblemState} from "models";
 import {Line, Path, Polyline, Shape} from "svgdotjs";
 
 export class Utils {

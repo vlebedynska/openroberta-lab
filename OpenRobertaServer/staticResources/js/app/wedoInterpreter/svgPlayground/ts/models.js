@@ -1,6 +1,11 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var ResultState;
+    (function (ResultState) {
+        ResultState[ResultState["SUCCESS"] = 1] = "SUCCESS";
+        ResultState[ResultState["ERROR"] = 2] = "ERROR";
+    })(ResultState = exports.ResultState || (exports.ResultState = {}));
     var Rho;
     (function (Rho) {
         Rho["EXPLOIT"] = "nutze das Wissen aus";

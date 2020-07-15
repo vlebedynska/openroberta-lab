@@ -1,5 +1,4 @@
-import {Nu, QLearningStep, Rho} from "models";
-import {OptimalPathResult, ResultState} from "aiReinforcementLearningModule";
+import {Action, Nu, OptimalPathResult, QLearningStep, ResultState, Rho} from "models";
 
 export class QLearningAlgorithm extends EventTarget {
     private readonly qValueStore: QValueStore;
@@ -88,6 +87,8 @@ export class QLearningAlgorithm extends EventTarget {
     public findOptimalPath(startState: number, finishState: number): OptimalPathResult {
         return this.qValueStore.createOptimalPath(startState, finishState, this.problem);
     }
+
+
 }
 
 
@@ -95,6 +96,12 @@ interface TakeActionResult {
     reward: number;
     newState: number;
 }
+
+
+
+
+
+
 
 class QValueStore {
     qMatrix: number[][];
@@ -111,16 +118,16 @@ class QValueStore {
     }
 
     getQValue(state:number, action:number): number {
-        var actions: number[] = this.qMatrix[state];
+        let actions: number[] = this.qMatrix[state];
         return actions[action]; //associatedQValue
     }
 
     getBestAction(state: number, availableActions: number[]): number {
-        var actionsQMatrix: number[] = this.qMatrix[state];
-        var bestActionValue: number = -1;
-        var bestAction: number;
-        for (var actionIndex in actionsQMatrix) {
-            var action: number = actionsQMatrix[actionIndex];
+        let actionsQMatrix: number[] = this.qMatrix[state];
+        let bestActionValue: number = -1;
+        let bestAction: number;
+        for (let actionIndex in actionsQMatrix) {
+            let action: number = actionsQMatrix[actionIndex];
             if (action != undefined && availableActions.includes(parseInt(actionIndex)) && action > bestActionValue) {
                 bestActionValue = actionsQMatrix[actionIndex];
                 bestAction = parseInt(actionIndex);
@@ -135,26 +142,34 @@ class QValueStore {
     }
 
 
-    //TODO Optimize calculating of the best path
+
+
     createOptimalPath(startState: number, endState: number, problem: ReinforcementProblem): OptimalPathResult {
         let optimalPath: number[] = [startState];
         let currentState: number = startState;
         let resultState: ResultState = ResultState.SUCCESS;
         while (currentState !== endState) {
-            var nextState: number = this.getBestAction(currentState, problem.getAvailableActions(currentState));
-            currentState = nextState;
-            if (optimalPath.includes(currentState)) {
+            let nextState: number = this.getBestAction(currentState, problem.getAvailableActions(currentState));
+            if (optimalPath.includes(nextState)) {
+                optimalPath.push(nextState);
                 console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
                 resultState = ResultState.ERROR;
                 break;
             }
             optimalPath.push(nextState);
+            currentState = nextState;
         }
         return {optimalPath, resultState};
     }
 }
 
-class ReinforcementProblem {
+
+
+
+
+
+
+export class ReinforcementProblem {
     statesAndActions: number[][];
     states: number[];
 
@@ -167,23 +182,24 @@ class ReinforcementProblem {
     }
 
     getRandomState(): number {
-        var indexOfState: number = Math.floor(Math.random() * this.states.length)
+        let indexOfState: number = Math.floor(Math.random() * this.states.length)
         return this.states[indexOfState];
     }
 
     getAvailableActions(state: number): number[] {
-        var availableActions: number[] = [];
-        var actions: number[] = this.statesAndActions[state];
-        for (let action of actions) {
-            if (action !== undefined) {
-                availableActions.push(action);
+        let availableActions: number[] = [];
+        let actions: number[] = this.statesAndActions[state];
+        let actionIndex: string;
+        for (actionIndex in actions) {
+            if (actions[actionIndex] !== undefined) {
+                availableActions.push(parseInt(actionIndex));
             }
         }
         return availableActions;
     }
 
     takeAction(state: number, action:number): TakeActionResult {
-        var actions: number[] = this.statesAndActions[state];
+        let actions: number[] = this.statesAndActions[state];
         return {
             "reward": actions[action],
             "newState": action
@@ -194,4 +210,38 @@ class ReinforcementProblem {
         let action: number = Math.floor(Math.random() * actions.length);
         return actions[action];
     }
+}
+
+
+
+
+
+
+
+export class RlUtils {
+
+    private static readonly REWARD_VALUE = 50;
+    private static readonly DEFAULT_REWARD_VALUE = 0;
+
+
+    static generateRewardsAndProblem(allActions: Array<Action>, startFinishState: Action): Array<Array<number>> {
+        let statesAndActions = new Array<Array<number>>();
+        for (let action of allActions) {
+            if (statesAndActions[action.startState.id] == undefined) {
+                statesAndActions[action.startState.id] = new Array<number>();
+            }
+            let rewardValue = RlUtils.DEFAULT_REWARD_VALUE;
+            if (action.finishState.id == startFinishState.finishState.id) {
+                rewardValue = this.REWARD_VALUE;
+            }
+            statesAndActions[action.startState.id][action.finishState.id] = rewardValue;
+        }
+        return statesAndActions;
+    }
+
+
+    static hideAllPathsExeptTheOptimal(svg) {
+        svg.find('.cls-customPathColor').hide();
+    }
+
 }

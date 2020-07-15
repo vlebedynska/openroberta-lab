@@ -1,9 +1,57 @@
 import {Visualizer} from "visualizer";
 import {TimerImpl} from "timerImpl";
 
+
+
+export interface QlearningAlgorithmParameters {
+    // svg: SVG.Svg;
+    startNode: number;
+    updateBackground: any;
+    finishNode: number;
+    // problem: ReinforcementProblem;
+    alpha: number;
+    gamma: number;
+    nu: number;
+    rho: number;
+    episodes: number;
+    totalTime: number;
+    obstaclesList: Array<Obstacle>;
+}
+
+
+
+
 export interface ProblemSource {
     getActions(): Array<Action>;
 }
+
+export enum ResultState {
+    SUCCESS = 1,
+    ERROR= 2
+}
+
+
+export interface OptimalPathResult {
+    optimalPath: Array<number>;
+    resultState: ResultState;
+}
+
+export interface Obstacle {
+    startNode: number;
+    finishNode: number;
+}
+
+
+
+
+
+interface TakeActionResult {
+    reward: number;
+    newState: number;
+}
+
+
+
 
 export interface Player {
     finishState: ProblemState;

@@ -47,7 +47,7 @@ export class RobotWeDoBehaviour extends ARobotBehaviour {
     public setUpQLearningBehaviour(alpha: number, gamma: number, nu: number, rho: number): void {
         throw new Error("Method not implemented.");
     }
-    public runQLearner(): void {
+    public runQLearner() {
         throw new Error("Method not implemented.");
     }
     public drawOptimalPath(): void {

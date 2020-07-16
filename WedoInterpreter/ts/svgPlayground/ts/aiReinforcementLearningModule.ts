@@ -4,6 +4,7 @@ import {Size, Visualizer} from "visualizer";
 import {Utils} from "utils";
 import {PlayerImpl} from "playerImpl";
 import {QLearningAlgorithm, ReinforcementProblem, RlUtils} from "qLearner";
+import {Svg} from "svgdotjs";
 
 
 export class QLearningAlgorithmModule {
@@ -116,17 +117,24 @@ export class QLearningAlgorithmModule {
                 //     console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
                 // }
                 // that.visualizer.drawPath(optimalPathResult.optimalPath);
-                that.visualizer.drawFinalOptimalPath();
+                that.visualizer.drawFinalOptimalPath()
+                    .then(() => {
+                        let copyOfSVG: SVG.Svg = (<Svg>that.visualizer.svg.findOne("svg")).clone();
+                        copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
+                        copyOfSVG.size(1962.26/2, 946.08/2)
+                        //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
+
+                        //copyOfSVG.viewbox(copyOfSVG.findOne('svg').attr("viewBox"));
+
+                        let learnedImageHTML = copyOfSVG.svg();
+                        let learnedImage = window.btoa(learnedImageHTML);
+                        let temp: string = 'data:image/svg+xml;base64,' + learnedImage;
+                        that.updateBackground(9, temp);
+
+                        resolve();
+                    })
 
 
-                let copyOfSVG: SVG.Svg = that.visualizer.svg.clone();
-                //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-                let learnedImageHTML = copyOfSVG.svg();
-                let learnedImage = window.btoa(learnedImageHTML);
-                let temp: string = 'data:image/svg+xml;base64,' + learnedImage;
-                that.updateBackground(9, temp);
-
-                resolve();
             })
 
         });

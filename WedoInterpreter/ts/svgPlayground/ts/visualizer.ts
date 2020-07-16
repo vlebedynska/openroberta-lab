@@ -180,7 +180,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.setTotalNumberOfEpisodes(totalQLearningSteps);
         this.setTotalTime(totalTime);
 
-        let setInitialEpisode: Text = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
+        let setInitialEpisode: Text = this.svgLookup.getTextElement('#episode_number > text');
         setInitialEpisode.plain('');
 
 
@@ -210,12 +210,12 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     private setTotalTime(totalTime: number) {
         let formattedTime: String = Utils.convertNumberToSeconds(totalTime);
-        let timeCurrent: Text = this.svgLookup.getTextElement('#time > text:nth-child(1)');
+        let timeCurrent: Text = this.svgLookup.getTextElement('#time text');
         timeCurrent.plain('' + formattedTime);
     }
 
     private setTotalNumberOfEpisodes(totalQLearningSteps: number) {
-        let episodeTotal: Text = this.svgLookup.getTextElement('#episode > text:nth-child(2)');
+        let episodeTotal: Text = this.svgLookup.getTextElement('#totalEpisodes > text');
         episodeTotal.plain('' + totalQLearningSteps);
     }
 
@@ -245,6 +245,8 @@ export class Visualizer extends EventTarget implements ProblemSource {
             .then(() => Visualizer.delay(0.6 * executionDuration))
             .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
             .then(() => Visualizer.delay(0))
+            .then(() => this.showCurrentQValue(this.newQLearnerStepData.qValueNew, 4))
+            .then(() => Visualizer.delay(0))
             .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
 
     }
@@ -257,13 +259,13 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     private showCurrentTime(currentTime: number) {
         console.log("The new q Learnig step " + Date.now())
-        let timeCurrent: Text = this.svgLookup.getTextElement('#time > text:nth-child(1)')
+        let timeCurrent: Text = this.svgLookup.getTextElement('#time > text')
         timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
     }
 
     private showCurrentEpisode(newQLearnerStep: QLearningStep) {
         console.log("Dalay ist zu Ende " + Date.now())
-        let episodeCurrent: Text = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
+        let episodeCurrent: Text = this.svgLookup.getTextElement('#episode_number > text');
         episodeCurrent.plain('' + newQLearnerStep.stepNumber);
     }
 
@@ -280,6 +282,14 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private showCurrentRho(currentRho: string) {
+        let rhoActiveRect = this.svgLookup.getPathElement('#explore_exlploit_rect');
+        if (currentRho == "erkunde") {
+            rhoActiveRect.removeClass("rho-exploit-active")
+            rhoActiveRect.addClass("rho-explore-active");
+        } else {
+            rhoActiveRect.removeClass("rho-explore-active");
+            rhoActiveRect.addClass("rho-exploit-active")
+        }
         this.rho.plain('' + currentRho);
     }
 
@@ -318,7 +328,11 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     }
 
-
+    private showCurrentQValue(qValue: number, stars: number) {
+        let currentQValue: Text = this.svgLookup.getTextElement("#qvalue");
+        let currentStar: Path = this.svgLookup.getPathElement("#star" + stars).attr({fill: '#f06'});
+        currentQValue.plain('' + Math.round(qValue));
+    }
 
     private showCurrentOptimalPath(optimalPath: Array<number>) {
         this.checkAndUpdateOptimalPath(optimalPath);
@@ -481,10 +495,18 @@ export class Visualizer extends EventTarget implements ProblemSource {
     }
 
 
-    public drawFinalOptimalPath() {
+    public drawFinalOptimalPath(): Promise<void> {
         let combinedPath = this.getCombinedPath();
-        combinedPath.addTo(this._svg);
-        combinedPath.addClass('line-follower-outside');
+        combinedPath.addTo(this._svg.findOne('svg'));
+        combinedPath.attr({
+            stroke: '#ffffff',
+            'stroke-width': 80,
+            'stroke-opacity': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            fill: 'none'
+        })
+
         let pathLength = combinedPath.length();
 
         combinedPath.stroke( {
@@ -493,8 +515,15 @@ export class Visualizer extends EventTarget implements ProblemSource {
         combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
 
         let combinedPathCopy: Path = combinedPath.clone();
-        combinedPathCopy.addTo(this._svg);
-        combinedPathCopy.addClass('line-follower-inside');
+        combinedPathCopy.addTo(this._svg.findOne('svg'));
+        combinedPathCopy.attr({
+            stroke: '#000000',
+            'stroke-width': 30,
+            'stroke-opacity': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            fill: 'none'
+        });
         combinedPathCopy.stroke( {
             dasharray: pathLength + ", " + pathLength,
             dashoffset: pathLength})
@@ -502,6 +531,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
         console.log(combinedPath.array())
         console.log(combinedPath.array())
+        return new Promise(res => setTimeout(res, 7000));
     }
 
 

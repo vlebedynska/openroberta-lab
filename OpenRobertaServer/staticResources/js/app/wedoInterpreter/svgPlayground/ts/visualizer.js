@@ -121,7 +121,7 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.setStartAndFinishState(this.startStateID, this.finishStateID);
             this.setTotalNumberOfEpisodes(totalQLearningSteps);
             this.setTotalTime(totalTime);
-            let setInitialEpisode = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
+            let setInitialEpisode = this.svgLookup.getTextElement('#episode_number > text');
             setInitialEpisode.plain('');
             this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
             this.nodeStartNaviBar.plain('');
@@ -141,11 +141,11 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
         }
         setTotalTime(totalTime) {
             let formattedTime = utils_1.Utils.convertNumberToSeconds(totalTime);
-            let timeCurrent = this.svgLookup.getTextElement('#time > text:nth-child(1)');
+            let timeCurrent = this.svgLookup.getTextElement('#time text');
             timeCurrent.plain('' + formattedTime);
         }
         setTotalNumberOfEpisodes(totalQLearningSteps) {
-            let episodeTotal = this.svgLookup.getTextElement('#episode > text:nth-child(2)');
+            let episodeTotal = this.svgLookup.getTextElement('#totalEpisodes > text');
             episodeTotal.plain('' + totalQLearningSteps);
         }
         onQLearningStep(newQLearnerStepDataAndPath, currentTime, executionDuration) {
@@ -168,6 +168,8 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
                 .then(() => Visualizer.delay(0.6 * executionDuration))
                 .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
                 .then(() => Visualizer.delay(0))
+                .then(() => this.showCurrentQValue(this.newQLearnerStepData.qValueNew, 4))
+                .then(() => Visualizer.delay(0))
                 .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
         }
         static delay(ms) {
@@ -175,12 +177,12 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
         }
         showCurrentTime(currentTime) {
             console.log("The new q Learnig step " + Date.now());
-            let timeCurrent = this.svgLookup.getTextElement('#time > text:nth-child(1)');
+            let timeCurrent = this.svgLookup.getTextElement('#time > text');
             timeCurrent.plain('' + utils_1.Utils.convertNumberToSeconds(currentTime));
         }
         showCurrentEpisode(newQLearnerStep) {
             console.log("Dalay ist zu Ende " + Date.now());
-            let episodeCurrent = this.svgLookup.getTextElement('#episode > text:nth-child(3)');
+            let episodeCurrent = this.svgLookup.getTextElement('#episode_number > text');
             episodeCurrent.plain('' + newQLearnerStep.stepNumber);
         }
         showCurrentStartNode(state, newState) {
@@ -192,6 +194,15 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.nodeStartOnMap.addClass("node-active");
         }
         showCurrentRho(currentRho) {
+            let rhoActiveRect = this.svgLookup.getPathElement('#explore_exlploit_rect');
+            if (currentRho == "erkunde") {
+                rhoActiveRect.removeClass("rho-exploit-active");
+                rhoActiveRect.addClass("rho-explore-active");
+            }
+            else {
+                rhoActiveRect.removeClass("rho-explore-active");
+                rhoActiveRect.addClass("rho-exploit-active");
+            }
             this.rho.plain('' + currentRho);
         }
         showCurrentStroke(duration, timeout, state, newState, qValue, maxQValue) {
@@ -219,6 +230,11 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.nodeFinishOnMap = this.svgLookup.getPathElement('#node-' + newState + ' path');
             this.nodeFinishOnMap.addClass("node-active");
             this.nodeFinishNaviBar.plain('' + newState);
+        }
+        showCurrentQValue(qValue, stars) {
+            let currentQValue = this.svgLookup.getTextElement("#qvalue");
+            let currentStar = this.svgLookup.getPathElement("#star" + stars).attr({ fill: '#f06' });
+            currentQValue.plain('' + Math.round(qValue));
         }
         showCurrentOptimalPath(optimalPath) {
             this.checkAndUpdateOptimalPath(optimalPath);
@@ -345,8 +361,15 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
         }
         drawFinalOptimalPath() {
             let combinedPath = this.getCombinedPath();
-            combinedPath.addTo(this._svg);
-            combinedPath.addClass('line-follower-outside');
+            combinedPath.addTo(this._svg.findOne('svg'));
+            combinedPath.attr({
+                stroke: '#ffffff',
+                'stroke-width': 80,
+                'stroke-opacity': 1,
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                fill: 'none'
+            });
             let pathLength = combinedPath.length();
             combinedPath.stroke({
                 dasharray: pathLength + ", " + pathLength,
@@ -354,8 +377,15 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             });
             combinedPath.animate(6000, '>').attr("stroke-dashoffset", "0");
             let combinedPathCopy = combinedPath.clone();
-            combinedPathCopy.addTo(this._svg);
-            combinedPathCopy.addClass('line-follower-inside');
+            combinedPathCopy.addTo(this._svg.findOne('svg'));
+            combinedPathCopy.attr({
+                stroke: '#000000',
+                'stroke-width': 30,
+                'stroke-opacity': 1,
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                fill: 'none'
+            });
             combinedPathCopy.stroke({
                 dasharray: pathLength + ", " + pathLength,
                 dashoffset: pathLength
@@ -363,6 +393,7 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             combinedPathCopy.animate(6000, '>').attr("stroke-dashoffset", "0");
             console.log(combinedPath.array());
             console.log(combinedPath.array());
+            return new Promise(res => setTimeout(res, 7000));
         }
         drawCurrentOptimalPathOnMap() {
             if (this.currentOptimalPath != undefined) {

@@ -6,7 +6,7 @@ define(["require", "exports", "aiReinforcementLearningModule"], function (requir
     var updateBackground = function () {
         console.log("Hallo");
     };
-    var qLearningAlgorithmModule = new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/PopUPDesign_Minimal_2.svg");
+    var qLearningAlgorithmModule = new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/Eisenbahn_Design_End.svg");
     let qLearningParams = {
         alpha: 0.5,
         episodes: 150,

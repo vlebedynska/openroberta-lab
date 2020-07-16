@@ -98,15 +98,50 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
     var currentBackground = 2;
 
     function updateBackground(num, source) {
-        imgObjectList[num] = new Image(1000, 500);
+        imgObjectList[num] = new Image();
+        let img = imgObjectList[num];
         imgObjectList[num].onload = function () {
-            setTimeout(function () {
-                setBackground(num, setBackground);
+            var canvas = document.createElement("canvas");
+            var scaleX = 1;
+            var scaleY = 1;
+            // - 20 because of the border pattern which is 10 pixels wide on both sides
+            if (img.width > C.MAX_WIDTH - 20) {
+                scaleX = (C.MAX_WIDTH - 20) / img.width;
             }
-            , 100);
+            if (img.height > C.MAX_HEIGHT - 20) {
+                scaleY = (C.MAX_HEIGHT - 20) / img.height;
+            }
+            var scale = Math.min(scaleX, scaleY);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            var ctx = canvas.getContext("2d");
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0);
+            var dataURL = canvas.toDataURL("image/png");
+            var image = new Image(canvas.width, canvas.height);
+            image.src = dataURL;
+            image.onload = function() {
+                if (customBackgroundLoaded) {
+                    // replace previous image
+                    imgObjectList[num] = image;
+                } else {
+                    imgObjectList[num] = image;
+                }
+                setBackground(num, setBackground);
+                // initScene();
+            }
+
+
+        // setBackground(num, setBackground);
+
+
             //initScene();
         };
         imgObjectList[num].src = source;
+
+
+
+        // imgObjectList[num].src = source;
     }
 
     exports.updateBackground = updateBackground;

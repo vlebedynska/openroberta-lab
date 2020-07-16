@@ -13,7 +13,7 @@ var qLearningAlgorithmModule: QLearningAlgorithmModule =
         updateBackground,
         "#qLearningBackgroundArea",
         {width: 629, height: 352},
-        "../public/PopUPDesign_Minimal_2.svg"
+        "../public/Eisenbahn_Design_End.svg"
     );
 
 
@@ -54,5 +54,7 @@ createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startN
     setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
     runQLearner();
     drawOptimalPath();
+
+
 });
 

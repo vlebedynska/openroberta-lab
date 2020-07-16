@@ -23,7 +23,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 				updateBackground,
 				"#qLearningBackgroundArea",
 				{width: 800, height: 800},
-				"/js/app/simulation/simBackgrounds/PopUPDesign_Minimal_2.svg"
+				"/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
 			);
 
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
@@ -529,13 +529,12 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	}
 
 	drawOptimalPath() {
-		this.promise.then(resolve => {
-			this.qLearningAlgorithmModule.drawOptimalPath()
-				.then(() => {
-					this.setBlocking(false);
-				}
-				);
-	})}
+		this.promise
+			.then(resolve => this.qLearningAlgorithmModule.drawOptimalPath())
+			.then(() => {
+				this.setBlocking(false);
+			})
+	}
 
 	public close() {
 	}

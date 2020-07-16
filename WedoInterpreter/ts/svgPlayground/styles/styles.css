@@ -18,35 +18,32 @@
 
 .shape-active {
     stroke: gold;
+    stroke-width: 17;
 }
 
 .path-active {
     stroke: red;
 }
 
+.rho-exploit-active {
+    fill: aquamarine;
+}
+
+.rho-explore-active {
+    fill: coral;
+}
+
+.rho-star-active {
+    fill: aquamarine;
+}
+
 .line-path-inactive {
     stroke: url(#Ripple_Viktoriya-0);
 }
 
-.line-follower-outside {
-    stroke-width: 80;
-    stroke: #ffffff;
-    stroke-opacity: 1;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-}
-
-.line-follower-inside {
-    stroke:  #000000;
-    stroke-width: 30;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-}
 
 .current-optimal-path-on-map {
-    stroke: palegreen;
+    stroke: royalblue;
     stroke-width: 5;
     stroke-linecap: round;
     opacity: 1;

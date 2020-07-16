@@ -11,7 +11,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.neuralNetworkModule = null;
             this.updateBackground = updateBackground;
             this.qLearningAlgorithmModule =
-                new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/PopUPDesign_Minimal_2.svg");
+                new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg");
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             this.promise = undefined;
             U.loggingEnabled(false, false);
@@ -455,11 +455,10 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             // .then(resolve => )
         }
         drawOptimalPath() {
-            this.promise.then(resolve => {
-                this.qLearningAlgorithmModule.drawOptimalPath()
-                    .then(() => {
-                    this.setBlocking(false);
-                });
+            this.promise
+                .then(resolve => this.qLearningAlgorithmModule.drawOptimalPath())
+                .then(() => {
+                this.setBlocking(false);
             });
         }
         close() {

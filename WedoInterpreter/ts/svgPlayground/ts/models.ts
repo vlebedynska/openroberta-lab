@@ -86,6 +86,7 @@ export interface QLearningStep {
     readonly newState: number;
     readonly duration: number;
     readonly stepNumber: number;
+    readonly highestQValue: number;
 }
 
 export enum Rho {
@@ -129,8 +130,15 @@ export interface Clock {
     time: number;
 }
 
+export interface qValue {
+    state: number,
+    newState: number;
+    stars: number
+}
+
 export enum RunningState {
     PAUSE,
     STOP,
     PLAY
 }
+

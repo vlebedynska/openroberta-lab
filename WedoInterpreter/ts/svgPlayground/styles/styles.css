@@ -24,17 +24,21 @@
 .path-active {
     stroke: red;
 }
-
-.rho-exploit-active {
-    fill: aquamarine;
+.rho {
+    opacity: 40%
 }
 
-.rho-explore-active {
-    fill: coral;
+.rho.rho-active {
+    fill: #7ccaff;
+    opacity: 50%;
+}
+
+.rho.rho-text-active {
+    opacity: 100%;
 }
 
 .rho-star-active {
-    fill: aquamarine;
+    fill: #7fffd4;
 }
 
 .line-path-inactive {
@@ -48,4 +52,24 @@
     stroke-linecap: round;
     opacity: 1;
  
+}
+
+.newStar {
+    fill: coral;
+}
+
+.oldStar {
+    fill: darkgray;
+    stroke: dimgray;
+}
+
+
+.newStar.oldStar {
+    fill: coral;
+    stroke-width: 3;
+    stroke: dimgray;
+}
+
+.star {
+    fill: darkgray;
 }

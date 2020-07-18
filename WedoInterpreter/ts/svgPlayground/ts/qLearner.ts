@@ -56,7 +56,6 @@ export class QLearningAlgorithm extends EventTarget {
         let newStateActions: Array<number> = this.problem.getAvailableActions(newState);
         let maxQ: number = this.qValueStore.getQValue(newState, this.qValueStore.getBestAction(newState, newStateActions));
         qValueNew = (1 - this.alpha) * qValueOld + this.alpha * (reward + this.gamma * maxQ);
-
         this.qValueStore.storeQValue(this.state, action, qValueNew);
         console.log(this.qValueStore)
         console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
@@ -71,7 +70,8 @@ export class QLearningAlgorithm extends EventTarget {
             rho: rho,
             state: state,
             duration: duration,
-            stepNumber: this.stepNumber
+            stepNumber: this.stepNumber,
+            highestQValue: this.qValueStore.highestQValue
         }
 
         this.dispatchEvent(new CustomEvent<QLearningStep>("stepCompleted", {
@@ -104,7 +104,9 @@ interface TakeActionResult {
 
 
 class QValueStore {
+
     qMatrix: number[][];
+    private _highestQValue: number = 0;
 
     constructor(statesAndActions: number[][]) {
         this.qMatrix = [];
@@ -138,10 +140,16 @@ class QValueStore {
 
     storeQValue(state: number, action: number, value: number) {
         let actions: number[] = this.qMatrix[state];
-        actions[action] = value; // === this.qMatrix[state][action] = value;
+        actions[action] = value;// === this.qMatrix[state][action] = value;
+        this.updateHighestQValue(value);
     }
 
 
+    updateHighestQValue(qValue: number){
+        if (qValue > this._highestQValue) {
+            this._highestQValue = qValue;
+        }
+    }
 
 
     createOptimalPath(startState: number, endState: number, problem: ReinforcementProblem): OptimalPathResult {
@@ -160,6 +168,11 @@ class QValueStore {
             currentState = nextState;
         }
         return {optimalPath, resultState};
+    }
+
+
+    get highestQValue(): number {
+        return this._highestQValue;
     }
 }
 

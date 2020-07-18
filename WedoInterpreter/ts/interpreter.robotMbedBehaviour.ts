@@ -22,6 +22,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 			new QLearningAlgorithmModule(
 				updateBackground,
 				"#qLearningBackgroundArea",
+				"#simConfigRLQLearningModal",
 				{width: 800, height: 800},
 				"/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
 			);

@@ -19,6 +19,7 @@ export class QLearningAlgorithmModule {
     rho: number;
     episodes: number;
     htmlSelector: string;
+    popupSelector: string;
     size: Size;
     pathToSvg: string;
     totalTime: number;
@@ -29,9 +30,10 @@ export class QLearningAlgorithmModule {
     private _drawOptimalPathResult: boolean;
 
 
-    constructor(updateBackground, htmlSelector: string, size: Size, pathToSvg: string) {
+    constructor(updateBackground, htmlSelector: string,popupSelector: string, size: Size, pathToSvg: string) {
         this.updateBackground = updateBackground;
         this.htmlSelector = htmlSelector;
+        this.popupSelector = popupSelector;
         this.size = size;
         this.pathToSvg = pathToSvg;
         this.problem = undefined;
@@ -41,6 +43,7 @@ export class QLearningAlgorithmModule {
         this.player = undefined;
         this.qLearner = undefined;
         this._drawOptimalPathResult = undefined;
+        this.addEventListenerToRLPopup();
     }
 
 
@@ -85,46 +88,23 @@ export class QLearningAlgorithmModule {
         }
         this.player = new PlayerImpl(qLearningSteps, this.totalTime, this.episodes, this.startFinishStates);
         this.player.initialize(this.visualizer);
+
     }
 
 
 
     async drawOptimalPath() {
         let that = this;
-            // this.player.timer.addEventListener("stop", function () {
-            //     // let optimalPathResult: OptimalPathResult = that.qLearner.findOptimalPath(that.startFinishStates.startState.id, that.startFinishStates.finishState.id);
-            //     // if (optimalPathResult.resultState == ResultState.ERROR) {
-            //     //     console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
-            //     // }
-            //     // that.visualizer.drawPath(optimalPathResult.optimalPath);
-            //     that.visualizer.drawFinalOptimalPath();
-            //
-            //
-            //     let copyOfSVG: SVG.Svg = that.visualizer.svg.clone();
-            //     //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-            //     let learnedImageHTML = copyOfSVG.svg();
-            //     let learnedImage = window.btoa(learnedImageHTML);
-            //     let temp: string = 'data:image/svg+xml;base64,' + learnedImage;
-            //     that.updateBackground(9, temp);
-            // })
-
 
 
         let promise = new Promise<void>(function (resolve) {
             that.player.timer.addEventListener("stop", function () {
-                // let optimalPathResult: OptimalPathResult = that.qLearner.findOptimalPath(that.startFinishStates.startState.id, that.startFinishStates.finishState.id);
-                // if (optimalPathResult.resultState == ResultState.ERROR) {
-                //     console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
-                // }
-                // that.visualizer.drawPath(optimalPathResult.optimalPath);
                 that.visualizer.drawFinalOptimalPath()
                     .then(() => {
                         let copyOfSVG: SVG.Svg = (<Svg>that.visualizer.svg.findOne("svg")).clone();
                         copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
                         copyOfSVG.size(1962.26/2, 946.08/2)
                         //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-
-                        //copyOfSVG.viewbox(copyOfSVG.findOne('svg').attr("viewBox"));
 
                         let learnedImageHTML = copyOfSVG.svg();
                         let learnedImage = window.btoa(learnedImageHTML);
@@ -146,6 +126,9 @@ export class QLearningAlgorithmModule {
     }
 
 
+    private addEventListenerToRLPopup() {
+        // document.querySelector(this.popupSelector).innerHTML ?;
+    }
 
     get drawOptimalPathResult(): boolean {
         return this._drawOptimalPathResult;

@@ -18,6 +18,7 @@ import {Action, Player, ProblemState, QLearningStep} from "models";
 import {Utils} from "utils";
 import {ProblemSource} from "models";
 import {Svglookup} from "svglookup";
+import {qValueLookup} from "qValueLookup";
 
 
 export class Visualizer extends EventTarget implements ProblemSource {
@@ -34,8 +35,8 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private finishStateID: number;
     private nodeStartInNaviText: Text;
     private nodeFinishInNaviText: Text;
-    private nodeStartInNaviColour: Text;
-    private nodeFinishInNaviColour: Text;
+    private nodeStartInNaviColour: Path;
+    private nodeFinishInNaviColour: Path;
     private nodeFinishNaviBar: Text;
     private nodeStartNaviBar: Text;
     private rho: Text;
@@ -43,6 +44,12 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private newQLearnerStepData: QLearningStep;
     private currentOptimalPathArray: Array<number>;
     private currentOptimalPath: Path;
+    private clupperHead: Element;
+    private qValueLookup: qValueLookup;
+    private rhoActiveRectExplore: Path;
+    private rhoActiveRectExploit: Path;
+    private rhoActiveTextExplore: Text;
+    private rhoActiveTextExploit: Text;
 
 
     private constructor(svg: Svg) {
@@ -60,9 +67,9 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.nodeFinishInNaviText = undefined;
         this.nodeFinishNaviBar = undefined;
         this.nodeStartNaviBar = undefined;
-        this.rho = undefined;
         this.svgLookup = new Svglookup(svg);
         this.newQLearnerStepData = undefined;
+        this.qValueLookup = new qValueLookup(5);
     }
 
     public get svg(): Svg {
@@ -184,11 +191,19 @@ export class Visualizer extends EventTarget implements ProblemSource {
         setInitialEpisode.plain('');
 
 
+        this.rhoActiveRectExplore = this.svgLookup.getPathElement('#explore_rect > rect');
+        this.rhoActiveRectExploit = this.svgLookup.getPathElement('#exploit_rect > rect');
+        this.rhoActiveTextExplore = this.svgLookup.getTextElement("#explore_text");
+        this.rhoActiveTextExploit = this.svgLookup.getTextElement("#exploit_text");
+
+        this.rhoActiveRectExplore.addClass("rho");
+        this.rhoActiveRectExploit.addClass("rho");
+        this.rhoActiveTextExplore.addClass("rho");
+        this.rhoActiveTextExploit.addClass("rho");
+
+
         this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
         this.nodeStartNaviBar.plain('');
-
-        this.rho = this.svgLookup.getTextElement('#explore_exploit text');
-        this.rho.plain('');
 
         this.nodeFinishNaviBar = this.svgLookup.getTextElement('#node-finish-navi text');
         this.nodeFinishNaviBar.plain('');
@@ -201,11 +216,11 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private setStartAndFinishState(startStateID: number, finishStateID: number) {
         this.nodeStartInNaviText = this.svgLookup.getTextElement('#node-start  text');
         this.nodeStartInNaviText.plain('' + startStateID);
-        this.nodeStartInNaviColour = this.svgLookup.getTextElement('#node-start path');
+        this.nodeStartInNaviColour = this.svgLookup.getPathElement('#node-start path');
 
         this.nodeFinishInNaviText = this.svgLookup.getTextElement('#node-finish text');
         this.nodeFinishInNaviText.plain('' + finishStateID);
-        this.nodeFinishInNaviColour = this.svgLookup.getTextElement('#node-finish path');
+        this.nodeFinishInNaviColour = this.svgLookup.getPathElement('#node-finish path');
     }
 
     private setTotalTime(totalTime: number) {
@@ -222,32 +237,31 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     onQLearningStep(newQLearnerStepDataAndPath: {qLearnerStepData: QLearningStep, optimalPath: Array<number>}, currentTime: number, executionDuration: number) {
 
-        this.newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
+        let newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
         // this.checkAndUpdateOptimalPath(newQLearnerStepDataAndPath.optimalPath);
 
-        console.log("gotStep! " + this.newQLearnerStepData.stepNumber);
+        console.log("gotStep! " + newQLearnerStepData.stepNumber);
 
 
         console.log("first measure " + Date.now())
 
         Visualizer.delay(0)
             .then(() => this.showCurrentTime(currentTime))
-            .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentEpisode(this.newQLearnerStepData))
+            .then(() => Visualizer.delay(0.3 * executionDuration))
+            .then(() => this.showCurrentEpisode(newQLearnerStepData))
             .then(() => Visualizer.delay(0.1 * executionDuration))
-            .then(() => this.showCurrentStartNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
+            .then(() => this.showCurrentStartNode(newQLearnerStepData.state, newQLearnerStepData.newState))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentRho(this.newQLearnerStepData.rho))
+            .then(() => this.showCurrentRho(newQLearnerStepData.rho))
             .then(() => Visualizer.delay(0.1 * executionDuration))
-            .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, this.newQLearnerStepData.state, this.newQLearnerStepData.newState, this.newQLearnerStepData.qValueNew, 100))
+            .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, newQLearnerStepData.state, newQLearnerStepData.newState, newQLearnerStepData.qValueNew, 100))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentFinishNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
+            .then(() => this.showCurrentFinishNode(newQLearnerStepData.state, newQLearnerStepData.newState))
+            .then(() => this.showCurrentQValue(newQLearnerStepData.state, newQLearnerStepData.newState, newQLearnerStepData.qValueNew, newQLearnerStepData.highestQValue))
             .then(() => Visualizer.delay(0.6 * executionDuration))
             .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
             .then(() => Visualizer.delay(0))
-            .then(() => this.showCurrentQValue(this.newQLearnerStepData.qValueNew, 4))
-            .then(() => Visualizer.delay(0))
-            .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
+            .then(() => this.resetAllValues(newQLearnerStepData.state, newQLearnerStepData.newState));
 
     }
 
@@ -260,6 +274,9 @@ export class Visualizer extends EventTarget implements ProblemSource {
     private showCurrentTime(currentTime: number) {
         console.log("The new q Learnig step " + Date.now())
         let timeCurrent: Text = this.svgLookup.getTextElement('#time > text')
+        let clockHand: Path = this.svgLookup.getPathElement('#clockhand');
+        clockHand.rotate(-360/60, clockHand.attr("x2"), clockHand.attr("y2"))
+
         timeCurrent.plain('' + Utils.convertNumberToSeconds(currentTime));
     }
 
@@ -282,15 +299,14 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private showCurrentRho(currentRho: string) {
-        let rhoActiveRect = this.svgLookup.getPathElement('#explore_exlploit_rect');
+
         if (currentRho == "erkunde") {
-            rhoActiveRect.removeClass("rho-exploit-active")
-            rhoActiveRect.addClass("rho-explore-active");
+            this.rhoActiveRectExplore.addClass("rho-active");
+            this.rhoActiveTextExplore.addClass("rho-text-active");
         } else {
-            rhoActiveRect.removeClass("rho-explore-active");
-            rhoActiveRect.addClass("rho-exploit-active")
+            this.rhoActiveRectExploit.addClass("rho-active")
+            this.rhoActiveTextExploit.addClass("rho-text-active");
         }
-        this.rho.plain('' + currentRho);
     }
 
     private showCurrentStroke(duration: number, timeout: number, state: number, newState: number, qValue: number, maxQValue: number) {
@@ -328,10 +344,26 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     }
 
-    private showCurrentQValue(qValue: number, stars: number) {
+    private showCurrentQValue(state: number, newState: number, qValue: number, highestQValue: number) {
         let currentQValue: Text = this.svgLookup.getTextElement("#qvalue");
-        let currentStar: Path = this.svgLookup.getPathElement("#star" + stars).attr({fill: '#f06'});
         currentQValue.plain('' + Math.round(qValue));
+
+        let OldNumberOfStars: number = this.qValueLookup.getOldNumberOfStars(state, newState);
+        for (let i = 1; i <= OldNumberOfStars; i++) {
+            let oldStar = this.svgLookup.getPathElement('#star' + i);
+            oldStar.removeClass("star");
+            oldStar.addClass("oldStar");
+        }
+
+        let NewNumberOfStars: number = this.qValueLookup.getNewNumberOfStars(state, newState, qValue, highestQValue);
+        for (let i = 1; i <= NewNumberOfStars; i++) {
+            let newStar = this.svgLookup.getPathElement('#star' + i)
+            newStar.removeClass("star");
+            newStar.addClass("newStar")
+        }
+
+
+        // let currentStar: Path = this.svgLookup.getPathElement("#star" + ).attr({fill: '#f06'});
     }
 
     private showCurrentOptimalPath(optimalPath: Array<number>) {
@@ -346,6 +378,17 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
     private resetAllValues(state: number, newState: number) {
+
+        for (let i =  1; i<=5; i++) {
+            let star = this.svgLookup.getPathElement('#star' + i)
+            star.removeClass("newStar").removeClass("oldStar").addClass("star");
+        }
+
+        this.rhoActiveRectExplore.removeClass("rho-active");
+        this.rhoActiveRectExploit.removeClass("rho-active");
+        this.rhoActiveTextExploit.removeClass("rho-text-active")
+        this.rhoActiveTextExplore.removeClass("rho-text-active")
+
         if (this.nodeStartOnMap) {
             this.nodeStartOnMap.removeClass("node-active").addClass("node-visited")
         }
@@ -371,8 +414,9 @@ export class Visualizer extends EventTarget implements ProblemSource {
         }
 
         this.nodeStartNaviBar.plain('');
-        this.rho.plain('');
         this.nodeFinishNaviBar.plain('');
+
+
     }
 
 

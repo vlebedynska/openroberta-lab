@@ -6,18 +6,18 @@ define(["require", "exports", "aiReinforcementLearningModule"], function (requir
     var updateBackground = function () {
         console.log("Hallo");
     };
-    var qLearningAlgorithmModule = new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 629, height: 352 }, "../public/Eisenbahn_Design_End.svg");
+    var qLearningAlgorithmModule = new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", "#simConfigRLQLearningModal", { width: 629, height: 352 }, "../public/Eisenbahn_Design_End.svg");
     let qLearningParams = {
         alpha: 0.5,
         episodes: 150,
-        finishNode: 6,
+        finishNode: 4,
         gamma: 0.8,
         nu: 0.9,
         rho: 0.5,
         startNode: 0,
         totalTime: 500,
         updateBackground: updateBackground,
-        obstaclesList: []
+        obstaclesList: [{ startNode: 1, finishNode: 2 }]
         // {startNode: 1, finishNode:2}
         // [{startState: {id:1}, finishState: {id:2}}]
     };

@@ -1,4 +1,4 @@
-define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (require, exports, svgdotjs_1, utils_1, svglookup_1) {
+define(["require", "exports", "svgdotjs", "utils", "svglookup", "qValueLookup"], function (require, exports, svgdotjs_1, utils_1, svglookup_1, qValueLookup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Visualizer extends EventTarget {
@@ -17,9 +17,9 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.nodeFinishInNaviText = undefined;
             this.nodeFinishNaviBar = undefined;
             this.nodeStartNaviBar = undefined;
-            this.rho = undefined;
             this.svgLookup = new svglookup_1.Svglookup(svg);
             this.newQLearnerStepData = undefined;
+            this.qValueLookup = new qValueLookup_1.qValueLookup(5);
         }
         get svg() {
             return this._svg;
@@ -122,22 +122,28 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.setTotalNumberOfEpisodes(totalQLearningSteps);
             this.setTotalTime(totalTime);
             let setInitialEpisode = this.svgLookup.getTextElement('#episode_number > text');
-            setInitialEpisode.plain('');
+            setInitialEpisode.plain('0');
+            this.rhoActiveRectExplore = this.svgLookup.getPathElement('#explore_rect > rect');
+            this.rhoActiveRectExploit = this.svgLookup.getPathElement('#exploit_rect > rect');
+            this.rhoActiveTextExplore = this.svgLookup.getTextElement("#explore_text");
+            this.rhoActiveTextExploit = this.svgLookup.getTextElement("#exploit_text");
+            this.rhoActiveRectExplore.addClass("rho");
+            this.rhoActiveRectExploit.addClass("rho");
+            this.rhoActiveTextExplore.addClass("rho");
+            this.rhoActiveTextExploit.addClass("rho");
             this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
-            this.nodeStartNaviBar.plain('');
-            this.rho = this.svgLookup.getTextElement('#explore_exploit text');
-            this.rho.plain('');
+            this.nodeStartNaviBar.plain('0');
             this.nodeFinishNaviBar = this.svgLookup.getTextElement('#node-finish-navi text');
-            this.nodeFinishNaviBar.plain('');
+            this.nodeFinishNaviBar.plain('0');
             // this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length
         }
         setStartAndFinishState(startStateID, finishStateID) {
             this.nodeStartInNaviText = this.svgLookup.getTextElement('#node-start  text');
             this.nodeStartInNaviText.plain('' + startStateID);
-            this.nodeStartInNaviColour = this.svgLookup.getTextElement('#node-start path');
+            this.nodeStartInNaviColour = this.svgLookup.getPathElement('#node-start path');
             this.nodeFinishInNaviText = this.svgLookup.getTextElement('#node-finish text');
             this.nodeFinishInNaviText.plain('' + finishStateID);
-            this.nodeFinishInNaviColour = this.svgLookup.getTextElement('#node-finish path');
+            this.nodeFinishInNaviColour = this.svgLookup.getPathElement('#node-finish path');
         }
         setTotalTime(totalTime) {
             let formattedTime = utils_1.Utils.convertNumberToSeconds(totalTime);
@@ -149,28 +155,27 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             episodeTotal.plain('' + totalQLearningSteps);
         }
         onQLearningStep(newQLearnerStepDataAndPath, currentTime, executionDuration) {
-            this.newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
+            let newQLearnerStepData = newQLearnerStepDataAndPath.qLearnerStepData;
             // this.checkAndUpdateOptimalPath(newQLearnerStepDataAndPath.optimalPath);
-            console.log("gotStep! " + this.newQLearnerStepData.stepNumber);
+            console.log("gotStep! " + newQLearnerStepData.stepNumber);
             console.log("first measure " + Date.now());
             Visualizer.delay(0)
                 .then(() => this.showCurrentTime(currentTime))
-                .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentEpisode(this.newQLearnerStepData))
+                .then(() => Visualizer.delay(0.3 * executionDuration))
+                .then(() => this.showCurrentEpisode(newQLearnerStepData))
                 .then(() => Visualizer.delay(0.1 * executionDuration))
-                .then(() => this.showCurrentStartNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
+                .then(() => this.showCurrentStartNode(newQLearnerStepData.state, newQLearnerStepData.newState))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentRho(this.newQLearnerStepData.rho))
+                .then(() => this.showCurrentRho(newQLearnerStepData.rho))
                 .then(() => Visualizer.delay(0.1 * executionDuration))
-                .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, this.newQLearnerStepData.state, this.newQLearnerStepData.newState, this.newQLearnerStepData.qValueNew, 100))
+                .then(() => this.showCurrentStroke(0.6 * executionDuration, 0.6 * executionDuration, newQLearnerStepData.state, newQLearnerStepData.newState, newQLearnerStepData.qValueNew, 100))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentFinishNode(this.newQLearnerStepData.state, this.newQLearnerStepData.newState))
+                .then(() => this.showCurrentFinishNode(newQLearnerStepData.state, newQLearnerStepData.newState))
+                .then(() => this.showCurrentQValue(newQLearnerStepData.state, newQLearnerStepData.newState, newQLearnerStepData.qValueNew, newQLearnerStepData.highestQValue))
                 .then(() => Visualizer.delay(0.6 * executionDuration))
                 .then(() => this.showCurrentOptimalPath(newQLearnerStepDataAndPath.optimalPath))
                 .then(() => Visualizer.delay(0))
-                .then(() => this.showCurrentQValue(this.newQLearnerStepData.qValueNew, 4))
-                .then(() => Visualizer.delay(0))
-                .then(() => this.resetAllValues(this.newQLearnerStepData.state, this.newQLearnerStepData.newState));
+                .then(() => this.resetAllValues(newQLearnerStepData.state, newQLearnerStepData.newState));
         }
         static delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -178,6 +183,8 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
         showCurrentTime(currentTime) {
             console.log("The new q Learnig step " + Date.now());
             let timeCurrent = this.svgLookup.getTextElement('#time > text');
+            let clockHand = this.svgLookup.getPathElement('#clockhand');
+            clockHand.rotate(-360 / 60, clockHand.attr("x2"), clockHand.attr("y2"));
             timeCurrent.plain('' + utils_1.Utils.convertNumberToSeconds(currentTime));
         }
         showCurrentEpisode(newQLearnerStep) {
@@ -194,16 +201,14 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.nodeStartOnMap.addClass("node-active");
         }
         showCurrentRho(currentRho) {
-            let rhoActiveRect = this.svgLookup.getPathElement('#explore_exlploit_rect');
             if (currentRho == "erkunde") {
-                rhoActiveRect.removeClass("rho-exploit-active");
-                rhoActiveRect.addClass("rho-explore-active");
+                this.rhoActiveRectExplore.addClass("rho-active");
+                this.rhoActiveTextExplore.addClass("rho-text-active");
             }
             else {
-                rhoActiveRect.removeClass("rho-explore-active");
-                rhoActiveRect.addClass("rho-exploit-active");
+                this.rhoActiveRectExploit.addClass("rho-active");
+                this.rhoActiveTextExploit.addClass("rho-text-active");
             }
-            this.rho.plain('' + currentRho);
         }
         showCurrentStroke(duration, timeout, state, newState, qValue, maxQValue) {
             let path = this.findPathWithID(state, newState);
@@ -231,10 +236,20 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             this.nodeFinishOnMap.addClass("node-active");
             this.nodeFinishNaviBar.plain('' + newState);
         }
-        showCurrentQValue(qValue, stars) {
+        showCurrentQValue(state, newState, qValue, highestQValue) {
             let currentQValue = this.svgLookup.getTextElement("#qvalue");
-            let currentStar = this.svgLookup.getPathElement("#star" + stars).attr({ fill: '#f06' });
             currentQValue.plain('' + Math.round(qValue));
+            let OldNumberOfStars = this.qValueLookup.getOldNumberOfStars(state, newState);
+            for (let i = 1; i <= OldNumberOfStars; i++) {
+                let oldStar = this.svgLookup.getPathElement('#star' + i);
+                oldStar.removeClass("star").addClass("oldStar");
+            }
+            let NewNumberOfStars = this.qValueLookup.getNewNumberOfStars(state, newState, qValue, highestQValue);
+            for (let i = 1; i <= NewNumberOfStars; i++) {
+                let newStar = this.svgLookup.getPathElement('#star' + i);
+                newStar.removeClass("star").addClass("newStar");
+            }
+            // let currentStar: Path = this.svgLookup.getPathElement("#star" + ).attr({fill: '#f06'});
         }
         showCurrentOptimalPath(optimalPath) {
             this.checkAndUpdateOptimalPath(optimalPath);
@@ -243,17 +258,19 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             currentOptimalPath.plain(result);
         }
         resetAllValues(state, newState) {
+            for (let i = 1; i <= 5; i++) {
+                let star = this.svgLookup.getPathElement('#star' + i);
+                star.removeClass("newStar").removeClass("oldStar").addClass("star");
+            }
+            this.rhoActiveRectExplore.removeClass("rho-active");
+            this.rhoActiveRectExploit.removeClass("rho-active");
+            this.rhoActiveTextExploit.removeClass("rho-text-active");
+            this.rhoActiveTextExplore.removeClass("rho-text-active");
             if (this.nodeStartOnMap) {
                 this.nodeStartOnMap.removeClass("node-active").addClass("node-visited");
             }
             if (this.nodeFinishOnMap) {
                 this.nodeFinishOnMap.removeClass("node-active").addClass("node-visited");
-            }
-            if (this.line) {
-                this.line.removeClass("line-active");
-            }
-            if (this.path) {
-                this.path.removeClass("path-active");
             }
             if (state == this.startStateID || newState == this.startStateID) {
                 this.nodeStartInNaviColour.removeClass("node-active").addClass("node-visited");
@@ -261,9 +278,8 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
             if (state == this.finishStateID || newState == this.finishStateID) {
                 this.nodeFinishInNaviColour.removeClass("node-active").addClass("node-visited");
             }
-            this.nodeStartNaviBar.plain('');
-            this.rho.plain('');
-            this.nodeFinishNaviBar.plain('');
+            this.nodeStartNaviBar.plain('0');
+            this.nodeFinishNaviBar.plain('0');
         }
         addEventListeners() {
             let buttonStepInto = this.svgLookup.getElement("#navi-step-for-step-button");
@@ -361,7 +377,7 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup"], function (requi
         }
         drawFinalOptimalPath() {
             let combinedPath = this.getCombinedPath();
-            combinedPath.addTo(this._svg.findOne('svg'));
+            combinedPath.addTo(this._svg.findOne('svg')).addClass("finalPath-outline");
             combinedPath.attr({
                 stroke: '#ffffff',
                 'stroke-width': 80,

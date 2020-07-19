@@ -54,6 +54,10 @@ export class TimerImpl extends EventTarget implements Clock {
     }
 
     public pause() {
+        if (this._runningState == RunningState.STOP) {
+            console.log("Pause not called because the current running state is already stop.")
+            return;
+        }
         if (this.updateRunningState(RunningState.PAUSE)) {
             this.createAndDispatchEvent("pause");
         }

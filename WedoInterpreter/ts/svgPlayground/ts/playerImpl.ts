@@ -69,7 +69,7 @@ export class PlayerImpl extends EventTarget implements Player{
         this.timer.stop();
     }
 
-    private pause() {
+    public pause() {
         this.timer.pause();
     }
 

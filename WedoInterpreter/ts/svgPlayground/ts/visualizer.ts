@@ -188,7 +188,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
         this.setTotalTime(totalTime);
 
         let setInitialEpisode: Text = this.svgLookup.getTextElement('#episode_number > text');
-        setInitialEpisode.plain('');
+        setInitialEpisode.plain('0');
 
 
         this.rhoActiveRectExplore = this.svgLookup.getPathElement('#explore_rect > rect');
@@ -203,10 +203,10 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
 
         this.nodeStartNaviBar = this.svgLookup.getTextElement('#node-start-navi text');
-        this.nodeStartNaviBar.plain('');
+        this.nodeStartNaviBar.plain('0');
 
         this.nodeFinishNaviBar = this.svgLookup.getTextElement('#node-finish-navi text');
-        this.nodeFinishNaviBar.plain('');
+        this.nodeFinishNaviBar.plain('0');
 
 
         // this.startState.id, this.finishState.id, this.totalTime,this.qLearningSteps.length
@@ -351,15 +351,13 @@ export class Visualizer extends EventTarget implements ProblemSource {
         let OldNumberOfStars: number = this.qValueLookup.getOldNumberOfStars(state, newState);
         for (let i = 1; i <= OldNumberOfStars; i++) {
             let oldStar = this.svgLookup.getPathElement('#star' + i);
-            oldStar.removeClass("star");
-            oldStar.addClass("oldStar");
+            oldStar.removeClass("star").addClass("oldStar");
         }
 
         let NewNumberOfStars: number = this.qValueLookup.getNewNumberOfStars(state, newState, qValue, highestQValue);
         for (let i = 1; i <= NewNumberOfStars; i++) {
             let newStar = this.svgLookup.getPathElement('#star' + i)
-            newStar.removeClass("star");
-            newStar.addClass("newStar")
+            newStar.removeClass("star").addClass("newStar")
         }
 
 
@@ -397,14 +395,6 @@ export class Visualizer extends EventTarget implements ProblemSource {
             this.nodeFinishOnMap.removeClass("node-active").addClass("node-visited")
         }
 
-        if (this.line) {
-            this.line.removeClass("line-active")
-        }
-
-        if (this.path) {
-            this.path.removeClass("path-active")
-        }
-
         if (state == this.startStateID || newState == this.startStateID) {
             this.nodeStartInNaviColour.removeClass("node-active").addClass("node-visited")
         }
@@ -413,8 +403,8 @@ export class Visualizer extends EventTarget implements ProblemSource {
             this.nodeFinishInNaviColour.removeClass("node-active").addClass("node-visited")
         }
 
-        this.nodeStartNaviBar.plain('');
-        this.nodeFinishNaviBar.plain('');
+        this.nodeStartNaviBar.plain('0');
+        this.nodeFinishNaviBar.plain('0');
 
 
     }
@@ -541,7 +531,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
     public drawFinalOptimalPath(): Promise<void> {
         let combinedPath = this.getCombinedPath();
-        combinedPath.addTo(this._svg.findOne('svg'));
+        combinedPath.addTo(this._svg.findOne('svg')).addClass("finalPath-outline");
         combinedPath.attr({
             stroke: '#ffffff',
             'stroke-width': 80,

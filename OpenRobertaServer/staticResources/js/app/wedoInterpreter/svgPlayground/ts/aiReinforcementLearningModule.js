@@ -2,9 +2,10 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class QLearningAlgorithmModule {
-        constructor(updateBackground, htmlSelector, size, pathToSvg) {
+        constructor(updateBackground, htmlSelector, popupSelector, size, pathToSvg) {
             this.updateBackground = updateBackground;
             this.htmlSelector = htmlSelector;
+            this.popupSelector = popupSelector;
             this.size = size;
             this.pathToSvg = pathToSvg;
             this.problem = undefined;
@@ -14,6 +15,8 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
             this.player = undefined;
             this.qLearner = undefined;
             this._drawOptimalPathResult = undefined;
+            this.addEventListenerToRLPopup();
+            console.log("New RL-Module created.");
         }
         async createQLearningEnvironment(obstaclesList, startNode, finishNode) {
             this.visualizer = await visualizer_1.Visualizer.createVisualizer(this.pathToSvg, this.htmlSelector, this.size);
@@ -49,37 +52,30 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
         }
         async drawOptimalPath() {
             let that = this;
-            // this.player.timer.addEventListener("stop", function () {
-            //     // let optimalPathResult: OptimalPathResult = that.qLearner.findOptimalPath(that.startFinishStates.startState.id, that.startFinishStates.finishState.id);
-            //     // if (optimalPathResult.resultState == ResultState.ERROR) {
-            //     //     console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
-            //     // }
-            //     // that.visualizer.drawPath(optimalPathResult.optimalPath);
-            //     that.visualizer.drawFinalOptimalPath();
-            //
-            //
-            //     let copyOfSVG: SVG.Svg = that.visualizer.svg.clone();
-            //     //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-            //     let learnedImageHTML = copyOfSVG.svg();
-            //     let learnedImage = window.btoa(learnedImageHTML);
-            //     let temp: string = 'data:image/svg+xml;base64,' + learnedImage;
-            //     that.updateBackground(9, temp);
-            // })
             let promise = new Promise(function (resolve) {
                 that.player.timer.addEventListener("stop", function () {
-                    // let optimalPathResult: OptimalPathResult = that.qLearner.findOptimalPath(that.startFinishStates.startState.id, that.startFinishStates.finishState.id);
-                    // if (optimalPathResult.resultState == ResultState.ERROR) {
-                    //     console.log(optimalPathResult.optimalPath + "ist not an optimal Path.")
-                    // }
-                    // that.visualizer.drawPath(optimalPathResult.optimalPath);
                     that.visualizer.drawFinalOptimalPath()
                         .then(() => {
                         let copyOfSVG = that.visualizer.svg.findOne("svg").clone();
                         copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
-                        copyOfSVG.size(1962.26/2, 946.08/2);
+                        copyOfSVG.size(1962.26 / 2, 946.08 / 2);
                         //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
-                        //copyOfSVG.viewbox(copyOfSVG.findOne('svg').attr("viewBox"));
+                        //For some reason while transferring svg via URI (data:image/svg+xml;base64,) it gets broken, if it contains empty text elements.
+                        // It gets also broken, if it contains tspan elements.
+                        // For this reason tsapn elements are found in the svg and their parents - i.e. texts - are set to random text e.g. "0".
+                        copyOfSVG.find("tspan").each(el => {
+                            let parent = el.parent();
+                            if (parent) {
+                                parent.plain("0");
+                            }
+                        });
+                        let point = copyOfSVG.findOne(".finalPath-outline").pointAt(0);
+                        let rect = copyOfSVG.rect(50, 50).cx(point.x).cy(point.y).attr({ fill: '#f06' });
                         let learnedImageHTML = copyOfSVG.svg();
+                        //The svg transferred via URI gets also broken, if the namespace of svgjs and its references in certain elements remain in the svg.
+                        // For this reason, they must be removed from the svg that is to be transferred.
+                        learnedImageHTML = learnedImageHTML.replace(/svgjs:data="{[^}]*}"/g, "");
+                        learnedImageHTML = learnedImageHTML.replace('xmlns:svgjs="http://svgjs.com/svgjs"', "");
                         let learnedImage = window.btoa(learnedImageHTML);
                         let temp = 'data:image/svg+xml;base64,' + learnedImage;
                         that.updateBackground(9, temp);
@@ -88,6 +84,16 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                 });
             });
             return promise;
+        }
+        addEventListenerToRLPopup() {
+            let that = this;
+            if (this.popupSelector && this.popupSelector.on) {
+                this.popupSelector.on("hidden.bs.modal", function () {
+                    if (that.player) {
+                        that.player.pause();
+                    }
+                });
+            }
         }
         get drawOptimalPathResult() {
             return this._drawOptimalPathResult;

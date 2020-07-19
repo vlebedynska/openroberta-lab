@@ -17,6 +17,7 @@
         }
     },
     "exclude": [
+        "**/interpreter.robotMbedBehaviour.ts",
         "**/node_modules",
         "**/interpreter.runStackMachineJson.ts"
     ],

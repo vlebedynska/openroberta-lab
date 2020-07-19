@@ -42,6 +42,10 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
             }
         }
         pause() {
+            if (this._runningState == models_1.RunningState.STOP) {
+                console.log("Pause not called because the current running state is already stop.");
+                return;
+            }
             if (this.updateRunningState(models_1.RunningState.PAUSE)) {
                 this.createAndDispatchEvent("pause");
             }

@@ -24,39 +24,27 @@
 .path-active {
     stroke: red;
 }
-
-.rho-exploit-active {
-    fill: aquamarine;
+.rho {
+    opacity: 40%
 }
 
-.rho-explore-active {
-    fill: coral;
+.rho.rho-active {
+    fill: #7ccaff;
+    opacity: 50%;
+}
+
+.rho.rho-text-active {
+    opacity: 100%;
 }
 
 .rho-star-active {
-    fill: aquamarine;
+    fill: #7fffd4;
 }
 
 .line-path-inactive {
     stroke: url(#Ripple_Viktoriya-0);
 }
 
-.line-follower-outside {
-    stroke-width: 80;
-    stroke: #ffffff;
-    stroke-opacity: 1;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-}
-
-.line-follower-inside {
-    stroke:  #000000;
-    stroke-width: 30;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-}
 
 .current-optimal-path-on-map {
     stroke: royalblue;
@@ -64,4 +52,29 @@
     stroke-linecap: round;
     opacity: 1;
  
+}
+
+.newStar {
+    fill: coral;
+}
+
+.oldStar {
+    fill: darkgray;
+    stroke: dimgray;
+}
+
+
+.newStar.oldStar {
+    fill: coral;
+    stroke-width: 3;
+    stroke: dimgray;
+}
+
+.star {
+    fill: darkgray;
+}
+
+
+.test {
+
 }

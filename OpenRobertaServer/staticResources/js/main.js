@@ -1,6 +1,7 @@
 require.config({
     baseUrl : 'js/libs',
     paths : {
+        'qValueLookup': '../app/wedoInterpreter/svgPlayground/ts/qValueLookup',
         'svglookup': '../app/wedoInterpreter/svgPlayground/ts/svglookup',
         'aiReinforcementLearningModule': '../app/wedoInterpreter/svgPlayground/ts/aiReinforcementLearningModule',
         'index_2':'../app/wedoInterpreter/svgPlayground/ts/index_2',

@@ -1,4 +1,4 @@
-import {qValue} from "models.ts";
+import {qValue} from "models";
 
 export class qValueLookup implements qValue {
     newState: number;

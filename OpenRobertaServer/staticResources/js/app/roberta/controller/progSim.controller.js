@@ -126,9 +126,6 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
         });
 
         $('#simConfigRLQLearningModal').draggable();
-        $('#simConfigRLQLearningModal').on('hidden.bs.modal', function(){
-            alert('The modal is now hidden.');
-        })
 
         $('#simConfigRLQLearning').on('click', function (event) {
             var position = $("#simDiv").position();

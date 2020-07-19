@@ -64,6 +64,7 @@ export interface Player {
     qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>;
     timer: TimerImpl;
     initialize(visualizer: Visualizer): void;
+    pause(): void;
 }
 
 export interface StateStatus {

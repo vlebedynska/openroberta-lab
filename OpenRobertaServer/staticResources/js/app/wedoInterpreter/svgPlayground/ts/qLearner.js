@@ -55,7 +55,8 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
                 rho: rho,
                 state: state,
                 duration: duration,
-                stepNumber: this.stepNumber
+                stepNumber: this.stepNumber,
+                highestQValue: this.qValueStore.highestQValue
             };
             this.dispatchEvent(new CustomEvent("stepCompleted", {
                 detail: qLearningStep
@@ -70,6 +71,7 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
     exports.QLearningAlgorithm = QLearningAlgorithm;
     class QValueStore {
         constructor(statesAndActions) {
+            this._highestQValue = 0;
             this.qMatrix = [];
             for (var statesIndex in statesAndActions) {
                 var actions = statesAndActions[statesIndex].slice().fill(0);
@@ -96,6 +98,12 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
         storeQValue(state, action, value) {
             let actions = this.qMatrix[state];
             actions[action] = value; // === this.qMatrix[state][action] = value;
+            this.updateHighestQValue(value);
+        }
+        updateHighestQValue(qValue) {
+            if (qValue > this._highestQValue) {
+                this._highestQValue = qValue;
+            }
         }
         createOptimalPath(startState, endState, problem) {
             let optimalPath = [startState];
@@ -113,6 +121,9 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
                 currentState = nextState;
             }
             return { optimalPath, resultState };
+        }
+        get highestQValue() {
+            return this._highestQValue;
         }
     }
     class ReinforcementProblem {

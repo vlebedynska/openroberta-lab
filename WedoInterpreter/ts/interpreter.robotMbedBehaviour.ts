@@ -22,14 +22,14 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 			new QLearningAlgorithmModule(
 				updateBackground,
 				"#qLearningBackgroundArea",
-				"#simConfigRLQLearningModal",
+				$('#simConfigRLQLearningModal'),
 				{width: 800, height: 800},
 				"/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
 			);
 
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
 		this.promise = undefined;
-		U.loggingEnabled(false, false);
+		U.loggingEnabled(true, false);
 	}
 
 

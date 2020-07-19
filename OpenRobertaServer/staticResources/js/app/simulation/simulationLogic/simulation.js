@@ -98,9 +98,8 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
     var currentBackground = 2;
 
     function updateBackground(num, source) {
-        imgObjectList[num] = new Image();
-        let img = imgObjectList[num];
-        imgObjectList[num].onload = function () {
+        let img = new Image();
+        img.onload = function () {
             var canvas = document.createElement("canvas");
             var scaleX = 1;
             var scaleY = 1;
@@ -121,32 +120,22 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
             var image = new Image(canvas.width, canvas.height);
             image.src = dataURL;
             image.onload = function() {
-                if (customBackgroundLoaded) {
-                    // replace previous image
-                    imgObjectList[num] = image;
-                } else {
-                    imgObjectList[num] = image;
-                }
-                setBackground(num, setBackground);
-                // initScene();
+                imgObjectList[num] = image;
+                setBackground(num, setBackground,false);
             }
 
-
-        // setBackground(num, setBackground);
-
-
-            //initScene();
         };
-        imgObjectList[num].src = source;
+        img.onerror = function(e) {
+            alert("Error occurred while loading image");
+        };
 
+        img.src = source;
 
-
-        // imgObjectList[num].src = source;
     }
 
     exports.updateBackground = updateBackground;
 
-    function setBackground(num, callback) {
+    function setBackground(num, callback, pause=true) {
         if (num == undefined) {
             setObstacle();
             setRuler();
@@ -160,7 +149,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
             resizeAll();
             return currentBackground;
         }
-        setPause(true);
+        setPause(pause);
         $('#simControl').attr('data-original-title', Blockly.Msg.MENU_SIM_STOP_TOOLTIP);
         if (num === -1) {
             currentBackground += 1;

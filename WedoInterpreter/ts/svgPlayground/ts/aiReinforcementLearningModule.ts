@@ -4,7 +4,7 @@ import {Size, Visualizer} from "visualizer";
 import {Utils} from "utils";
 import {PlayerImpl} from "playerImpl";
 import {QLearningAlgorithm, ReinforcementProblem, RlUtils} from "qLearner";
-import {Svg} from "svgdotjs";
+import {Path, Point, Svg} from "svgdotjs";
 
 
 export class QLearningAlgorithmModule {
@@ -19,7 +19,7 @@ export class QLearningAlgorithmModule {
     rho: number;
     episodes: number;
     htmlSelector: string;
-    popupSelector: string;
+    popupSelector: any;
     size: Size;
     pathToSvg: string;
     totalTime: number;
@@ -30,7 +30,7 @@ export class QLearningAlgorithmModule {
     private _drawOptimalPathResult: boolean;
 
 
-    constructor(updateBackground, htmlSelector: string,popupSelector: string, size: Size, pathToSvg: string) {
+    constructor(updateBackground, htmlSelector: string, popupSelector: any, size: Size, pathToSvg: string) {
         this.updateBackground = updateBackground;
         this.htmlSelector = htmlSelector;
         this.popupSelector = popupSelector;
@@ -44,6 +44,7 @@ export class QLearningAlgorithmModule {
         this.qLearner = undefined;
         this._drawOptimalPathResult = undefined;
         this.addEventListenerToRLPopup();
+        console.log("New RL-Module created.");
     }
 
 
@@ -101,12 +102,33 @@ export class QLearningAlgorithmModule {
             that.player.timer.addEventListener("stop", function () {
                 that.visualizer.drawFinalOptimalPath()
                     .then(() => {
+
                         let copyOfSVG: SVG.Svg = (<Svg>that.visualizer.svg.findOne("svg")).clone();
                         copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
                         copyOfSVG.size(1962.26/2, 946.08/2)
                         //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
 
+
+                        //For some reason while transferring svg via URI (data:image/svg+xml;base64,) it gets broken, if it contains empty text elements.
+                        // It gets also broken, if it contains tspan elements.
+                        // For this reason tsapn elements are found in the svg and their parents - i.e. texts - are set to random text e.g. "0".
+                        copyOfSVG.find("tspan").each(el => {
+                            let parent = el.parent();
+                            if (parent) {
+                                parent.plain("0");
+                            }
+                            });
+
+                        let point: {x, y} = (<Path>copyOfSVG.findOne(".finalPath-outline")).pointAt(0);
+                        let rect = copyOfSVG.rect(50, 50).cx(point.x).cy(point.y).attr({ fill: '#f06' });
+
                         let learnedImageHTML = copyOfSVG.svg();
+
+                        //The svg transferred via URI gets also broken, if the namespace of svgjs and its references in certain elements remain in the svg.
+                        // For this reason, they must be removed from the svg that is to be transferred.
+                        learnedImageHTML = learnedImageHTML.replace(/svgjs:data="{[^}]*}"/g, "");
+                        learnedImageHTML = learnedImageHTML.replace('xmlns:svgjs="http://svgjs.com/svgjs"', "");
+
                         let learnedImage = window.btoa(learnedImageHTML);
                         let temp: string = 'data:image/svg+xml;base64,' + learnedImage;
                         that.updateBackground(9, temp);
@@ -127,7 +149,15 @@ export class QLearningAlgorithmModule {
 
 
     private addEventListenerToRLPopup() {
-        // document.querySelector(this.popupSelector).innerHTML ?;
+        let that = this;
+        if (this.popupSelector && this.popupSelector.on) {
+            this.popupSelector.on("hidden.bs.modal", function() {
+                if (that.player){
+                    that.player.pause();
+                }
+            });
+        }
+
     }
 
     get drawOptimalPathResult(): boolean {

@@ -11,10 +11,10 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.neuralNetworkModule = null;
             this.updateBackground = updateBackground;
             this.qLearningAlgorithmModule =
-                new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg");
+                new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", $('#simConfigRLQLearningModal'), { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg");
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             this.promise = undefined;
-            U.loggingEnabled(false, false);
+            U.loggingEnabled(true, false);
         }
         getSample(s, name, sensor, port, mode) {
             var robotText = 'robot: ' + name + ', port: ' + port + ', mode: ' + mode;

@@ -97,7 +97,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
 
     var currentBackground = 2;
 
-    function updateBackground(num, source) {
+    function updateBackground(num, source, poses = []) {
         let img = new Image();
         img.onload = function () {
             var canvas = document.createElement("canvas");
@@ -121,7 +121,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
             image.src = dataURL;
             image.onload = function() {
                 imgObjectList[num] = image;
-                setBackground(num, setBackground,false);
+                setBackground(num, setBackground,false, poses);
             }
 
         };
@@ -135,7 +135,7 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
 
     exports.updateBackground = updateBackground;
 
-    function setBackground(num, callback, pause=true) {
+    function setBackground(num, callback, pause=true, poses = []) {
         if (num == undefined) {
             setObstacle();
             setRuler();
@@ -170,6 +170,9 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
             for (var i = 0; i < robots.length; i++) {
                 robots[i].debug = debug;
                 robots[i].reset();
+            }
+            if (poses) {
+                resetPose(poses);
             }
             callback();
         });
@@ -270,10 +273,10 @@ define(['exports', 'simulation.scene', 'simulation.math', 'program.controller', 
     }
     exports.setInfo = setInfo;
 
-    function resetPose() {
+    function resetPose(poses = []) {
         for (var i = 0; i < numRobots; i++) {
             if (robots[i].resetPose) {
-                robots[i].resetPose();
+                robots[i].resetPose(poses[i]);
             }
             if (robots[i].time) {
                 robots[i].time = 0;

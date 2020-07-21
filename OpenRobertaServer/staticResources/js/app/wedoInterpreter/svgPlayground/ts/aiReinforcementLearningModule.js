@@ -56,9 +56,16 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                 that.player.timer.addEventListener("stop", function () {
                     that.visualizer.drawFinalOptimalPath()
                         .then(() => {
+                        // <rect id="myScene" x="69.77" y="484.02" width="1962.26" height="946.08" fill="none"/>
                         let copyOfSVG = that.visualizer.svg.findOne("svg").clone();
-                        copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
-                        copyOfSVG.size(1962.26 / 2, 946.08 / 2);
+                        let sceneToBeTransmitted = that.visualizer.svg.findOne("#myScene");
+                        let x = sceneToBeTransmitted.x();
+                        let y = sceneToBeTransmitted.y();
+                        let width = sceneToBeTransmitted.width();
+                        let height = sceneToBeTransmitted.height();
+                        copyOfSVG.viewbox(x, y, width, height);
+                        // copyOfSVG.viewbox("69.77 484.02 1962.26 946.08");
+                        copyOfSVG.size(width / 2, height / 2);
                         //RlUtils.hideAllPathsExeptTheOptimal(copyOfSVG);
                         //For some reason while transferring svg via URI (data:image/svg+xml;base64,) it gets broken, if it contains empty text elements.
                         // It gets also broken, if it contains tspan elements.
@@ -69,8 +76,24 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                                 parent.plain("0");
                             }
                         });
-                        let point = copyOfSVG.findOne(".finalPath-outline").pointAt(0);
-                        let rect = copyOfSVG.rect(50, 50).cx(point.x).cy(point.y).attr({ fill: '#f06' });
+                        let point0 = copyOfSVG.findOne(".finalPath-outline").pointAt(0);
+                        let point1 = copyOfSVG.findOne(".finalPath-outline").pointAt(20);
+                        // let rect = copyOfSVG.rect(50, 50).cx(point0.x).cy(point0.y).attr({ fill: '#f06' });
+                        //Berechnung der Steigung
+                        copyOfSVG.line(point0.x, point0.y, point1.x, point1.y).stroke({ width: 10, color: "red" });
+                        let m = (point1.y - point0.y) / (point1.x - point0.x);
+                        let theta = Math.atan(m) * (-1);
+                        point0.x = (point0.x - sceneToBeTransmitted.x()) / 2;
+                        point0.y = (point0.y - sceneToBeTransmitted.y()) / 2;
+                        let pose = {
+                            x: point0.x + 10,
+                            y: point0.y + 10,
+                            theta: theta,
+                            transX: 0,
+                            transY: 0
+                        };
+                        let poses = new Array();
+                        poses.push(pose);
                         let learnedImageHTML = copyOfSVG.svg();
                         //The svg transferred via URI gets also broken, if the namespace of svgjs and its references in certain elements remain in the svg.
                         // For this reason, they must be removed from the svg that is to be transferred.
@@ -78,7 +101,7 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                         learnedImageHTML = learnedImageHTML.replace('xmlns:svgjs="http://svgjs.com/svgjs"', "");
                         let learnedImage = window.btoa(learnedImageHTML);
                         let temp = 'data:image/svg+xml;base64,' + learnedImage;
-                        that.updateBackground(9, temp);
+                        that.updateBackground(9, temp, poses);
                         resolve();
                     });
                 });

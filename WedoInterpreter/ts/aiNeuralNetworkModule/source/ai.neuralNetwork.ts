@@ -399,7 +399,7 @@ export class SVGSlider extends EventTarget {
     set sliderValue(value: number) {
         this._sliderValue = value;
         let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
-        this.sliderShape.cx(pointOnPath.x + 20).cy(pointOnPath.y);
+        this.sliderShape.cx(pointOnPath.x).cy(pointOnPath.y);
         let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: value});
         console.log("slidervalue changed: " + value);
         this.dispatchEvent(event);
@@ -409,15 +409,31 @@ export class SVGSlider extends EventTarget {
         let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint, sliderValue);
         slider.sliderShape.on('dragmove', function (e) {
             let mouseEvent: MouseEvent = e.detail;
-            var m = path.root().point(mouseEvent.pageX, mouseEvent.pageY),
+            let m = path.root().point(mouseEvent.pageX, mouseEvent.pageY),
                 p = SVGUtils.closestPoint(path.node, m);
-            sliderShape.cx(p.x).cy(p.y);
+            //umrechnen startpoint und endpoint
+
+            if (p.lengthOnPath >= startPoint && p.lengthOnPath <= path.length() - endPoint ) {
+                sliderShape.cx(p.x).cy(p.y);
+            } else {
+                if (p.lengthOnPath < startPoint) {
+                    let minimalPoint = path.node.getPointAtLength(startPoint);
+                    sliderShape.cx(minimalPoint.x).cy(minimalPoint.y);
+                } else {
+                    let maximalPoint = path.node.getPointAtLength(endPoint);
+                    sliderShape.cx(maximalPoint.x).cy(maximalPoint.y);
+                }
+
+            }
 
             let sliderShapeCenter = {x: sliderShape.cx(), y: sliderShape.cy()};
             slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
         });
         return slider;
     }
+
+
+
 }
 
 
@@ -431,7 +447,7 @@ export class SVGUtils {
     }
 
 
-    public static closestPoint(pathNode, point): {x, y, distance} {
+    public static closestPoint(pathNode, point): {x, y, distance, lengthOnPath} {
         var pathLength = pathNode.getTotalLength(),
             precision = 8,
             best,
@@ -461,7 +477,7 @@ export class SVGUtils {
                 precision /= 2;
             }
         }
-        return {x: best.x, y: best.y, distance: Math.sqrt(bestDistance)};
+        return {x: best.x, y: best.y, distance: Math.sqrt(bestDistance), lengthOnPath: bestLength};
 
     }
 

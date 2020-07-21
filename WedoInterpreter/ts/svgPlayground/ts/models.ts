@@ -143,3 +143,13 @@ export enum RunningState {
     PLAY
 }
 
+
+export interface Pose {
+    x: number,
+    y: number,
+    theta: number,
+    transX: number,
+    transY: number,
+    oldX?: number,
+    oldY?: number
+}

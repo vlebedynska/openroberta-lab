@@ -44,15 +44,15 @@ define([ 'simulation.simulation', 'simulation.constants' ], function(SIM, CONSTA
     Robot.prototype.replaceState = function(robotBehaviour) {
         this.robotBehaviour = robotBehaviour;
     }
-    Robot.prototype.resetPose = function() {
-        this.pose.x = this.initialPose.x;
-        this.pose.y = this.initialPose.y;
-        this.pose.theta = this.initialPose.theta;
-        this.pose.xOld = this.initialPose.x;
-        this.pose.yOld = this.initialPose.y;
-        this.pose.thetaOld = this.initialPose.theta;
-        this.pose.transX = this.initialPose.transX;
-        this.pose.transY = this.initialPose.transY;
+    Robot.prototype.resetPose = function(pose = this.initialPose) {
+        this.pose.x = pose.x;
+        this.pose.y = pose.y;
+        this.pose.theta = pose.theta;
+        this.pose.xOld = pose.x;
+        this.pose.yOld = pose.y;
+        this.pose.thetaOld = pose.theta;
+        this.pose.transX = pose.transX;
+        this.pose.transY = pose.transY;
         this.debug = false;
     };
     Robot.prototype.reset = null;

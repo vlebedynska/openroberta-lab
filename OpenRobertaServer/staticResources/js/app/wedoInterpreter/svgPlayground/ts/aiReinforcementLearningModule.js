@@ -81,6 +81,7 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                         // let rect = copyOfSVG.rect(50, 50).cx(point0.x).cy(point0.y).attr({ fill: '#f06' });
                         //Berechnung der Steigung
                         copyOfSVG.line(point0.x, point0.y, point1.x, point1.y).stroke({ width: 10, color: "red" });
+                        //Berechung der Drehung des Roboters
                         let m = (point1.y - point0.y) / (point1.x - point0.x);
                         let theta = Math.atan(m) * (-1);
                         point0.x = (point0.x - sceneToBeTransmitted.x()) / 2;

@@ -481,6 +481,7 @@ export class Interpreter {
                     }
                     case C.CREATE_INPUT_NODE: {
                         let node = {
+                            data: s.pop(),
                             threshold: s.pop(),
                             value: s.pop()
                         };

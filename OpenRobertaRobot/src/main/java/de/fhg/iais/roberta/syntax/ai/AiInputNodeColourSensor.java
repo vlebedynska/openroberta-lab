@@ -64,7 +64,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
      */
     private AiInputNodeColourSensor(
         BlockType kind, ExternalSensor<V> externalSensor, Integer threshold, Colour colour, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, externalSensor, threshold, property, comment);
+        super(kind, externalSensor, threshold, property, comment, nodeData);
         this.colour = colour;
     }
 
@@ -75,6 +75,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
     protected V acceptImpl(IVisitor<V> visitor) {
         return ((IAiVisitor<V>) visitor).visitAiInputNodeColourSensor(this);
     }
+
 
     public String toString() {
         return this.getClass().getSimpleName() + " [" + this.externalSensor + ", " + "Threshold = " + this.threshold  + "," + "Colour = " + this.colour + "]";

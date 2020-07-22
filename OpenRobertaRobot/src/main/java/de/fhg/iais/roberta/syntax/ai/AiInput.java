@@ -9,13 +9,14 @@ import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
 import de.fhg.iais.roberta.syntax.sensor.SensorMetaDataBean;
-import de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor;
 import de.fhg.iais.roberta.syntax.sensor.generic.UltrasonicSensor;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
+import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
+import org.json.JSONObject;
 
 /**
     TODO Doku
@@ -32,13 +33,20 @@ public class AiInput<V> extends AiNode<V> {
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
-     *
-     * @param kind     of the the object used in AST,
+     *  @param kind     of the the object used in AST,
      * @param property
      * @param comment  that the user added to the block
+     * @param nodeData
      */
-    private AiInput(BlockType kind, ExternalSensor<V> externalSensor, Integer threshold, String sensorInfo, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, threshold, property, comment);
+    private AiInput(
+        BlockType kind,
+        ExternalSensor<V> externalSensor,
+        Integer threshold,
+        String sensorInfo,
+        BlocklyBlockProperties property,
+        BlocklyComment comment,
+        JSONObject nodeData) {
+        super(kind, threshold, property, comment, nodeData);
         this.externalSensor = externalSensor;
         this.sensorInfo = sensorInfo;
         setReadOnly();
@@ -47,8 +55,9 @@ public class AiInput<V> extends AiNode<V> {
     /**
     TODO Doku
      */
-    public static <V> AiInput<V> make(ExternalSensor<V> externalSensor, Integer threshold, String sensorInfo, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiInput<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE"), externalSensor, threshold, sensorInfo, properties, comment);
+    public static <V> AiInput<V> make(
+        ExternalSensor<V> externalSensor, Integer threshold, String sensorInfo, BlocklyBlockProperties properties, BlocklyComment comment, JSONObject nodeData) {
+        return new AiInput<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE"), externalSensor, threshold, sensorInfo, properties, comment, nodeData);
     }
 
     @Override
@@ -68,23 +77,32 @@ public class AiInput<V> extends AiNode<V> {
         List<Field> fields = helper.extractFields(block, (short) 2);
 
         String sensorInfo = helper.extractField(fields, BlocklyConstants.INPUTNODE, "");
-        ExternalSensor<V> externalSensor = createSensorAst(sensorInfo, block, helper);
+        String[] sensorInfoList = sensorInfo.toLowerCase().split("_");
+        String portName = sensorInfoList[2];
+        String modeName = BlocklyConstants.DISTANCE;
+        String slotName = BlocklyConstants.NO_SLOT;
+        JSONObject nodeData = new JSONObject();
+        nodeData.put("port", portName).put("mode", modeName).put("slot", slotName).put("name", C.ULTRASONIC);
+
+        ExternalSensor<V> externalSensor = createSensorAst(nodeData, block, helper);
+        
 
         String thresholdInfo = helper.extractField(fields, BlocklyConstants.THRESHOLD, "");
         Integer threshold = getThresholdValue(thresholdInfo);
 
-        return AiInput.make(externalSensor, threshold, sensorInfo, helper.extractBlockProperties(block), helper.extractComment(block));
+        return AiInput.make(externalSensor, threshold, sensorInfo, helper.extractBlockProperties(block), helper.extractComment(block), nodeData);
     }
 
 
-    private static <V> ExternalSensor<V> createSensorAst(String sensorInfo, Block block, AbstractJaxb2Ast<V> helper) {
+    private static <V> ExternalSensor<V> createSensorAst(JSONObject nodeData, Block block, AbstractJaxb2Ast<V> helper) {
         BlocklyDropdownFactory factory = helper.getDropdownFactory();
-            String[] sensorInfoList = sensorInfo.toLowerCase().split("_");
-            String portName = sensorInfoList[2];
-            String modeName = BlocklyConstants.DISTANCE;
-            String slotName = BlocklyConstants.NO_SLOT;
             boolean isPortInMutation = false;
-            SensorMetaDataBean sensorMetaDataBean = new SensorMetaDataBean(factory.sanitizePort(portName), factory.getMode(modeName), factory.sanitizeSlot(slotName), isPortInMutation);
+            SensorMetaDataBean sensorMetaDataBean = new SensorMetaDataBean(
+                factory.sanitizePort(nodeData.getString("port")),
+                factory.getMode(nodeData.getString("mode")),
+                factory.sanitizeSlot(nodeData.getString("slot")),
+                isPortInMutation
+            );
             return UltrasonicSensor.make(sensorMetaDataBean, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 

@@ -1,6 +1,7 @@
 package de.fhg.iais.roberta.syntax.ai;
 import de.fhg.iais.roberta.syntax.*;
 import de.fhg.iais.roberta.syntax.sensor.ExternalSensor;
+import org.json.JSONObject;
 
 public abstract class AiInputNode<V> extends AiNode<V> {
 
@@ -8,8 +9,9 @@ public abstract class AiInputNode<V> extends AiNode<V> {
     protected final ExternalSensor<V> externalSensor;
 
 
-    protected AiInputNode(BlockType kind, ExternalSensor<V> externalSensor, Integer threshold, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, threshold, property, comment);
+    protected AiInputNode(
+        BlockType kind, ExternalSensor<V> externalSensor, Integer threshold, BlocklyBlockProperties property, BlocklyComment comment, JSONObject nodeData) {
+        super(kind, threshold, property, comment, nodeData);
         this.externalSensor = externalSensor;
         setReadOnly();
     }

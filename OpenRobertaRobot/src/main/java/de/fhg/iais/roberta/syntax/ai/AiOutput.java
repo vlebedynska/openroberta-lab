@@ -31,7 +31,7 @@ public class AiOutput<V> extends AiNode<V> {
      * @param comment that the user added to the block
      */
     public AiOutput(BlockType kind, Integer threshold, JSONObject aiOutputNodeData, BlocklyBlockProperties property, BlocklyComment comment) {
-        super(kind, threshold, property, comment);
+        super(kind, threshold, property, comment, nodeData);
         this.aiOutputNodeData = aiOutputNodeData;
         setReadOnly();
     }
@@ -47,7 +47,6 @@ public class AiOutput<V> extends AiNode<V> {
     protected V acceptImpl(IVisitor<V> visitor) {
         return ((IAiVisitor<V>) visitor).visitAiOutputNode(this);
     }
-
 
 
     @Override

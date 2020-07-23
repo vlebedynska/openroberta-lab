@@ -1,4 +1,4 @@
-define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "aiNeuralNetworkModule/source/ai.neuralNetwork", "aiReinforcementLearningModule"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, ai_neuralNetwork_1, aiReinforcementLearningModule_1) {
+define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.constants", "interpreter.util", "jquery", "aiReinforcementLearningModule", "interpreter.aiNeuralNetworkModule/source/aiNeuralNetworkModule"], function (require, exports, interpreter_aRobotBehaviour_1, C, U, $, aiReinforcementLearningModule_1, aiNeuralNetworkModule_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class RobotMbedBehaviour extends interpreter_aRobotBehaviour_1.ARobotBehaviour {
@@ -385,7 +385,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
         processNeuralNetwork(inputLayer, outputLayer) {
             if ($.isEmptyObject(this.neuralNetworkModule)) {
-                this.neuralNetworkModule = new ai_neuralNetwork_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", { width: 500, height: 400 }, inputLayer, outputLayer);
+                this.neuralNetworkModule = new aiNeuralNetworkModule_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", { width: 500, height: 400 }, inputLayer, outputLayer);
             }
             //set new Values in InputLayer
             let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();

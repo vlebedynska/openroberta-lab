@@ -3,8 +3,9 @@ import { State } from "interpreter.state";
 import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 import * as $ from "jquery";
-import {AiNeuralNetworkModule} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
 import {QLearningAlgorithmModule} from "interpreter.svgPlayground/ts/aiReinforcementLearningModule";
+import {AiNeuralNetworkModule} from "./aiNeuralNetworkModule/source/aiNeuralNetworkModule";
+import {Node} from "./aiNeuralNetworkModule/source/models";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
 
@@ -442,7 +443,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		//set new Values in InputLayer
 		let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
 		for (let nodeID in inputLayer) {
-			let node = inputLayer[nodeID];
+			let node: Node = inputLayer[nodeID];
 			aiNeuralNetworkInputLayer[nodeID].value = node.value;
 		}
 

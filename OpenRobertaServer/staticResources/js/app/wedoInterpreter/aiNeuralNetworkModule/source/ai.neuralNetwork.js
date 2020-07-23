@@ -72,6 +72,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             for (let layerID in layers) {
                 let layer = layers[layerID];
                 AiNeuralNetwork.addNodesPositionXY(parseInt(layerID), layer);
+                AiNeuralNetwork.addNodesName(layer);
             }
             return new AiNeuralNetwork(layers, links);
         }
@@ -88,6 +89,11 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                 }
             }
         }
+        static addNodesName(layer) {
+            for (let node of layer) {
+                node.name = node.name + " Port " + node.port;
+            }
+        }
         getInputLayer() {
             return this._layers[0];
         }
@@ -97,9 +103,16 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
     }
     exports.AiNeuralNetwork = AiNeuralNetwork;
     class Node {
-        constructor(value, threshold) {
+        constructor(value, threshold, data) {
             this.value = value;
             this.threshold = threshold;
+            this.data = data;
+        }
+        get name() {
+            return this._name;
+        }
+        set name(value) {
+            this._name = value;
         }
         get positionX() {
             return this._positionX;
@@ -113,22 +126,14 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         set positionY(value) {
             this._positionY = value;
         }
-    }
-    exports.Node = Node;
-    class Ev3MotorOutputNode extends Node {
-        constructor(value, threshold, port, type) {
-            super(value, threshold);
-            this._port = port;
-            this._type = type;
+        get type() {
+            return this._type;
         }
         get port() {
             return this._port;
         }
-        get type() {
-            return this._type;
-        }
     }
-    exports.Ev3MotorOutputNode = Ev3MotorOutputNode;
+    exports.Node = Node;
     class Link extends EventTarget {
         constructor(node1, node2, _weight) {
             super();
@@ -153,6 +158,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             this.svg = svg;
             this.draggable = draggable;
             this.isActivated = false;
+            this.sliderValueText = this.svg.text("");
             this.drawSlider();
             this.addLinkListener();
         }
@@ -163,11 +169,8 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                 .stroke(LinkUI.COLOR_DEFAULT);
             let circle = this.svg.circle()
                 .radius(LinkUI.SLIDER_SHAPE_RADIUS)
-                .fill('red')
-                .click(function () {
-                that.activateLink();
-            });
-            this.slider = SVGSlider.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS, path.length() - (AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS), this.link.weight);
+                .fill('red');
+            this.slider = SVGSlider.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, this.sliderValueText, AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS, path.length() - (AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS), this.link.weight);
             this.slider.addEventListener('sliderValueChanged', function (sliderValueData) {
                 that.link.weight = sliderValueData.detail;
             });
@@ -206,7 +209,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         }
         activateLink() {
             this.isActivated = true;
-            this.slider.path.stroke(LinkUI.COLOR_ACTIVE).front();
+            this.slider.path.stroke(LinkUI.COLOR_ACTIVE);
             this.slider.sliderShape.front();
             let event = new CustomEvent('linkActivated');
             console.log("Link aktiviert");
@@ -282,7 +285,15 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                     .radius(AiNeuralNetworkUI.NODE_CIRCLE_RADIUS)
                     .cx(nodePositionXY.x)
                     .cy(nodePositionXY.y)
-                    .fill('black');
+                    .addClass("inputNode");
+                let nodeName = node.name;
+                let text = this.svg.text("").tspan(nodeName).dy("" + circle.cy());
+                if (node.positionX == 0) {
+                    text.ax("" + (circle.cx() - 175)).addClass("inputNodeName");
+                }
+                else {
+                    text.ax("" + (circle.cx() + 30)).addClass("outputNodeName");
+                }
             }
         }
         drawLinks(links) {
@@ -304,13 +315,13 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         }
     }
     exports.AiNeuralNetworkUI = AiNeuralNetworkUI;
-    AiNeuralNetworkUI.LAYER_OFFSET_TOP = 20;
-    AiNeuralNetworkUI.LAYER_OFFSET_LEFT = 50;
+    AiNeuralNetworkUI.LAYER_OFFSET_TOP = 60;
+    AiNeuralNetworkUI.LAYER_OFFSET_LEFT = 200;
     AiNeuralNetworkUI.HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES = 170;
-    AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 70;
+    AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 110;
     AiNeuralNetworkUI.NODE_CIRCLE_RADIUS = 20;
     class SVGSlider extends EventTarget {
-        constructor(_path, rangeMin, rangeMax, _sliderShape, startPoint = 0, endPoint = _path.length(), _sliderValue) {
+        constructor(_path, rangeMin, rangeMax, _sliderShape, sliderValueText, startPoint = 0, endPoint = _path.length(), _sliderValue) {
             super();
             this._path = _path;
             this.rangeMin = rangeMin;
@@ -319,6 +330,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             this.startPoint = startPoint;
             this.endPoint = endPoint;
             this._sliderValue = _sliderValue;
+            this.sliderValueText = sliderValueText;
             this.sliderValue = _sliderValue;
         }
         get path() {
@@ -330,6 +342,26 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
         get sliderValue() {
             return this._sliderValue;
         }
+        set sliderValueText(value) {
+            this._sliderValueText = value;
+        }
+        get sliderValueText() {
+            return this._sliderValueText;
+        }
+        static createSlider(path, rangeMin, rangeMax, sliderShape, sliderValueText, startPoint, endPoint = path.length(), sliderValue = 0) {
+            let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, sliderValueText, startPoint, endPoint, sliderValue);
+            slider.updateSliderShapePosition(sliderValue);
+            slider.sliderShape.on('dragmove', function (e) {
+                let mouseEvent = e.detail;
+                let m = path.root().point(mouseEvent.pageX, mouseEvent.pageY), p = SVGUtils.closestPoint(path.node, m);
+                //umrechnen startpoint und endpoint
+                slider.updateSliderShapePosition(p.lengthOnPath);
+                slider.sliderValueText = slider.sliderValueText.cx(sliderShape.cx()).cy(sliderShape.cy() - 15);
+                let sliderShapeCenter = { x: sliderShape.cx(), y: sliderShape.cy() };
+                slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
+            });
+            return slider;
+        }
         set sliderValue(value) {
             this._sliderValue = value;
             let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
@@ -337,19 +369,7 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
             let event = new CustomEvent('sliderValueChanged', { detail: value });
             console.log("slidervalue changed: " + value);
             this.dispatchEvent(event);
-        }
-        static createSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint = path.length(), sliderValue = 0) {
-            let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint, sliderValue);
-            slider.updateSliderShapePosition(sliderValue);
-            slider.sliderShape.on('dragmove', function (e) {
-                let mouseEvent = e.detail;
-                let m = path.root().point(mouseEvent.pageX, mouseEvent.pageY), p = SVGUtils.closestPoint(path.node, m);
-                //umrechnen startpoint und endpoint
-                slider.updateSliderShapePosition(p.lengthOnPath);
-                let sliderShapeCenter = { x: sliderShape.cx(), y: sliderShape.cy() };
-                slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
-            });
-            return slider;
+            this.updateSliderValueText(value);
         }
         updateSliderShapePosition(p) {
             if (p >= this.startPoint && p <= this.endPoint) {
@@ -365,6 +385,9 @@ define(["require", "exports", "svgdotjs", "jquery"], function (require, exports,
                     this.sliderShape.cx(maximalPoint.x).cy(maximalPoint.y);
                 }
             }
+        }
+        updateSliderValueText(value) {
+            this.sliderValueText.plain("" + value.toFixed(2));
         }
     }
     exports.SVGSlider = SVGSlider;

@@ -480,11 +480,9 @@ export class Interpreter {
                         break;
                     }
                     case C.CREATE_INPUT_NODE: {
-                        let node = {
-                            data: s.pop(),
-                            threshold: s.pop(),
-                            value: s.pop()
-                        };
+                        let node = stmt["data"];
+                        node.threshold = s.pop();
+                        node.value = s.pop();
                         s.push(node);
                         break;
                     }

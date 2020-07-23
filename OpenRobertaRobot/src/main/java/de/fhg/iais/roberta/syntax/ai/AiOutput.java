@@ -9,6 +9,7 @@ import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
+import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONObject;
@@ -17,11 +18,7 @@ import org.json.JSONObject;
  * TODO Doku
  */
 public class AiOutput<V> extends AiNode<V> {
-    private final JSONObject aiOutputNodeData;
 
-    public JSONObject getAiOutputNodeData() {
-        return aiOutputNodeData;
-    }
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
@@ -30,17 +27,16 @@ public class AiOutput<V> extends AiNode<V> {
      * @param property
      * @param comment that the user added to the block
      */
-    public AiOutput(BlockType kind, Integer threshold, JSONObject aiOutputNodeData, BlocklyBlockProperties property, BlocklyComment comment) {
+    public AiOutput(BlockType kind, Integer threshold, JSONObject nodeData, BlocklyBlockProperties property, BlocklyComment comment) {
         super(kind, threshold, property, comment, nodeData);
-        this.aiOutputNodeData = aiOutputNodeData;
         setReadOnly();
     }
 
     /**
      * TODO Doku
      */
-    public static <V> AiOutput<V> make(JSONObject aiOutputAction, Integer threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
-        return new AiOutput<V>(BlockTypeContainer.getByName("AI_NN_OUTPUT_NODE"), threshold, aiOutputAction, properties, comment);
+    public static <V> AiOutput<V> make(JSONObject nodeData, Integer threshold, BlocklyBlockProperties properties, BlocklyComment comment) {
+        return new AiOutput<V>(BlockTypeContainer.getByName("AI_NN_OUTPUT_NODE"), threshold, nodeData, properties, comment);
     }
 
     @Override
@@ -51,16 +47,16 @@ public class AiOutput<V> extends AiNode<V> {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + " [" + this.aiOutputNodeData + "]";
+        return this.getClass().getSimpleName() + " [" + getNodeData() + "]";
     }
 
     /**
      * TODO Doku
      */
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
-        JSONObject aiOutputNodeData = createOutputNodeData(block, helper);
+        JSONObject nodeData = createOutputNodeData(block, helper);
         Integer threshold = 0;
-        return AiOutput.make(aiOutputNodeData, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
+        return AiOutput.make(nodeData, threshold, helper.extractBlockProperties(block), helper.extractComment(block));
     }
 
     private static <V> JSONObject createOutputNodeData(Block block, AbstractJaxb2Ast<V> helper) {
@@ -74,6 +70,7 @@ public class AiOutput<V> extends AiNode<V> {
                 JSONObject outputNodeStream = new JSONObject();
                 outputNodeStream.put("port", actorPort.toLowerCase());
                 outputNodeStream.put("type", outputType.toLowerCase());
+                outputNodeStream.put("name", "Motor");
                 return outputNodeStream;
             default:
                 throw new RuntimeException("Output type " + outputType + " not supported!");
@@ -84,10 +81,10 @@ public class AiOutput<V> extends AiNode<V> {
     public Block astToBlock() {
         Block jaxbDestination = new Block();
         Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
-        String type = getAiOutputNodeData().getString("type");
+        String type = getNodeData().getString("type");
         switch ( type.toLowerCase() ){
             case "motorport":
-            String port = getAiOutputNodeData().getString("port");
+            String port = getNodeData().getString("port");
             String actorInfo = (type + "_"+ port).toUpperCase();
             Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
         }

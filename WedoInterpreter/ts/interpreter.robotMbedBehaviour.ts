@@ -3,7 +3,7 @@ import { State } from "interpreter.state";
 import * as C from "interpreter.constants";
 import * as U from "interpreter.util";
 import * as $ from "jquery";
-import {AiNeuralNetworkModule, Ev3MotorOutputNode} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
+import {AiNeuralNetworkModule} from "aiNeuralNetworkModule/source/ai.neuralNetwork";
 import {QLearningAlgorithmModule} from "interpreter.svgPlayground/ts/aiReinforcementLearningModule";
 
 export class RobotMbedBehaviour extends ARobotBehaviour {
@@ -437,7 +437,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	public processNeuralNetwork(inputLayer, outputLayer) {
 
 		if ($.isEmptyObject(this.neuralNetworkModule)) {
-			this.neuralNetworkModule = new AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", {width: 300, height: 200}, inputLayer, outputLayer);
+			this.neuralNetworkModule = new AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", {width: 500, height: 400}, inputLayer, outputLayer);
 		}
 		//set new Values in InputLayer
 		let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
@@ -457,7 +457,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 			} else {
 				value = node2.value;
 			}
-			this.setMotorSpeed("ev3", (<Ev3MotorOutputNode>node2).port, value);
+			this.setMotorSpeed("ev3", node2.port, value);
 			console.log("Motorspeed" + value)
 		}
 

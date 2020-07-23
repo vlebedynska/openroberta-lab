@@ -385,7 +385,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
         processNeuralNetwork(inputLayer, outputLayer) {
             if ($.isEmptyObject(this.neuralNetworkModule)) {
-                this.neuralNetworkModule = new ai_neuralNetwork_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", { width: 300, height: 200 }, inputLayer, outputLayer);
+                this.neuralNetworkModule = new ai_neuralNetwork_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", { width: 500, height: 400 }, inputLayer, outputLayer);
             }
             //set new Values in InputLayer
             let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();

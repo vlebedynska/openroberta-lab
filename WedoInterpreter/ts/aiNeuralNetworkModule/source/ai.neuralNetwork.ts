@@ -114,7 +114,7 @@ export class AiNeuralNetwork {
 
     public static addNodesName(layer: Array<Node>) {
         for ( let node of layer) {
-            node.name = node.data.name + " Port " + node.data.port;
+            node.name = node.name + " Port " + node.port;
         }
     }
 
@@ -131,9 +131,12 @@ export class AiNeuralNetwork {
 
 export class Node {
 
+
     private _positionX: number;
     private _positionY: number;
     private _name: String;
+    private _port: String;
+    private _type: String;
 
     constructor(public value: number,
                 public threshold: number,
@@ -164,27 +167,25 @@ export class Node {
     set positionY(value: number) {
         this._positionY = value;
     }
-}
 
-export class Ev3MotorOutputNode extends Node {
-
-    private readonly _port: string;
-    private readonly _type: string;
-
-    get port(): string {
+    get type(): String {
+        return this._type;
+    }
+    get port(): String {
         return this._port;
     }
 
-    get type(): string {
-        return this._type;
-    }
 
-    constructor (value: number, threshold: number, port: string, type: string ) {
-        super(value, threshold);
-        this._port = port;
-        this._type = type;
-    }
 }
+
+
+
+
+
+
+
+
+
 
 
 export class Link extends EventTarget {
@@ -216,9 +217,11 @@ export class LinkUI extends EventTarget {
     private static readonly STARTPOINT = 0;
     private slider: SVGSlider;
     private isActivated: boolean = false;
+    private sliderValueText: SVG.Text;
 
     constructor(private readonly link: Link, private svg: SVG.Svg, private draggable: Draggable) {
         super();
+        this.sliderValueText = this.svg.text("");
         this.drawSlider();
         this.addLinkListener();
     };
@@ -230,14 +233,12 @@ export class LinkUI extends EventTarget {
         let circle: SVG.Shape = this.svg.circle()
             .radius(LinkUI.SLIDER_SHAPE_RADIUS)
             .fill('red')
-            .click(function () {
-                that.activateLink();
-            });
         this.slider = SVGSlider.createSlider(
             path,
             LinkUI.RANGE_MIN,
             LinkUI.RANGE_MAX,
             circle,
+            this.sliderValueText,
             AiNeuralNetworkUI.NODE_CIRCLE_RADIUS+LinkUI.SLIDER_SHAPE_RADIUS,
             path.length()-(AiNeuralNetworkUI.NODE_CIRCLE_RADIUS+LinkUI.SLIDER_SHAPE_RADIUS),
             this.link.weight);
@@ -284,7 +285,7 @@ export class LinkUI extends EventTarget {
 
     private activateLink() {
         this.isActivated = true;
-        this.slider.path.stroke(LinkUI.COLOR_ACTIVE).front();
+        this.slider.path.stroke(LinkUI.COLOR_ACTIVE);
         this.slider.sliderShape.front();
         let event: CustomEvent = new CustomEvent('linkActivated');
         console.log("Link aktiviert");
@@ -296,6 +297,8 @@ export class LinkUI extends EventTarget {
         this.slider.path.stroke(LinkUI.COLOR_INACTIVE);
         console.log("Link deaktiviert");
     }
+
+
 }
 
 
@@ -343,13 +346,16 @@ export class Draggable {
     }
 }
 
+
+
+
 export class AiNeuralNetworkUI {
     private draggable: Draggable;
     private activeLinkUI: LinkUI;
-    public static readonly LAYER_OFFSET_TOP = 20;
-    public static readonly LAYER_OFFSET_LEFT = 50;
+    public static readonly LAYER_OFFSET_TOP = 60;
+    public static readonly LAYER_OFFSET_LEFT = 200;
     public static HORIZONTAL_DISTANCE_BETWEEN_TWO_NODES = 170;
-    public static VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 70;
+    public static VERTICAL_DISTANCE_BETWEEN_TWO_NODES = 110;
     public static NODE_CIRCLE_RADIUS = 20;
 
     public constructor(public neuralNetwork: AiNeuralNetwork, private svg: SVG.Svg) {
@@ -371,7 +377,15 @@ export class AiNeuralNetworkUI {
                 .radius(AiNeuralNetworkUI.NODE_CIRCLE_RADIUS)
                 .cx(nodePositionXY.x)
                 .cy(nodePositionXY.y)
-                .fill('black');
+                .addClass("inputNode");
+            let nodeName = node.name;
+            let text = this.svg.text("").tspan(nodeName).dy(""+circle.cy());
+            if (node.positionX == 0) {
+                text.ax(""+(circle.cx()-175)).addClass("inputNodeName");
+            } else {
+                text.ax("" + (circle.cx()+30)).addClass("outputNodeName");
+            }
+
         }
     }
 
@@ -393,22 +407,31 @@ export class AiNeuralNetworkUI {
         let y = AiNeuralNetworkUI.LAYER_OFFSET_TOP + AiNeuralNetworkUI.VERTICAL_DISTANCE_BETWEEN_TWO_NODES * nodePositionY;
         return {x: x, y: y};
     }
+
 }
+
+
+
+
 
 
 export class SVGSlider extends EventTarget {
 
+
     private static readonly ACCURACY = 100;
+    private _sliderValueText: SVG.Text;
 
     private constructor(
         private readonly _path: SVG.Path,
         private readonly rangeMin: number,
         private readonly rangeMax: number,
         private readonly _sliderShape: SVG.Shape,
+        sliderValueText: SVG.Text,
         private readonly startPoint = 0,
         private readonly endPoint = _path.length(),
         private _sliderValue: number) {
         super();
+        this.sliderValueText = sliderValueText;
         this.sliderValue = _sliderValue;
     }
 
@@ -424,17 +447,17 @@ export class SVGSlider extends EventTarget {
         return this._sliderValue;
     }
 
-    set sliderValue(value: number) {
-        this._sliderValue = value;
-        let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
-        this.sliderShape.cx(pointOnPath.x).cy(pointOnPath.y);
-        let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: value});
-        console.log("slidervalue changed: " + value);
-        this.dispatchEvent(event);
+    set sliderValueText(value: SVG.Text) {
+        this._sliderValueText = value;
+    }
+    get sliderValueText(): SVG.Text {
+        return this._sliderValueText;
     }
 
-    public static createSlider(path: SVG.Path, rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, startPoint: number, endPoint = path.length(), sliderValue = 0): SVGSlider {
-        let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, startPoint, endPoint, sliderValue);
+
+
+    public static createSlider(path: SVG.Path, rangeMin: number, rangeMax: number, sliderShape: SVG.Shape, sliderValueText: SVG.Text, startPoint: number, endPoint = path.length(), sliderValue = 0): SVGSlider {
+        let slider = new SVGSlider(path, rangeMin, rangeMax, sliderShape, sliderValueText, startPoint, endPoint, sliderValue);
         slider.updateSliderShapePosition(sliderValue);
 
         slider.sliderShape.on('dragmove', function (e) {
@@ -444,11 +467,23 @@ export class SVGSlider extends EventTarget {
             //umrechnen startpoint und endpoint
             slider.updateSliderShapePosition(p.lengthOnPath);
 
-
+            slider.sliderValueText = slider.sliderValueText.cx(sliderShape.cx()).cy(sliderShape.cy()-15);
             let sliderShapeCenter = {x: sliderShape.cx(), y: sliderShape.cy()};
             slider.sliderValue = SVGUtils.getPositionOnPath(path, sliderShapeCenter, SVGSlider.ACCURACY, rangeMax);
         });
         return slider;
+    }
+
+
+    set sliderValue(value: number) {
+        this._sliderValue = value;
+        let pointOnPath = this.path.node.getPointAtLength(this.path.node.getTotalLength() * value);
+        this.sliderShape.cx(pointOnPath.x).cy(pointOnPath.y);
+        let event: CustomEvent = new CustomEvent<number>('sliderValueChanged', {detail: value});
+        console.log("slidervalue changed: " + value);
+        this.dispatchEvent(event);
+
+        this.updateSliderValueText(value);
     }
 
     private updateSliderShapePosition(p: number) {
@@ -467,12 +502,23 @@ export class SVGSlider extends EventTarget {
         }
     }
 
+    private updateSliderValueText(value: number) {
+        this.sliderValueText.plain(""+value.toFixed(2));
+    }
+
 
 
 }
 
 
+
+
+
+
+
+
 export class SVGUtils {
+
 
     public static createPath(svg, node1PositionX, node1PositionY, node2PositionX, node2PositionY): SVG.Path {
         return svg.path([

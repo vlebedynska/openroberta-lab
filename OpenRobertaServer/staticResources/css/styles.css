@@ -75,6 +75,21 @@
 }
 
 
-.test {
 
+
+
+
+.inputNode {
+    fill: #f29400;
+}
+
+.inputNodeName {
+    font-style: italic;
+    text-align: right;
+}
+
+
+.outputNodeName {
+    font-style: italic;
+    text-align: left;
 }

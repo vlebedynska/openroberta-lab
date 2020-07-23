@@ -230,9 +230,9 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
             aiInputNode.getExternalSensor().accept(this);
         }
         int threshold = aiInputNode.getThreshold();
-        JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUM_CONST).put(C.VALUE, threshold).put("data", aiInputNode.getNodeData());
+        JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUM_CONST).put(C.VALUE, threshold);
         app(o);
-        return app(mk(C.CREATE_INPUT_NODE));
+        return app(mk(C.CREATE_INPUT_NODE).put("data", aiInputNode.getNodeData()));
     }
 
     @Override
@@ -242,12 +242,12 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         }
         AiInputNodeColourSensor.Colour colour = aiInputNodeColourSensor.getColour();
         int threshold = aiInputNodeColourSensor.getThreshold();
-        return app(mk(C.CREATE_INPUT_NODE_COLOUR_SENSOR).put(C.THRESHOLD, threshold).put(C.COLOUR, colour));
+        return app(mk(C.CREATE_INPUT_NODE_COLOUR_SENSOR).put(C.THRESHOLD, threshold).put(C.COLOUR, colour).put("data", aiInputNodeColourSensor.getNodeData()));
     }
 
     @Override
     public V visitAiOutputNode(AiOutput<V> aiOutputNode) {
-        JSONObject a = aiOutputNode.getAiOutputNodeData();
+        JSONObject a = aiOutputNode.getNodeData();
         return app(mk(C.CREATE_OUTPUT_NODE).put("data", a));
     }
 

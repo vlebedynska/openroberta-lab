@@ -82,7 +82,7 @@ public class AiInput<V> extends AiNode<V> {
         String modeName = BlocklyConstants.DISTANCE;
         String slotName = BlocklyConstants.NO_SLOT;
         JSONObject nodeData = new JSONObject();
-        nodeData.put("port", portName).put("mode", modeName).put("slot", slotName).put("name", C.ULTRASONIC);
+        nodeData.put("port", portName).put("mode", modeName).put("slot", slotName).put("name", "Ultraschalsensor");
 
         ExternalSensor<V> externalSensor = createSensorAst(nodeData, block, helper);
         

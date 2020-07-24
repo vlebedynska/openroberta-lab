@@ -10,13 +10,15 @@ export class NodeImpl extends EventTarget implements Node {
     private _value: number;
     private readonly _threshold: number;
     private readonly _data: Object;
+    private _color: string;
 
-    constructor(value: number, threshold: number, port: string, type: string) {
+    constructor(value: number, threshold: number, port: string, type: string, color: string = "default") {
         super();
         this._value = value;
         this._threshold = threshold;
         this._port = port;
         this._type = type;
+        this._color = color;
     }
 
 
@@ -31,8 +33,10 @@ export class NodeImpl extends EventTarget implements Node {
     }
 
     set value(value: number) {
-        this._value = value;
-        this.dispatchEvent(new CustomEvent<number>("valueChanged", {detail: value}))
+        if (value !== this._value) {
+            this._value = value;
+            this.dispatchEvent(new CustomEvent<number>("valueChanged", {detail: value}));
+        }
     }
 
     get positionX(): number {
@@ -70,6 +74,15 @@ export class NodeImpl extends EventTarget implements Node {
     get data(): Object {
         return this._data;
     }
+
+    get color(): string {
+        return this._color;
+    }
+
+    set color(value: string) {
+        this._color = value;
+    }
+
 
 
 }

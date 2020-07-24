@@ -30,7 +30,17 @@ export class LinkUI extends EventTarget {
             .stroke(LinkUI.COLOR_DEFAULT);
         let circle: SVG.Shape = this.svg.circle()
             .radius(LinkUI.SLIDER_SHAPE_RADIUS)
-            .fill('red')
+            .addClass("sliderShape")
+
+        circle.on("mousedown", function () {
+            circle.addClass("sliderShapeMouseDown")
+        })
+
+        circle.on("mouseup", function () {
+            circle.removeClass("sliderShapeMouseDown")
+        })
+
+
         this.slider = SVGSliderImpl.createSlider(
             path,
             LinkUI.RANGE_MIN,

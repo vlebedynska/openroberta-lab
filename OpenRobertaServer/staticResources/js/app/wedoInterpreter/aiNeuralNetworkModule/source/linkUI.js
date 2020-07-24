@@ -19,7 +19,13 @@ define(["require", "exports", "interpreter.aiNeuralNetworkModule/source/svgSlide
                 .stroke(LinkUI.COLOR_DEFAULT);
             let circle = this.svg.circle()
                 .radius(LinkUI.SLIDER_SHAPE_RADIUS)
-                .fill('red');
+                .addClass("sliderShape");
+            circle.on("mousedown", function () {
+                circle.addClass("sliderShapeMouseDown");
+            });
+            circle.on("mouseup", function () {
+                circle.removeClass("sliderShapeMouseDown");
+            });
             this.slider = svgSlider_1.SVGSliderImpl.createSlider(path, LinkUI.RANGE_MIN, LinkUI.RANGE_MAX, circle, this.sliderValueText, aiNeuralNetworkUI_1.AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS, path.length() - (aiNeuralNetworkUI_1.AiNeuralNetworkUI.NODE_CIRCLE_RADIUS + LinkUI.SLIDER_SHAPE_RADIUS), this.link.weight);
             this.slider.addEventListener('sliderValueChanged', function (sliderValueData) {
                 that.link.weight = sliderValueData.detail;

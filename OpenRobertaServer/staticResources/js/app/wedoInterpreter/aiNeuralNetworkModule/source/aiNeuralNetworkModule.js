@@ -1,15 +1,18 @@
-define(["require", "exports", "svgdotjs", "jquery", "interpreter.aiNeuralNetworkModule/source/aiNeuralNetworkUI", "interpreter.aiNeuralNetworkModule/source/aiNeuralNetwork", "interpreter.aiNeuralNetworkModule/source/node"], function (require, exports, SVG, $, aiNeuralNetworkUI_1, aiNeuralNetwork_1, node_1) {
+define(["require", "exports", "svgdotjs", "jquery", "interpreter.aiNeuralNetworkModule/source/aiNeuralNetworkUI", "interpreter.aiNeuralNetworkModule/source/aiNeuralNetwork", "interpreter.aiNeuralNetworkModule/source/node", "interpreter.aiNeuralNetworkModule/source/player"], function (require, exports, SVG, $, aiNeuralNetworkUI_1, aiNeuralNetwork_1, node_1, player_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class AiNeuralNetworkModule {
-        constructor(selector, size, ...layers) {
+        constructor(selector, ...layers) {
             this._aiNeuralNetwork = null;
             this._aiNeuralNetworkUI = null;
+            this._player = null;
             $(selector).html('');
-            this.svg = SVG.SVG().addTo(selector).size(size.width, size.height);
+            this.svg = SVG.SVG().addTo(selector);
             let layersWithNormalizedNodes = this.normalizeNodes(...layers);
             this._aiNeuralNetwork = this.createNeuralNetwork(...layersWithNormalizedNodes);
             this._aiNeuralNetworkUI = new aiNeuralNetworkUI_1.AiNeuralNetworkUI(this.aiNeuralNetwork, this.svg);
+            this.svg.addClass("svgViewBoxNNModule").viewbox(this.svg.bbox());
+            this._player = new player_1.Player(this.aiNeuralNetworkUI);
         }
         createNeuralNetwork(...layers) {
             if (this._aiNeuralNetwork != null) {
@@ -25,7 +28,7 @@ define(["require", "exports", "svgdotjs", "jquery", "interpreter.aiNeuralNetwork
             for (let layer of layers) {
                 let normalizedNodes = new Array();
                 for (let nodeOld of layer) {
-                    let node = new node_1.NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type);
+                    let node = new node_1.NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type, nodeOld.color);
                     node.name = nodeOld.name;
                     normalizedNodes.push(node);
                 }
@@ -43,6 +46,9 @@ define(["require", "exports", "svgdotjs", "jquery", "interpreter.aiNeuralNetwork
         }
         get aiNeuralNetworkUI() {
             return this._aiNeuralNetworkUI;
+        }
+        get player() {
+            return this._player;
         }
     }
     exports.AiNeuralNetworkModule = AiNeuralNetworkModule;

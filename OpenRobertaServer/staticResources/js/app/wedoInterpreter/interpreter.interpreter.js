@@ -460,11 +460,9 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.CREATE_INPUT_NODE_COLOUR_SENSOR: {
-                            let node = {
-                                value: s.pop(),
-                                threshold: stmt[C.THRESHOLD],
-                                colour: stmt[C.COLOUR]
-                            };
+                            let node = stmt["data"];
+                            node.value = s.pop();
+                            node.threshold = stmt[C.THRESHOLD];
                             n.extractColourChannelAndNormalize(node);
                             s.push(node);
                             break;

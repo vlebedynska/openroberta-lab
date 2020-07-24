@@ -2,7 +2,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class RobotMbedBehaviour extends interpreter_aRobotBehaviour_1.ARobotBehaviour {
-        constructor(updateBackground) {
+        constructor(updateBackground, simSetPause) {
             super();
             this.mouseOver = function (line) {
                 line.stroke = "rgb(0,255,0)";
@@ -10,6 +10,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.hardwareState.motors = {};
             this.neuralNetworkModule = null;
             this.updateBackground = updateBackground;
+            this.simSetPause = simSetPause;
             this.qLearningAlgorithmModule =
                 new aiReinforcementLearningModule_1.QLearningAlgorithmModule(updateBackground, "#qLearningBackgroundArea", $('#simConfigRLQLearningModal'), { width: 800, height: 800 }, "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg");
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
@@ -385,13 +386,29 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
         processNeuralNetwork(inputLayer, outputLayer) {
             if ($.isEmptyObject(this.neuralNetworkModule)) {
-                this.neuralNetworkModule = new aiNeuralNetworkModule_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", { width: 500, height: 400 }, inputLayer, outputLayer);
+                this.neuralNetworkModule = new aiNeuralNetworkModule_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", inputLayer, outputLayer);
+                let that = this;
+                this.neuralNetworkModule.player.addEventListener("pause", function () {
+                    that.setBlocking(true);
+                    that.simSetPause(true);
+                });
+                this.neuralNetworkModule.player.addEventListener("play", function () {
+                    that.setBlocking(false);
+                    that.simSetPause(false);
+                });
             }
             //set new Values in InputLayer
             let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
+            let valuesChanged = false;
             for (let nodeID in inputLayer) {
                 let node = inputLayer[nodeID];
-                aiNeuralNetworkInputLayer[nodeID].value = node.value;
+                if (aiNeuralNetworkInputLayer[nodeID].value !== node.value) {
+                    valuesChanged = true;
+                    aiNeuralNetworkInputLayer[nodeID].value = node.value;
+                }
+            }
+            if (!valuesChanged) {
+                return;
             }
             //calculates new network nodes values
             this.neuralNetworkModule.calculateNeuralNetworkOutput();
@@ -416,7 +433,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         }
         extractColourChannelAndNormalize(node) {
             var colourChannel;
-            switch (node.colour) {
+            switch (node.color) {
                 case "R":
                     colourChannel = 0;
                     break;
@@ -427,7 +444,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                     colourChannel = 2;
                     break;
                 default:
-                    throw node.colour + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
+                    throw node.color + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
             }
             var colourChannelValue = node.value[colourChannel];
             var inputValue = colourChannelValue / 2.55;

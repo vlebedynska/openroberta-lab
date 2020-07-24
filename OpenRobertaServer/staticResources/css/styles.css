@@ -79,22 +79,53 @@
 
 
 
-.inputNode {
-    fill: #f29400;
+.sliderShape {
+    cursor: grab;
+    fill: #e72552;
 }
+
+.sliderShape.sliderShapeMouseDown {
+    cursor: grabbing;
+}
+
 
 .inputNodeName {
     font-style: italic;
-    text-align: right;
 }
 
 
 .outputNodeName {
     font-style: italic;
-    text-align: left;
 }
 
 
 .activeNodeValue {
 
+}
+
+.backgroundPlayerButtonsNNModule {
+    fill: #aaaaa9;
+}
+
+.buttonNNModule {
+    fill: #fcfaec;
+}
+
+.buttonPressed.buttonNNModule{
+    fill: olivedrab;
+
+}
+
+.buttonHovered {
+    fill: #d52b2b;
+    stroke-width: 3;
+    stroke: #eceaea;
+    stroke-linejoin: round;
+    -webkit-filter: drop-shadow(16px 16px 20px);
+}
+
+
+.svgViewBoxNNModule {
+    margin: 40px;
+    user-select: none;
 }

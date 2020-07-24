@@ -2309,26 +2309,27 @@ pre code {
 }
 
 
-#simConfigNeuralNetworkContent {
-    width: 300px;
-    padding: 15px;
-}
-
-#simConfigNeuralNetworkSVG {
-    width: 300px;
-    padding: 15px;
-}
 
 #test{
-    width: 300px;
+    width: 500px;
     padding: 15px;
 }
 
 #simConfigNeuralNetworkModal .modal-dialog{
+    cursor: default;
     margin: 0px;
     background: #fcfaec;
     border: 2px solid rgba(107, 134, 14, 0.5);
 
+}
+
+#simConfigNeuralNetworkModal .modal-header {
+    cursor: move;
+    background: #9ea39c;
+}
+
+#simConfigNeuralNetworkModal .modal-header .close {
+    margin-top: -12px;
 }
 
 #simConfigRLQLearningModal .modal-dialog{

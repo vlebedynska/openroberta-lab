@@ -1,6 +1,7 @@
 require.config({
     baseUrl : 'js/libs',
     paths : {
+        'interpreter.aiNeuralNetworkModule/source/player': '../app/wedoInterpreter/aiNeuralNetworkModule/source/player',
         'interpreter.aiNeuralNetworkModule/source/aiNeuralNetwork': '../app/wedoInterpreter/aiNeuralNetworkModule/source/aiNeuralNetwork',
         'interpreter.aiNeuralNetworkModule/source/aiNeuralNetworkModule': '../app/wedoInterpreter/aiNeuralNetworkModule/source/aiNeuralNetworkModule',
         'interpreter.aiNeuralNetworkModule/source/aiNeuralNetworkUI': '../app/wedoInterpreter/aiNeuralNetworkModule/source/aiNeuralNetworkUI',

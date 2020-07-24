@@ -16,6 +16,7 @@ export interface Node extends EventTarget{
     positionY: number;
     name: string;
     value: number;
+    color?: string;
 }
 
 export interface AiNeuralNetwork {

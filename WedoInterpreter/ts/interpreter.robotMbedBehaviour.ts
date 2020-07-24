@@ -11,14 +11,17 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	private neuralNetworkModule: AiNeuralNetworkModule;
 	private readonly updateBackground: Function;
+	private readonly simSetPause: Function;
 	private readonly qLearningAlgorithmModule: QLearningAlgorithmModule;
 	private promise;
 
-	constructor(updateBackground) {
+	constructor(updateBackground, simSetPause: Function) {
 		super();
 		this.hardwareState.motors = {};
 		this.neuralNetworkModule = null;
 		this.updateBackground = updateBackground;
+		this.simSetPause = simSetPause;
+
 		this.qLearningAlgorithmModule =
 			new QLearningAlgorithmModule(
 				updateBackground,
@@ -438,13 +441,30 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	public processNeuralNetwork(inputLayer, outputLayer) {
 
 		if ($.isEmptyObject(this.neuralNetworkModule)) {
-			this.neuralNetworkModule = new AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", {width: 500, height: 400}, inputLayer, outputLayer);
+			this.neuralNetworkModule = new AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", inputLayer, outputLayer);
+			let that = this;
+			this.neuralNetworkModule.player.addEventListener("pause", function () {
+				that.setBlocking(true);
+				that.simSetPause(true);
+			})
+			this.neuralNetworkModule.player.addEventListener("play", function () {
+				that.setBlocking(false);
+				that.simSetPause(false);
+			})
 		}
 		//set new Values in InputLayer
 		let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
+		let valuesChanged = false;
 		for (let nodeID in inputLayer) {
 			let node: Node = inputLayer[nodeID];
-			aiNeuralNetworkInputLayer[nodeID].value = node.value;
+			if (aiNeuralNetworkInputLayer[nodeID].value !== node.value) {
+				valuesChanged = true;
+				aiNeuralNetworkInputLayer[nodeID].value = node.value;
+			}
+		}
+
+		if (!valuesChanged) {
+			return;
 		}
 
 		//calculates new network nodes values
@@ -478,7 +498,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 
 	public extractColourChannelAndNormalize (node) {
 		var colourChannel;
-		switch (node.colour) {
+		switch (node.color) {
 			case "R":
 				colourChannel = 0;
 				break;
@@ -489,7 +509,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 				colourChannel = 2;
 				break;
 			default:
-				throw node.colour + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
+				throw node.color + " is not a colour channel. Expected value is 'R', 'G' or 'B'. ";
 		}
 		var colourChannelValue = node.value[colourChannel];
 		var inputValue = colourChannelValue/2.55;

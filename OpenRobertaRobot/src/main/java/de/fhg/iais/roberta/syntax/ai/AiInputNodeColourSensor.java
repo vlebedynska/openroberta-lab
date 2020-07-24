@@ -117,7 +117,12 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
         Integer threshold = DEFAULT_THRESHOLD;
 
         JSONObject nodeData = new JSONObject();
-        nodeData.put("port", portName).put("colour", colourExtracted).put("name", C.COLOR);
+        nodeData
+            .put("port", portName)
+            .put("mode", externalSensor.getMode())
+            .put("slot", externalSensor.getSlot())
+            .put("color", colour)
+            .put("name", "Farbsensor");
 
         return AiInputNodeColourSensor.make(externalSensor, threshold, colour, helper.extractBlockProperties(block), helper.extractComment(block), nodeData);
     }

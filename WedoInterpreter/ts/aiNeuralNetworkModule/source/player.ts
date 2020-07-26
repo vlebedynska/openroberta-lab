@@ -4,11 +4,13 @@ import {AiNeuralNetworkUI} from "interpreter.aiNeuralNetworkModule/source/aiNeur
 export class Player extends EventTarget {
 
 
+    private _isPlaying: boolean;
     private readonly _aiNeuralNetworkUI: AiNeuralNetworkUI;
 
     constructor(aiNeuralNetworkUI: AiNeuralNetworkUI) {
         super();
         this._aiNeuralNetworkUI = aiNeuralNetworkUI;
+        this._isPlaying = false;
         this.initialize()
     }
 
@@ -38,6 +40,15 @@ export class Player extends EventTarget {
 
     get aiNeuralNetworkUI(): AiNeuralNetworkUI {
         return this._aiNeuralNetworkUI;
+    }
+
+
+    get isPlaying(): boolean {
+        return this._isPlaying;
+    }
+
+    set isPlaying(value: boolean) {
+        this._isPlaying = value;
     }
 
 }

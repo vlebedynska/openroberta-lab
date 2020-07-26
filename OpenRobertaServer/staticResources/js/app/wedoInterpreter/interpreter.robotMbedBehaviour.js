@@ -387,28 +387,29 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         processNeuralNetwork(inputLayer, outputLayer) {
             if ($.isEmptyObject(this.neuralNetworkModule)) {
                 this.neuralNetworkModule = new aiNeuralNetworkModule_1.AiNeuralNetworkModule("#simConfigNeuralNetworkSVG", inputLayer, outputLayer);
+                this.neuralNetworkModule.player.isPlaying = true;
                 let that = this;
                 this.neuralNetworkModule.player.addEventListener("pause", function () {
                     that.setBlocking(true);
                     that.simSetPause(true);
+                    that.neuralNetworkModule.player.isPlaying = false;
                 });
                 this.neuralNetworkModule.player.addEventListener("play", function () {
                     that.setBlocking(false);
                     that.simSetPause(false);
+                    that.neuralNetworkModule.player.isPlaying = true;
                 });
             }
             //set new Values in InputLayer
+            if (!this.neuralNetworkModule.player.isPlaying) {
+                return;
+            }
             let aiNeuralNetworkInputLayer = this.neuralNetworkModule.aiNeuralNetwork.getInputLayer();
-            let valuesChanged = false;
             for (let nodeID in inputLayer) {
                 let node = inputLayer[nodeID];
                 if (aiNeuralNetworkInputLayer[nodeID].value !== node.value) {
-                    valuesChanged = true;
                     aiNeuralNetworkInputLayer[nodeID].value = node.value;
                 }
-            }
-            if (!valuesChanged) {
-                return;
             }
             //calculates new network nodes values
             this.neuralNetworkModule.calculateNeuralNetworkOutput();

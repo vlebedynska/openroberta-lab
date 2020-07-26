@@ -231,7 +231,7 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         }
         int threshold = aiInputNode.getThreshold();
         JSONObject o = mk(C.EXPR).put(C.EXPR, C.NUM_CONST).put(C.VALUE, threshold);
-        app(o);
+//        app(o);
         return app(mk(C.CREATE_INPUT_NODE).put("data", aiInputNode.getNodeData()));
     }
 

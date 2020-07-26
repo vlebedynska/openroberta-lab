@@ -1,84 +1,200 @@
 <toolbox_set id="toolbox" style="display: none">
   <category name="TOOLBOX_AI" svg="true">
     <category name="TOOLBOX_NEURAL_NETWORKS" svg="true">
-        <block type="ai_neural_network"/>
-        <block type="ai_nn_input_node_ultrasonic"/>
-        <block type="ai_nn_input_node_coloursensor_rgb_channel"/>
-        <block type="ai_nn_output_node"/>
 
-      <block type="ai_neural_network" id="t7O%8CcmaaB?sPK+P5gG" intask="false">
+
+      <block type="ai_neural_network" id=",Z,j/{BU1-#Fh@hto.g+" intask="false">
         <value name="INPUT_LAYER">
-          <block type="robLists_create_with" id="l:ns@B:pkZA@=3P-()Xs" intask="false">
-            <mutation items="3" list_type="InputNode"></mutation>
-            <field name="LIST_TYPE">InputNode</field>
-            <value name="ADD0">
-              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="OsWN#j5G|qK?Th`zRyOT" intask="false">
-                <field name="COLOUR">#DC143C</field>
-                <field name="SENSORPORT">1</field>
-              </block>
-            </value>
-            <value name="ADD1">
-              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="b8_/h}}UyA+@~`8QR`D5" intask="false">
-                <field name="COLOUR">#00ff00</field>
-                <field name="SENSORPORT">1</field>
-              </block>
-            </value>
-            <value name="ADD2">
-              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="@iX^.~H5n(?y1,N%(m3s" intask="false">
-                <field name="COLOUR">#0057a6</field>
-                <field name="SENSORPORT">1</field>
-              </block>
-            </value>
+          <block type="ai_easy_list" id="WDLKJ?#2,hy=!]q/#vgM" intask="false">
+            <mutation items="1" list_type="InputNode"></mutation>
           </block>
         </value>
         <value name="OUTPUT_LAYER">
-          <block type="robLists_create_with" id="/7k.oYW/uP1ix#eDQgCN" intask="false">
-            <mutation items="2" list_type="OutputNode"></mutation>
-            <field name="LIST_TYPE">OutputNode</field>
-            <value name="ADD0">
-              <block type="ai_nn_output_node" id="o3!(37Tcu]BV.!V:/uR}" intask="false">
-                <field name="OUTPUTNODE">MOTORPORT_A</field>
-              </block>
-            </value>
-            <value name="ADD1">
-              <block type="ai_nn_output_node" id="0!7Jr~|n)rLx`YEV_rgw" intask="false">
-                <field name="OUTPUTNODE">MOTORPORT_B</field>
-              </block>
-            </value>
-          </block>
-        </value>
-      </block>
-    </category>
-    <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">
-      <block type="ai_q_learning_states_and_actions_map" id="IUJLU!rzwElCjD@+4%6}" intask="false">
-        <field name="START">A</field>
-        <field name="FINISH">I</field>
-      </block>
-      <block type="ai_q_barrier_mountain" id=")eljm6pw3ob0}Ua6SmBm" intask="false">
-        <field name="START">A</field>
-        <field name="FINISH">I</field>
-      </block>
-      <block type="ai_q_draw_the_best_way"></block>
-      <block type="ai_q_drive_the_best_way" id="]c-r#3qKk_C@5Q@iU+th" intask="false">
-        <value name="POWER">
-          <block type="math_number" id="gy#qt`?AOW+yUwZNI}2/" intask="false">
-            <field name="NUM">30</field>
+          <block type="ai_easy_list" id="Fmf`QA0Gq]vRkdEcPCy(" intask="false">
+            <mutation items="1" list_type="OutputNode"></mutation>
           </block>
         </value>
       </block>
 
-      <block type="ai_q_apply_learning_rule" id="24=TMbMJo|N0s#{o1E!1" intask="false"></block>
-      <block type="ai_q_learner_config" id="/=W!|#l0HTvb-sK*h3MT" intask="false">
+        <block type="ai_nn_input_node_ultrasonic"/>
+        <block type="ai_nn_input_node_coloursensor_rgb_channel"/>
+        <block type="ai_nn_input_node_coloursensor_color"/>
+        <block type="ai_nn_input_node_coloursensor_light"/>
+
+
+        <block type="ai_nn_output_node"/>
+        <block type="ai_nn_output_node_led"/>
+        <block type="ai_nn_output_node_text"/>
+        <block type="ai_nn_output_node_sound"/>
+
+
+
+<!--      <block type="ai_neural_network" id="t7O%8CcmaaB?sPK+P5gG" intask="false">-->
+<!--        <value name="INPUT_LAYER">-->
+<!--          <block type="robLists_create_with" id="l:ns@B:pkZA@=3P-()Xs" intask="false">-->
+<!--            <mutation items="3" list_type="InputNode"></mutation>-->
+<!--            <field name="LIST_TYPE">InputNode</field>-->
+<!--            <value name="ADD0">-->
+<!--              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="OsWN#j5G|qK?Th`zRyOT" intask="false">-->
+<!--                <field name="COLOUR">#DC143C</field>-->
+<!--                <field name="SENSORPORT">1</field>-->
+<!--              </block>-->
+<!--            </value>-->
+<!--            <value name="ADD1">-->
+<!--              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="b8_/h}}UyA+@~`8QR`D5" intask="false">-->
+<!--                <field name="COLOUR">#00ff00</field>-->
+<!--                <field name="SENSORPORT">1</field>-->
+<!--              </block>-->
+<!--            </value>-->
+<!--            <value name="ADD2">-->
+<!--              <block type="ai_nn_input_node_coloursensor_rgb_channel" id="@iX^.~H5n(?y1,N%(m3s" intask="false">-->
+<!--                <field name="COLOUR">#0057a6</field>-->
+<!--                <field name="SENSORPORT">1</field>-->
+<!--              </block>-->
+<!--            </value>-->
+<!--          </block>-->
+<!--        </value>-->
+<!--        <value name="OUTPUT_LAYER">-->
+<!--          <block type="robLists_create_with" id="/7k.oYW/uP1ix#eDQgCN" intask="false">-->
+<!--            <mutation items="2" list_type="OutputNode"></mutation>-->
+<!--            <field name="LIST_TYPE">OutputNode</field>-->
+<!--            <value name="ADD0">-->
+<!--              <block type="ai_nn_output_node" id="o3!(37Tcu]BV.!V:/uR}" intask="false">-->
+<!--                <field name="OUTPUTNODE">MOTORPORT_A</field>-->
+<!--              </block>-->
+<!--            </value>-->
+<!--            <value name="ADD1">-->
+<!--              <block type="ai_nn_output_node" id="0!7Jr~|n)rLx`YEV_rgw" intask="false">-->
+<!--                <field name="OUTPUTNODE">MOTORPORT_B</field>-->
+<!--              </block>-->
+<!--            </value>-->
+<!--          </block>-->
+<!--        </value>-->
+<!--      </block>-->
+
+    </category>
+    <category name="TOOLBOX_REINFORCEMENT_LEARNING" svg="true">
+
+      <block type="ai_q_learning_states_and_actions_map" id="rH5m{d=[,8TjOD1dlL%8" intask="false">
+        <field name="MAP">MAP_RAILWAY</field>
+        <value name="START">
+          <block type="math_number" id="HT+OWNfW_Oe?MWbD-weF" intask="false">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="FINISH">
+          <block type="math_number" id="|gP8+:]Lf;?{r4yBZ1t6" intask="false">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="OBSTACLE">
+          <block type="rl_obstacles_easy_list" id="?=]X1?,gxh7}o^D+CGjj" intask="false">
+            <mutation items="1" list_type="Obstacle"></mutation>
+            <value name="ADD0">
+              <block type="ai_q_barrier_mountain" id="@~q2UimIQJ~v)Ml8GBh!" intask="false">
+                <value name="START">
+                  <block type="math_number" id="!)Ze{1gw|oO_+X5qstzK" intask="false">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="FINISH">
+                  <block type="math_number" id="Wdn{yLcTF%8|2d[ze*w{" intask="false">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block type="rl_obstacles_easy_list" id="?=]X1?,gxh7}o^D+CGjj" intask="false">
+        <mutation items="1" list_type="Obstacle"></mutation>
+        <value name="ADD0">
+          <block type="ai_q_barrier_mountain" id="@~q2UimIQJ~v)Ml8GBh!" intask="false">
+            <value name="START">
+              <block type="math_number" id="!)Ze{1gw|oO_+X5qstzK" intask="false">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="FINISH">
+              <block type="math_number" id="Wdn{yLcTF%8|2d[ze*w{" intask="false">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block type="ai_q_learner_config" id="v8i0{.)T78+7Jdh:v;z4" intask="false">
         <field name="ALPHA">0.1</field>
         <field name="GAMMA">0.2</field>
         <field name="NU">0.1</field>
         <field name="RHO">0.1</field>
       </block>
-    </category>
-    <category name="TOOLBOX_CLUSTERING" svg="true">
+      <block type="ai_q_apply_learning_rule" id="n{^h{T08ep|=DID8pwB?" intask="false">
+        <value name="EPISODES">
+          <block type="math_number" id="~:waa;L~jcE!.5B0^#hE" intask="false">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="Q_LEARNER_TIME">
+          <block type="math_number" id="I3+`rZNdS4aVV[Q?q.0(" intask="false">
+            <field name="NUM">30</field>
+          </block>
+        </value>
+      </block>
+      <block type="ai_q_draw_the_best_way" id="IZ%CU2%4L3=pvlJ7vuHr" intask="false"></block>
+
+
+      <block type="robProcedures_callnoreturn" id="2#eKuIxKgQL^|W_h%{vR" intask="true">
+        <mutation name="fahre_den_optimalen_Weg"></mutation>
+      </block>
+
+      <block type="robProcedures_defnoreturn" id="R6C!;SvLmoOoPW!}%hrY" intask="true">
+        <mutation declare="false"></mutation>
+        <field name="NAME">fahre_den_optimalen_Weg</field>
+        <statement name="STACK">
+          <block type="robControls_loopForever" id="F].Bn/w,ns:=5g#|RpQN" intask="true">
+            <statement name="DO">
+              <block type="robActions_motor_on" id="/cV_zx:r;z(WL6vTGdSi" intask="true">
+                <field name="MOTORPORT">B</field>
+                <value name="POWER">
+                  <block type="robSensors_colour_getSample" id="s4HL)E#Q}n8quVA.*x1v" intask="true">
+                    <mutation mode="LIGHT"></mutation>
+                    <field name="MODE">LIGHT</field>
+                    <field name="SENSORPORT">3</field>
+                    <field name="SLOT"></field>
+                  </block>
+                </value>
+              </block>
+              <block type="robActions_motor_on" id="g_**+kRBYB/nt`q}YeIB" intask="true">
+                <field name="MOTORPORT">C</field>
+                <value name="POWER">
+                  <block type="math_arithmetic" id="Qk(?*ps^nY(3uM/_1]#+" intask="true">
+                    <field name="OP">MINUS</field>
+                    <value name="A">
+                      <block type="math_number" id="IY32qD9#5Kc|FeQSsAL=" intask="true">
+                        <field name="NUM">100</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="robSensors_colour_getSample" id="r+0K?4Qn+Yew.8=n@7Wo" intask="true">
+                        <mutation mode="LIGHT"></mutation>
+                        <field name="MODE">LIGHT</field>
+                        <field name="SENSORPORT">3</field>
+                        <field name="SLOT"></field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+          </block>
+        </statement>
+      </block>
 
     </category>
   </category>
+
   <category name="TOOLBOX_ACTION" svg="true">
     <block type="robActions_motorDiff_on_for">
       <value name="POWER">

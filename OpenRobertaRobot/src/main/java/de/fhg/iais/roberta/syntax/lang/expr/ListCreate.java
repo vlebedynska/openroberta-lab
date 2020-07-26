@@ -3,6 +3,7 @@ package de.fhg.iais.roberta.syntax.lang.expr;
 import java.math.BigInteger;
 import java.util.List;
 
+import de.fhg.iais.roberta.blockly.generated.Arg;
 import de.fhg.iais.roberta.blockly.generated.Block;
 import de.fhg.iais.roberta.blockly.generated.Field;
 import de.fhg.iais.roberta.blockly.generated.Mutation;
@@ -99,8 +100,9 @@ public class ListCreate<V> extends Expr<V> {
      * @return corresponding AST object
      */
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
+        String mutationList = block.getMutation().getListType();
         List<Field> fields = helper.extractFields(block, (short) 1);
-        String filename = helper.extractField(fields, BlocklyConstants.LIST_TYPE);
+        String filename = helper.extractField(fields, BlocklyConstants.LIST_TYPE, mutationList);
         return ListCreate
             .make(
                 BlocklyType.get(filename),

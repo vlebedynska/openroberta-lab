@@ -366,7 +366,7 @@ block:
   LIST_CREATE:
       category: EXPR
       implementor: de.fhg.iais.roberta.syntax.lang.expr.ListCreate
-      type: [lists_create_with,robLists_create_with]
+      type: [lists_create_with,robLists_create_with,ai_easy_list]
   LIST_INDEX_OF:
       category: FUNCTION
       implementor: de.fhg.iais.roberta.syntax.lang.functions.ListGetIndex

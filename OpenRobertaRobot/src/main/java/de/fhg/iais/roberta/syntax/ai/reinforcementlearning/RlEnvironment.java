@@ -21,19 +21,25 @@ public class RlEnvironment<V> extends Stmt<V> {
     private static final String AI_RL_ENVIRONMENT = "AI_RL_ENVIRONMENT";
 
     private final ListCreate<V> listRlObstacle;
-    private final int startNode;
-    private final int finishNode;
+    private final Phrase<V> startNode;
+    private final Phrase<V> finishNode;
+
+    private final String map;
 
     public ListCreate<V> getListRlObstacle() {
         return listRlObstacle;
     }
 
-    public int getStartNode() {
+    public Phrase<V> getStartNode() {
         return startNode;
     }
 
-    public int getFinishNode() {
+    public Phrase<V> getFinishNode() {
         return finishNode;
+    }
+
+    public String getMap() {
+        return map;
     }
 
     /**
@@ -49,12 +55,14 @@ public class RlEnvironment<V> extends Stmt<V> {
         BlocklyBlockProperties properties,
         BlocklyComment comment,
         ListCreate<V> listRlObstacle,
-        int startNode,
-        int finishNode) {
+        Phrase<V> startNode,
+        Phrase<V> finishNode,
+        String map) {
         super(kind, properties, comment);
         this.listRlObstacle = listRlObstacle;
         this.startNode = startNode;
         this.finishNode = finishNode;
+        this.map = map;
         setReadOnly();
     }
 
@@ -62,12 +70,8 @@ public class RlEnvironment<V> extends Stmt<V> {
      * TODO Doku
      */
     public static <V> RlEnvironment<V> make(
-        BlocklyBlockProperties properties,
-        BlocklyComment comment,
-        ListCreate<V> listRlObstacle,
-        int startNode,
-        int finishNode) {
-        return new RlEnvironment<V>(BlockTypeContainer.getByName(AI_RL_ENVIRONMENT), properties, comment, listRlObstacle, startNode, finishNode);
+        BlocklyBlockProperties properties, BlocklyComment comment, ListCreate<V> listRlObstacle, Phrase<V> startNode, Phrase<V> finishNode, String map) {
+        return new RlEnvironment<V>(BlockTypeContainer.getByName(AI_RL_ENVIRONMENT), properties, comment, listRlObstacle, startNode, finishNode, map);
     }
 
     @Override
@@ -78,10 +82,13 @@ public class RlEnvironment<V> extends Stmt<V> {
     }
 
     public static <V> Phrase<V> jaxbToAst(Block block, AbstractJaxb2Ast<V> helper) {
-        List<Value> values = helper.extractValues(block, (short) 1);
-        List<Field> fields = helper.extractFields(block, (short) 2);
+        List<Value> values = helper.extractValues(block, (short) 3);
+        List<Field> fields = helper.extractFields(block, (short) 1);
+
         Phrase<V> obstaclesExpr = helper.extractValue(values, new ExprParam(BlocklyConstants.OBSTACLE, BlocklyType.STRING));
         final ListCreate<V> obstacles;
+
+        String map = helper.extractField(fields, BlocklyConstants.MAP);
 
         if ( obstaclesExpr instanceof EmptyExpr ) {
             obstacles = null;
@@ -91,18 +98,19 @@ public class RlEnvironment<V> extends Stmt<V> {
             throw new IllegalArgumentException("Bad type in field " + BlocklyConstants.OBSTACLE + ": " + obstaclesExpr.getClass());
         }
 
-        int startNode = RlUtils.castCharacterStringToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_START));
-        int finishNode = RlUtils.castCharacterStringToInt(helper.extractField(fields, BlocklyConstants.QLEARNING_FINISH));
+        Phrase<V> startNode = helper.extractValue(values, new ExprParam(BlocklyConstants.QLEARNING_START, BlocklyType.NUMBER));
+        Phrase<V> finishNode = helper.extractValue(values, new ExprParam(BlocklyConstants.QLEARNING_FINISH, BlocklyType.NUMBER));
 
-        return RlEnvironment.make(helper.extractBlockProperties(block), helper.extractComment(block), obstacles, startNode, finishNode);
+        return RlEnvironment.make(helper.extractBlockProperties(block), helper.extractComment(block), obstacles, startNode, finishNode, map);
     }
 
     @Override
     public Block astToBlock() {
         Block jaxbDestination = new Block();
         Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
-        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_START, RlUtils.castIntToCharacterAsString(getStartNode()).toUpperCase());
-        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.QLEARNING_FINISH, RlUtils.castIntToCharacterAsString(getFinishNode()).toUpperCase());
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.MAP, getMap());
+        Ast2JaxbHelper.addValue(jaxbDestination, BlocklyConstants.QLEARNING_START, getStartNode());
+        Ast2JaxbHelper.addValue(jaxbDestination, BlocklyConstants.QLEARNING_FINISH, getFinishNode());
         Ast2JaxbHelper.addValue(jaxbDestination, BlocklyConstants.OBSTACLE, getListRlObstacle());
         return jaxbDestination;
     }

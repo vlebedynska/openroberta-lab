@@ -96,10 +96,11 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                     const opCode = stmt[C.OPCODE];
                     switch (opCode) {
                         case C.CREATE_Q_LEARNING_ENVIRONMENT: {
-                            var startNode = stmt[C.QLEARNING_STARTNODE];
-                            var finishNode = stmt[C.QLEARNING_FINISHNODE];
                             var obstaclesList = s.pop();
-                            return n.createQLearningEnvironment(obstaclesList, startNode, finishNode);
+                            var finishNode = s.pop();
+                            var startNode = s.pop();
+                            var map = stmt[C.QLEARNING_MAP];
+                            return n.createQLearningEnvironment(obstaclesList, startNode, finishNode, map);
                         }
                         case C.SETUP_Q_LEARNING_BEHAVIOUR: {
                             var rho = stmt[C.Q_LEARNING_RHO];
@@ -110,6 +111,8 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.RUN_Q_LEARNER: {
+                            var episodes = s.pop();
+                            var time = s.pop();
                             n.runQLearner();
                         }
                         case C.Q_LEARNING_DRAW_OPTIMAL_PATH: {
@@ -453,8 +456,8 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                         }
                         case C.CREATE_OBSTACLE: {
                             let obstacle = {
-                                startNode: stmt[C.QLEARNING_STARTNODE],
-                                finishNode: stmt[C.QLEARNING_FINISHNODE]
+                                finishNode: s.pop(),
+                                startNode: s.pop()
                             };
                             s.push(obstacle);
                             break;

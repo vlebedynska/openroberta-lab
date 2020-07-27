@@ -45,6 +45,7 @@ define(["require", "exports"], function (require, exports) {
     exports.CREATE_LIST_REPEAT = "createListREPEAT";
     exports.CREATE_LIST_WITH_ITEM = "createCreateListWithItem";
     exports.CREATE_Q_LEARNING_ENVIRONMENT = "createQLearningEnvironment";
+    exports.QLEARNING_MAP = "qLearningMap";
     exports.CREATE_OBSTACLE = "createObstacle";
     exports.CURVE_ACTION = "CurveAction";
     exports.DEBUG_ACTION = "DebugAction";

@@ -12,7 +12,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	private neuralNetworkModule: AiNeuralNetworkModule;
 	private readonly updateBackground: Function;
 	private readonly simSetPause: Function;
-	private readonly qLearningAlgorithmModule: QLearningAlgorithmModule;
+	private qLearningAlgorithmModule: QLearningAlgorithmModule;
 	private promise;
 
 	constructor(updateBackground, simSetPause: Function) {
@@ -21,15 +21,8 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		this.neuralNetworkModule = null;
 		this.updateBackground = updateBackground;
 		this.simSetPause = simSetPause;
+		this.qLearningAlgorithmModule = null;
 
-		this.qLearningAlgorithmModule =
-			new QLearningAlgorithmModule(
-				updateBackground,
-				"#qLearningBackgroundArea",
-				$('#simConfigRLQLearningModal'),
-				{width: 800, height: 800},
-				"/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
-			);
 
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
 		this.promise = undefined;
@@ -527,7 +520,27 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 
 
 
-	createQLearningEnvironment(obstaclesList, startNode, finishNode) {
+	createQLearningEnvironment(obstaclesList, startNode, finishNode, map) {
+
+		let path = null;
+		switch (map) {
+			case "MAP_RAILWAY":
+				path = "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
+				break
+			case "MAP_FOREST" :
+				path = "/js/app/simulation/simBackgrounds/_Wald_Labyrinth_End.svg"
+				break;
+		}
+
+		this.qLearningAlgorithmModule =
+			new QLearningAlgorithmModule(
+				this.updateBackground,
+				"#qLearningBackgroundArea",
+				$('#simConfigRLQLearningModal'),
+				{width: 800, height: 800},
+				path
+			);
+
 		this.promise = this.qLearningAlgorithmModule.createQLearningEnvironment(obstaclesList, startNode, finishNode);
 		return 0;
 	}

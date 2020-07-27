@@ -263,28 +263,30 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
 
     @Override
     public V visitAiRlEnvironment(RlEnvironment<V> rlEnvironment) {
+        String map = rlEnvironment.getMap();
+        rlEnvironment.getStartNode().accept(this);
+        rlEnvironment.getFinishNode().accept(this);
         rlEnvironment.getListRlObstacle().accept(this);
-        int startNode = rlEnvironment.getStartNode();
-        int finishNode = rlEnvironment.getFinishNode();
+
         JSONObject o = mk(C.CREATE_Q_LEARNING_ENVIRONMENT)
-            .put(C.QLEARNING_STARTNODE, startNode)
-            .put(C.QLEARNING_FINISHNODE, finishNode);
+            .put(C.QLEARNING_MAP, map);
         return app(o);
     }
 
     @Override
     public V visitAiRlGainExperience(RlGainExperience<V> rlGainExperience) {
+//        QLEARNING_EPISODES, QLEARNING_TIME
+        rlGainExperience.getqLearningEpisodes().accept(this);
+        rlGainExperience.getqLearningTime().accept(this);
         JSONObject o = mk(C.RUN_Q_LEARNER);
         return app(o);
     }
 
     @Override
     public V visitAiRlObstacle(RlObstacle<V> rlObstacle) {
-        int startNode = rlObstacle.getStartNode();
-        int finishNode = rlObstacle.getFinishNode();
-        JSONObject o = mk(C.CREATE_OBSTACLE)
-            .put(C.QLEARNING_STARTNODE, startNode)
-            .put(C.QLEARNING_FINISHNODE, finishNode);
+        rlObstacle.getStartNode().accept(this);
+        rlObstacle.getFinishNode().accept(this);
+        JSONObject o = mk(C.CREATE_OBSTACLE);
         return app(o);
     }
 

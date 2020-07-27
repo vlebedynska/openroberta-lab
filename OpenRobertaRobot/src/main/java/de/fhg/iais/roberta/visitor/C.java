@@ -217,6 +217,7 @@ public class C {
     public static final String PROCESS_NEURAL_NETWORK = "processNeuralNetwork";
     public static final String QLEARNING_STARTNODE = "qlearningStartNode";
     public static final String QLEARNING_FINISHNODE = "qlearningFinishNode";
+    public static final String QLEARNING_MAP = "qLearningMap";
     public static final String Q_LEARNING_ALPHA = "qLearningAlpha";
     public static final String Q_LEARNING_GAMMA = "qLearningGamma";
     public static final String Q_LEARNING_NU = "qLearningNu";

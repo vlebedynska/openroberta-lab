@@ -43,6 +43,7 @@ export const CREATE_LIST: string = "createList";
 export const CREATE_LIST_REPEAT: string = "createListREPEAT";
 export const CREATE_LIST_WITH_ITEM: string = "createCreateListWithItem";
 export const CREATE_Q_LEARNING_ENVIRONMENT: string = "createQLearningEnvironment";
+export const QLEARNING_MAP: string = "qLearningMap";
 export const CREATE_OBSTACLE: string = "createObstacle";
 export const CURVE_ACTION: string = "CurveAction";
 export const DEBUG_ACTION: string = "DebugAction";

@@ -21,6 +21,11 @@ public final class BlocklyConstants {
     public static final String QLEARNING_GAMMA = "GAMMA"; //TODO Blockly ändern
     public static final String QLEARNING_NU = "NU"; //TODO Blockly ändern
     public static final String QLEARNING_RHO = "RHO"; //TODO Blockly ändern
+    public static final String MAP = "MAP"; //TODO Blockly ändern
+    public static final String QLEARNING_EPISODES = "EPISODES"; //TODO Blockly ändern
+    public static final String QLEARNING_TIME = "Q_LEARNER_TIME"; //TODO Blockly ändern
+
+
 
     public static final String ADD = "ADD";
     public static final String ELSE = "ELSE";

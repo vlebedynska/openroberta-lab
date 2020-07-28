@@ -12,6 +12,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.updateBackground = updateBackground;
             this.simSetPause = simSetPause;
             this.qLearningAlgorithmModule = null;
+            this.clearingDisplay = false;
             this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
             this.promise = undefined;
             U.loggingEnabled(true, false);
@@ -310,13 +311,16 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             this.setBlocking(true);
             return 0;
         }
-        showTextActionPosition(text, x, y) {
+        showTextActionPosition(text, x, y, replaceText = false) {
             const showText = "" + text;
             U.debug('***** show "' + showText + '" *****');
             this.hardwareState.actions.display = {};
             this.hardwareState.actions.display.text = showText;
             this.hardwareState.actions.display.x = x;
             this.hardwareState.actions.display.y = y;
+            if (replaceText) {
+                this.hardwareState.actions.display.clear = replaceText;
+            }
         }
         showImageAction(image, mode) {
             const showImage = "" + image;
@@ -413,17 +417,39 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             //calculates new network nodes values
             this.neuralNetworkModule.calculateNeuralNetworkOutput();
             //set motor speed according to the new values
+            this.clearDisplay();
             let value = 0;
+            let textLines = new Array();
+            let textLinesPrepared = new Array();
             for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer()) {
-                if (node2.value > 100) {
-                    value = 100;
+                switch (node2.type) {
+                    case "motorport":
+                        if (node2.value > 100) {
+                            value = 100;
+                        }
+                        else {
+                            value = node2.value;
+                        }
+                        this.setMotorSpeed("ev3", node2.port, value);
+                        console.log("Motorspeed" + value);
+                        break;
+                    case "text":
+                        let textOutput = node2.value > 0 ? node2.name : "leer";
+                        textLines.push(textOutput);
+                        textLinesPrepared.push("<tspan x='1' dy='" + (node2.positionY * 16 + 1) + "'>" + textOutput + "</tspan>");
+                        break;
+                    case "sound":
+                        this.toneAction("outputNodeTon", node2.value, 100);
+                        break;
                 }
-                else {
-                    value = node2.value;
-                }
-                this.setMotorSpeed("ev3", node2.port, value);
-                console.log("Motorspeed" + value);
             }
+            if (textLinesPrepared.length > 0) {
+                this.showTextActionPosition(textLinesPrepared.join(""), 0, 0, true);
+                // (this.hardwareState.actions.display || this.hardwareState.actions.display.text == "" ) {
+            }
+        }
+        static delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
         changeInputTypeRange(regler) {
             //var value = slider.value;
@@ -449,6 +475,14 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             var colourChannelValue = node.value[colourChannel];
             var inputValue = colourChannelValue / 2.55;
             node.value = inputValue;
+        }
+        extractBasicColoursAndNormalize(node) {
+            if (node.value == node.color) {
+                node.value = 100;
+            }
+            else {
+                node.value = 0;
+            }
         }
         //Reinforcement Learning
         createQLearningEnvironment(obstaclesList, startNode, finishNode, map) {

@@ -466,7 +466,16 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             let node = stmt["data"];
                             node.value = s.pop();
                             node.threshold = stmt[C.THRESHOLD];
-                            n.extractColourChannelAndNormalize(node);
+                            switch (node.mode) {
+                                case "RGB":
+                                    n.extractColourChannelAndNormalize(node);
+                                    break;
+                                case "COLOUR":
+                                    n.extractBasicColoursAndNormalize(node);
+                                    break;
+                                // case "LIGHT":
+                                // n.extractLightAndNormalize(node);
+                            }
                             s.push(node);
                             break;
                         }

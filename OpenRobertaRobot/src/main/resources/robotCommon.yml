@@ -26,11 +26,11 @@ block:
   AI_NN_INPUT_NODE_COLOURSENSOR_RGB_CHANNEL:
       category: EXPR
       implementor: de.fhg.iais.roberta.syntax.ai.AiInputNodeColourSensor
-      type: [ai_nn_input_node_coloursensor_rgb_channel]
+      type: [ai_nn_input_node_coloursensor_rgb_channel, ai_nn_input_node_coloursensor_color, ai_nn_input_node_coloursensor_light]
   AI_NN_OUTPUT_NODE:
     category: EXPR
     implementor: de.fhg.iais.roberta.syntax.ai.AiOutput
-    type: [ai_nn_output_node]
+    type: [ai_nn_output_node, ai_nn_output_node_text, ai_nn_output_node_sound]
   AI_NEURAL_NETWORK:
     category: STMT
     implementor: de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork

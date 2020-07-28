@@ -11,7 +11,6 @@ import de.fhg.iais.roberta.syntax.sensor.generic.ColorSensor;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
-import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONObject;
@@ -23,13 +22,25 @@ import java.util.stream.Collectors;
 public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
 
     private static class TmpConstants {
-        private static final String RED = "#DC143C";
-        private static final String GREEN = "#00FF00";
-        private static final String BLUE = "#0057A6";
+        private static final String RED_CHANNEL = "#DC143C";
+        private static final String GREEN_CHANNEL = "#00FF00";
+        private static final String BLUE_CHANNEL = "#0057A6";
+        private static final String YELLOW = "#f7d117";
+        private static final String BLACK = "#000000";
+        private static final String GREEN = "#00642e";
+        private static final String BROWN = "#532115";
+        private static final String GREY = "#585858";
+        private static final String RED = "#b30006";
+        private static final String WHITE = "#ffffff";
+        private static final String BLUE = "#0057a6";
+        private static final String NONE = "";
+
     }
 
     public enum Colour {
-        R(TmpConstants.RED), G(TmpConstants.GREEN), B(TmpConstants.BLUE);
+        R(TmpConstants.RED_CHANNEL), G(TmpConstants.GREEN_CHANNEL), B(TmpConstants.BLUE_CHANNEL), YELLOW(TmpConstants.YELLOW),
+        BLACK(TmpConstants.BLACK), GREEN(TmpConstants.GREEN), BROWN(TmpConstants.BROWN), GREY(TmpConstants.GREY),
+        RED(TmpConstants.RED), WHITE(TmpConstants.WHITE), BLUE(TmpConstants.BLUE), NONE(TmpConstants.NONE);
 
         private final String colourString;
 
@@ -113,8 +124,10 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
         String portName = helper.extractField(fields, BlocklyConstants.SENSORPORT, "");
         String colourExtracted = helper.extractField(fields, BlocklyConstants.COLOUR, "");
         Colour colour = Colour.byColourString(colourExtracted.toUpperCase()); //throws exeption
+
         ExternalSensor<V> externalSensor = createSensorAst(portName, block, helper);
         Integer threshold = DEFAULT_THRESHOLD;
+
 
         JSONObject nodeData = new JSONObject();
         nodeData
@@ -130,7 +143,20 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
     private static <V> ExternalSensor<V> createSensorAst(String portName, Block block, AbstractJaxb2Ast<V> helper) {
         BlocklyDropdownFactory factory = helper.getDropdownFactory();
         String slotName = BlocklyConstants.NO_SLOT;
-        String modeName = "RGB";
+        String modeName = "";
+
+        switch (block.getType()) {
+            case "ai_nn_input_node_coloursensor_rgb_channel":
+                modeName = "RGB";
+                break;
+            case "ai_nn_input_node_coloursensor_color":
+                modeName = "COLOUR";
+                break;
+            case "ai_nn_input_node_coloursensor_light":
+                modeName = "LIGHT";
+                break;
+        }
+
         boolean isPortInMutation = false;
         SensorMetaDataBean sensorMetaDataBean = new SensorMetaDataBean(factory.sanitizePort(portName), factory.getMode(modeName), factory.sanitizeSlot(slotName), isPortInMutation);
         return ColorSensor.make(sensorMetaDataBean, helper.extractBlockProperties(block), helper.extractComment((block)));

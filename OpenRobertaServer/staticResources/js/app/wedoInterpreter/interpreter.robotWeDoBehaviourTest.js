@@ -168,6 +168,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         extractColourChannelAndNormalize(node) {
             throw new Error("Method not implemented.");
         }
+        extractBasicColoursAndNormalize(node) {
+            throw new Error("Method not implemented.");
+        }
         processNeuralNetwork(inputLayer, outputLayer) {
             throw new Error("Method not implemented.");
         }

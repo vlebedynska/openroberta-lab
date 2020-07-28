@@ -14,6 +14,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	private readonly simSetPause: Function;
 	private qLearningAlgorithmModule: QLearningAlgorithmModule;
 	private promise;
+	private clearingDisplay: boolean;
 
 	constructor(updateBackground, simSetPause: Function) {
 		super();
@@ -22,6 +23,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		this.updateBackground = updateBackground;
 		this.simSetPause = simSetPause;
 		this.qLearningAlgorithmModule = null;
+		this.clearingDisplay = false;
 
 
 		this.neuralNetwork = {}; //TODO es kann sein, dass man mehrere Neuronale Netze hat - also muss das hier angepasst werden.
@@ -343,13 +345,16 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		return 0;
 	}
 
-	public showTextActionPosition(text: any, x: number, y: number): void {
+	public showTextActionPosition(text: any, x: number, y: number, replaceText: boolean = false): void {
 		const showText = "" + text;
 		U.debug('***** show "' + showText + '" *****');
 		this.hardwareState.actions.display = {};
 		this.hardwareState.actions.display.text = showText;
 		this.hardwareState.actions.display.x = x;
 		this.hardwareState.actions.display.y = y;
+		if (replaceText) {
+			this.hardwareState.actions.display.clear = replaceText;
+		}
 	}
 
 	public showImageAction(image: any, mode: string): number {
@@ -466,18 +471,44 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		//calculates new network nodes values
 		this.neuralNetworkModule.calculateNeuralNetworkOutput();
 
-		//set motor speed according to the new values
-		let value = 0;
-		for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer() ) {
-			if ( node2.value > 100) {
-				value = 100;
-			} else {
-				value = node2.value;
-			}
-			this.setMotorSpeed("ev3", node2.port, value);
-			console.log("Motorspeed" + value)
-		}
 
+		//set motor speed according to the new values
+		this.clearDisplay();
+
+		let value = 0;
+		let textLines: Array<string> = new Array<string>();
+		let textLinesPrepared: Array<string> = new Array<string>();
+		for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer() ) {
+
+			switch (node2.type) {
+				case "motorport":
+					if ( node2.value > 100) {
+						value = 100;
+					} else {
+						value = node2.value;
+					}
+					this.setMotorSpeed("ev3", node2.port, value);
+					console.log("Motorspeed" + value);
+					break;
+				case "text" :
+					let textOutput = node2.value > 0 ? node2.name : "leer";
+					textLines.push(textOutput);
+					textLinesPrepared.push("<tspan x='1' dy='" + (node2.positionY*16+1) + "'>"+textOutput + "</tspan>");
+					break;
+				case "sound":
+					this.toneAction("outputNodeTon", node2.value, 100);
+					break;
+			}
+
+		}
+		if (textLinesPrepared.length > 0) {
+				this.showTextActionPosition( textLinesPrepared.join(""), 0, 0, true);
+				// (this.hardwareState.actions.display || this.hardwareState.actions.display.text == "" ) {
+		}
+	}
+
+	private static delay(ms) {
+		 return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
 
@@ -492,7 +523,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		line.stroke = "rgb(0,255,0)";
 	}
 
-	public extractColourChannelAndNormalize (node) {
+	public extractColourChannelAndNormalize(node) {
 		var colourChannel;
 		switch (node.color) {
 			case "R":
@@ -513,6 +544,13 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 	}
 
 
+	extractBasicColoursAndNormalize(node) {
+		if (node.value == node.color) {
+			node.value = 100;
+		} else {
+			node.value = 0;
+		}
+	}
 
 	//Reinforcement Learning
 

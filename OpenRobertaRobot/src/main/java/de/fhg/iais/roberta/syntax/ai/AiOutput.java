@@ -64,13 +64,25 @@ public class AiOutput<V> extends AiNode<V> {
         String actorInfo = helper.extractField(fields, BlocklyConstants.OUTPUTNODE, "");
         String[] actorInfoList = actorInfo.split("_");
         String outputType = actorInfoList[0];
-        switch ( outputType.toLowerCase() ) {
-            case "motorport":
+        JSONObject outputNodeStream = new JSONObject();
+        switch ( block.getType() ) {
+            case "ai_nn_output_node":
                 String actorPort = actorInfoList[1];
-                JSONObject outputNodeStream = new JSONObject();
                 outputNodeStream.put("port", actorPort.toLowerCase());
                 outputNodeStream.put("type", outputType.toLowerCase());
                 outputNodeStream.put("name", "Motor");
+                return outputNodeStream;
+            case "ai_nn_output_node_text":
+                outputNodeStream.put("port", BlocklyConstants.NO_PORT);
+                outputNodeStream.put("type", BlocklyConstants.TEXT.toLowerCase());
+                outputNodeStream.put("name", actorInfo );
+                outputNodeStream.put("text", actorInfo);
+                return outputNodeStream;
+            case "ai_nn_output_node_sound":
+                outputNodeStream.put("frequency", 300);
+                outputNodeStream.put("duration", 100);
+                outputNodeStream.put("type", "sound");
+                outputNodeStream.put("name", "Ton");
                 return outputNodeStream;
             default:
                 throw new RuntimeException("Output type " + outputType + " not supported!");
@@ -82,11 +94,16 @@ public class AiOutput<V> extends AiNode<V> {
         Block jaxbDestination = new Block();
         Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
         String type = getNodeData().getString("type");
-        switch ( type.toLowerCase() ){
+        String actorInfo = "";
+            switch ( type.toLowerCase() ){
             case "motorport":
-            String port = getNodeData().getString("port");
-            String actorInfo = (type + "_"+ port).toUpperCase();
-            Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
+                String port = getNodeData().getString("port");
+                actorInfo = (type + "_"+ port).toUpperCase();
+                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
+            case "text":
+                String text = getNodeData().getString("text");
+                actorInfo = text;
+                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
         }
         return  jaxbDestination;
     }

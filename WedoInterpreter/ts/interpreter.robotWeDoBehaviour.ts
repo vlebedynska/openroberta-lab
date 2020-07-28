@@ -37,6 +37,10 @@ export class RobotWeDoBehaviour extends ARobotBehaviour {
         throw new Error("Method not implemented.");
     }
 
+    public extractBasicColoursAndNormalize(node: any): void {
+        throw new Error("Method not implemented.");
+    }
+
     public processNeuralNetwork(inputLayer: any, outputLayer: any): void {
         throw new Error("Method not implemented.");
     }

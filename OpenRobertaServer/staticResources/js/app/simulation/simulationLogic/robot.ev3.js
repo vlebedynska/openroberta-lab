@@ -541,14 +541,14 @@ define(['simulation.simulation', 'interpreter.constants', 'simulation.robot', 'g
             var text = display.text;
             var x = display.x;
             var y = display.y;
+            if (display.clear) {
+                $("#display" + this.id).html('');
+            }
             if (text) {
                 $("#display" + this.id).html($("#display" + this.id).html() + '<text x=' + x * 10 + ' y=' + (y + 1) * 16 + '>' + text + '</text>');
             }
             if (display.picture) {
                 $("#display" + this.id).html(this.display[display.picture]);
-            }
-            if (display.clear) {
-                $("#display" + this.id).html('');
             }
         }
         // update tone

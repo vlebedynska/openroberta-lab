@@ -15,56 +15,13 @@ import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
 
-    private static class TmpConstants {
-        private static final String RED_CHANNEL = "#DC143C";
-        private static final String GREEN_CHANNEL = "#00FF00";
-        private static final String BLUE_CHANNEL = "#0057A6";
-        private static final String YELLOW = "#f7d117";
-        private static final String BLACK = "#000000";
-        private static final String GREEN = "#00642e";
-        private static final String BROWN = "#532115";
-        private static final String GREY = "#585858";
-        private static final String RED = "#b30006";
-        private static final String WHITE = "#ffffff";
-        private static final String BLUE = "#0057a6";
-        private static final String NONE = "";
+    private final AiColorUtils.Colour colour;
 
-    }
-
-    public enum Colour {
-        R(TmpConstants.RED_CHANNEL), G(TmpConstants.GREEN_CHANNEL), B(TmpConstants.BLUE_CHANNEL), YELLOW(TmpConstants.YELLOW),
-        BLACK(TmpConstants.BLACK), GREEN(TmpConstants.GREEN), BROWN(TmpConstants.BROWN), GREY(TmpConstants.GREY),
-        RED(TmpConstants.RED), WHITE(TmpConstants.WHITE), BLUE(TmpConstants.BLUE), NONE(TmpConstants.NONE);
-
-        private final String colourString;
-
-        private Colour (String colourString) {
-            this.colourString = colourString;
-        }
-
-        public static Colour byColourString(String colourStr) {
-            for ( Colour value : Colour.values() ) {
-                if ( value.colourString.equalsIgnoreCase(colourStr) ) {
-                    return value;
-                }
-            }
-            throw new IllegalArgumentException(colourStr + " : No such colour in " +
-                Arrays.stream(Colour.values())
-                    .map(c -> c.colourString)
-                    .collect(Collectors.joining(",", " ","")));
-        }
-    }
-
-
-    private final Colour colour;
-
-    public Colour getColour() {
+    public AiColorUtils.Colour getColour() {
         return colour;
     }
 
@@ -80,7 +37,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
         BlockType kind,
         ExternalSensor<V> externalSensor,
         Integer threshold,
-        Colour colour,
+        AiColorUtils.Colour colour,
         BlocklyBlockProperties property,
         BlocklyComment comment,
         JSONObject nodeData) {
@@ -89,7 +46,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
     }
 
     public static <V> AiInputNodeColourSensor<V> make(
-        ExternalSensor<V> externalSensor, Integer threshold, Colour colour, BlocklyBlockProperties properties, BlocklyComment comment, JSONObject nodeData) {
+        ExternalSensor<V> externalSensor, Integer threshold, AiColorUtils.Colour colour, BlocklyBlockProperties properties, BlocklyComment comment, JSONObject nodeData) {
         return new AiInputNodeColourSensor<V>(BlockTypeContainer.getByName("AI_NN_INPUT_NODE_COLOURSENSOR_RGB_CHANNEL"), externalSensor, threshold, colour, properties, comment,
             nodeData);
     }
@@ -123,7 +80,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
         List<Field> fields = helper.extractFields(block, (short) 2);
         String portName = helper.extractField(fields, BlocklyConstants.SENSORPORT, "");
         String colourExtracted = helper.extractField(fields, BlocklyConstants.COLOUR, "");
-        Colour colour = Colour.byColourString(colourExtracted.toUpperCase()); //throws exeption
+        AiColorUtils.Colour colour = AiColorUtils.Colour.byColourString(colourExtracted.toUpperCase()); //throws exeption
 
         ExternalSensor<V> externalSensor = createSensorAst(portName, block, helper);
         Integer threshold = DEFAULT_THRESHOLD;
@@ -135,7 +92,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
             .put("mode", externalSensor.getMode())
             .put("slot", externalSensor.getSlot())
             .put("color", colour)
-            .put("name", "Farbsensor");
+            .put("name", "Farbsensor"); //TODO VO extract sensor name to const
 
         return AiInputNodeColourSensor.make(externalSensor, threshold, colour, helper.extractBlockProperties(block), helper.extractComment(block), nodeData);
     }
@@ -145,6 +102,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
         String slotName = BlocklyConstants.NO_SLOT;
         String modeName = "";
 
+        //TODO VO extract block type names into constants, add validation by calling BlockType.blocklyNames
         switch (block.getType()) {
             case "ai_nn_input_node_coloursensor_rgb_channel":
                 modeName = "RGB";
@@ -165,7 +123,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
     @Override public Block astToBlock() {
         Block jaxbDestination = new Block();
         Ast2JaxbHelper.setBasicProperties(this, jaxbDestination);
-        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.COLOUR, getColour().colourString);
+        Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.COLOUR, getColour().getColourString());
         Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.SENSORPORT, getExternalSensor().getPort());
         return  jaxbDestination;
    }

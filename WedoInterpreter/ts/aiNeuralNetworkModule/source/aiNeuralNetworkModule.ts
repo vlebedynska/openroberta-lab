@@ -43,7 +43,7 @@ export class AiNeuralNetworkModule {
         for (let layer of layers) {
             let normalizedNodes: Array<Node> = new Array<Node>();
             for (let nodeOld of layer) {
-                let node: Node = new NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type, nodeOld.color);
+                let node: Node = new NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type, nodeOld.color, nodeOld.duration, nodeOld.frequency);
                 node.name = nodeOld.name;
                 normalizedNodes.push(node);
             }

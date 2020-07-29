@@ -9,7 +9,6 @@ import de.fhg.iais.roberta.syntax.lang.expr.Assoc;
 import de.fhg.iais.roberta.transformer.AbstractJaxb2Ast;
 import de.fhg.iais.roberta.transformer.Ast2JaxbHelper;
 import de.fhg.iais.roberta.typecheck.BlocklyType;
-import de.fhg.iais.roberta.visitor.C;
 import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 import org.json.JSONObject;
@@ -65,6 +64,9 @@ public class AiOutput<V> extends AiNode<V> {
         String[] actorInfoList = actorInfo.split("_");
         String outputType = actorInfoList[0];
         JSONObject outputNodeStream = new JSONObject();
+
+        //TODO VO extract block type names into constants, add validation by calling BlockType.blocklyNames
+        //TODO VO create child classes for each block type
         switch ( block.getType() ) {
             case "ai_nn_output_node":
                 String actorPort = actorInfoList[1];
@@ -79,10 +81,16 @@ public class AiOutput<V> extends AiNode<V> {
                 outputNodeStream.put("text", actorInfo);
                 return outputNodeStream;
             case "ai_nn_output_node_sound":
-                outputNodeStream.put("frequency", 300);
-                outputNodeStream.put("duration", 100);
+                outputNodeStream.put("frequency", 300); //TODO VO edit init value, use constants
+                outputNodeStream.put("duration", 100); //TODO VO edit init value, use constants
                 outputNodeStream.put("type", "sound");
                 outputNodeStream.put("name", "Ton");
+                return outputNodeStream;
+            case "ai_nn_output_node_led":
+                AiColorUtils.Colour color = AiColorUtils.Colour.byColourString(actorInfo.toUpperCase()); //throws exeption
+                outputNodeStream.put("color", color);
+                outputNodeStream.put("type", "LED");
+                outputNodeStream.put("name", "LED");
                 return outputNodeStream;
             default:
                 throw new RuntimeException("Output type " + outputType + " not supported!");
@@ -100,11 +108,15 @@ public class AiOutput<V> extends AiNode<V> {
                 String port = getNodeData().getString("port");
                 actorInfo = (type + "_"+ port).toUpperCase();
                 Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
+                break;
             case "text":
-                String text = getNodeData().getString("text");
-                actorInfo = text;
+                actorInfo = getNodeData().getString("text");
                 Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, actorInfo);
-        }
+                break;
+            case "led":
+                Ast2JaxbHelper.addField(jaxbDestination, BlocklyConstants.OUTPUTNODE, ((AiColorUtils.Colour)getNodeData().get("color")).getColourString());
+                break;
+            }
         return  jaxbDestination;
     }
 

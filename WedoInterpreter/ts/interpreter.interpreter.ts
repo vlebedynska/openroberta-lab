@@ -483,8 +483,9 @@ export class Interpreter {
                             case "COLOUR":
                                 n.extractBasicColoursAndNormalize(node);
                                 break;
-                            // case "LIGHT":
-                                // n.extractLightAndNormalize(node);
+                            case "LIGHT":
+                                //no additional value modification needed
+                                break;
                         }
                         s.push(node);
                         break;

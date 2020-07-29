@@ -421,6 +421,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             let value = 0;
             let textLines = new Array();
             let textLinesPrepared = new Array();
+            let ledPrepared = "";
             for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer()) {
                 switch (node2.type) {
                     case "motorport":
@@ -439,13 +440,23 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                         textLinesPrepared.push("<tspan x='1' dy='" + (node2.positionY * 16 + 1) + "'>" + textOutput + "</tspan>");
                         break;
                     case "sound":
-                        this.toneAction("outputNodeTon", node2.value, 100);
+                        if (node2.value > 0) {
+                            this.toneAction("outputNodeTon", node2.value * 5, node2.duration);
+                        }
+                        break;
+                    case "LED":
+                        this.statusLightOffAction("ev3", 0);
+                        if (node2.value > 0) {
+                            ledPrepared = node2.color;
+                        }
                         break;
                 }
             }
             if (textLinesPrepared.length > 0) {
                 this.showTextActionPosition(textLinesPrepared.join(""), 0, 0, true);
-                // (this.hardwareState.actions.display || this.hardwareState.actions.display.text == "" ) {
+            }
+            if (ledPrepared != "") {
+                this.lightAction("on", ledPrepared);
             }
         }
         static delay(ms) {

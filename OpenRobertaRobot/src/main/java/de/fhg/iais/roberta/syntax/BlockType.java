@@ -14,7 +14,6 @@ public class BlockType {
     private final Category category;
     private final Class<?> astClass;
     private final Set<String> blocklyNames;
-
     public BlockType(String name, Category category, Class<?> astClass, String... blocklyNames) {
         Assert.notNull(name);
         Assert.notNull(category);

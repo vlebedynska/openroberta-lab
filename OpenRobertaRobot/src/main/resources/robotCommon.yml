@@ -30,7 +30,7 @@ block:
   AI_NN_OUTPUT_NODE:
     category: EXPR
     implementor: de.fhg.iais.roberta.syntax.ai.AiOutput
-    type: [ai_nn_output_node, ai_nn_output_node_text, ai_nn_output_node_sound]
+    type: [ai_nn_output_node, ai_nn_output_node_text, ai_nn_output_node_sound, ai_nn_output_node_led]
   AI_NEURAL_NETWORK:
     category: STMT
     implementor: de.fhg.iais.roberta.syntax.ai.AiNeuralNetwork

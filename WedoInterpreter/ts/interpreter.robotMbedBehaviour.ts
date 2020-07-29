@@ -134,7 +134,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		this.hardwareState.actions.led.color = color;
 	}
 
-	public statusLightOffAction(name: string, port: number) {
+	public 	statusLightOffAction(name: string, port: number) {
 		const robotText = 'robot: ' + name + ', port: ' + port;
 		U.debug(robotText + ' led off');
 		this.hardwareState.actions.led = {};
@@ -478,6 +478,7 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		let value = 0;
 		let textLines: Array<string> = new Array<string>();
 		let textLinesPrepared: Array<string> = new Array<string>();
+		let ledPrepared: string = "";
 		for (let node2 of this.neuralNetworkModule.aiNeuralNetwork.getOutputLayer() ) {
 
 			switch (node2.type) {
@@ -496,15 +497,26 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 					textLinesPrepared.push("<tspan x='1' dy='" + (node2.positionY*16+1) + "'>"+textOutput + "</tspan>");
 					break;
 				case "sound":
-					this.toneAction("outputNodeTon", node2.value, 100);
+					if (node2.value > 0) {
+						this.toneAction("outputNodeTon", node2.value*5, node2.duration);
+					}
+					break;
+				case "LED":
+					this.statusLightOffAction("ev3", 0);
+					if (node2.value > 0) {
+						ledPrepared = node2.color;
+					}
 					break;
 			}
 
 		}
 		if (textLinesPrepared.length > 0) {
 				this.showTextActionPosition( textLinesPrepared.join(""), 0, 0, true);
-				// (this.hardwareState.actions.display || this.hardwareState.actions.display.text == "" ) {
 		}
+		if (ledPrepared != "") {
+			this.lightAction("on", ledPrepared);
+		}
+
 	}
 
 	private static delay(ms) {

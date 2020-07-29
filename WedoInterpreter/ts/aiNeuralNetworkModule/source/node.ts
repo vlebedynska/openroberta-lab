@@ -2,6 +2,7 @@ import {Node} from "interpreter.aiNeuralNetworkModule/source/models";
 
 export class NodeImpl extends EventTarget implements Node {
 
+
     private _positionX: number;
     private _positionY: number;
     private _name: string;
@@ -11,14 +12,18 @@ export class NodeImpl extends EventTarget implements Node {
     private readonly _threshold: number;
     private readonly _data: Object;
     private _color: string;
+    private readonly _duration: number;
+    private readonly _frequency: number;
 
-    constructor(value: number, threshold: number, port: string, type: string, color: string = "default") {
+    constructor(value: number, threshold: number, port: string, type: string, color: string = "default", duration: number = 0, frequency: number = 0) {
         super();
         this._value = value;
         this._threshold = threshold;
         this._port = port;
         this._type = type;
         this._color = color;
+        this._duration = duration;
+        this._frequency = frequency;
     }
 
 
@@ -83,6 +88,13 @@ export class NodeImpl extends EventTarget implements Node {
         this._color = value;
     }
 
+    get duration(): number {
+        return this._duration;
+    }
+
+    get frequency(): number {
+        return this._frequency;
+    }
 
 
 }

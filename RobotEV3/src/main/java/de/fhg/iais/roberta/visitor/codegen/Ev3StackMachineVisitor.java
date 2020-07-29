@@ -240,7 +240,7 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         if (aiInputNodeColourSensor.getExternalSensor() != null) {
             aiInputNodeColourSensor.getExternalSensor().accept(this);
         }
-        AiInputNodeColourSensor.Colour colour = aiInputNodeColourSensor.getColour();
+        AiColorUtils.Colour colour = aiInputNodeColourSensor.getColour();
         int threshold = aiInputNodeColourSensor.getThreshold();
         return app(mk(C.CREATE_INPUT_NODE_COLOUR_SENSOR).put(C.THRESHOLD, threshold).put(C.COLOUR, colour).put("data", aiInputNodeColourSensor.getNodeData()));
     }

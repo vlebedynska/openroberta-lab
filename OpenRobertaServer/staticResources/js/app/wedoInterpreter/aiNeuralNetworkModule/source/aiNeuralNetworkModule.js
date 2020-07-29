@@ -28,7 +28,7 @@ define(["require", "exports", "svgdotjs", "jquery", "interpreter.aiNeuralNetwork
             for (let layer of layers) {
                 let normalizedNodes = new Array();
                 for (let nodeOld of layer) {
-                    let node = new node_1.NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type, nodeOld.color);
+                    let node = new node_1.NodeImpl(nodeOld.value, nodeOld.threshold, nodeOld.port, nodeOld.type, nodeOld.color, nodeOld.duration, nodeOld.frequency);
                     node.name = nodeOld.name;
                     normalizedNodes.push(node);
                 }

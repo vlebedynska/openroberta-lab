@@ -7,12 +7,23 @@ export class AiNeuralNetworkUI extends EventTarget{
 
     private static readonly colorsMap: Map<string, string> = new Map<string, string>(
         [
-            ["R", "#ff3333"],
-            ["G", "#00b33c"],
-            ["B", "#008ae6"],
+            ["R", "#fa6b6b"],
+            ["G", "#6ce08a"],
+            ["B", "#95c9fa"],
+            ["BLACK","#555454"],
+            ["YELLOW","#f7d117"],
+            ["GREEN","#6ce08a"],
+            ["BROWN","#a58070"],
+            ["GREY","#c7c4c4"],
+            ["RED","#fa6b6b"],
+            ["WHITE","#ffffff"],
+            ["BLUE","#95c9fa"],
+            ["NONE","#bfbfbf"],
+            ["ORANGE","#F7D118"],
             ["default", "#bfbfbf" ]
         ]
     );
+
 
     private draggable: Draggable;
     private activeLinkUI: LinkUI;
@@ -56,10 +67,11 @@ export class AiNeuralNetworkUI extends EventTarget{
                 text.x("" + (circle.cx()+AiNeuralNetworkUI.LABEL_OFFSET_RIGHT)).addClass("outputNodeName");
             }
 
-            let nodeValue: SVG.Text = this.svg.plain("0").x(circle.cx()).cy(circle.cy()).font({anchor: 'middle'}).addClass("activeNodeValue");
+            let normalizedNodeValue: Function = value => Math.round(value);
+            let nodeValue: SVG.Text = this.svg.plain("" + normalizedNodeValue(node.value)).x(circle.cx()).cy(circle.cy()).font({anchor: 'middle'}).addClass("activeNodeValue");
             node.addEventListener("valueChanged", (e: CustomEvent<number>) => {
                 let newValue: number = e.detail;
-                nodeValue.plain(""+Math.round(newValue));
+                nodeValue.plain(""+normalizedNodeValue(newValue));
             });
 
         }

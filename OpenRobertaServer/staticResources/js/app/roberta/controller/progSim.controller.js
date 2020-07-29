@@ -111,7 +111,7 @@ define([ 'exports', 'message', 'log', 'util', 'simulation.simulation', 'guiState
 
 
         $('#simConfigNeuralNetworkModal').draggable();
-
+        // { handle:'.modal-dialog .modal-header'}
         $('#simConfigNeuralNetwork').on('click', function (event) {
             var position = $("#simDiv").position();
             position.top += 12;

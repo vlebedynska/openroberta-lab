@@ -199,7 +199,7 @@ export class RobotWeDoBehaviourTest extends ARobotBehaviour {
     public setUpQLearningBehaviour(alpha: number, gamma: number, nu: number, rho: number): void {
         throw new Error("Method not implemented.");
     }
-    public runQLearner() {
+    public runQLearner(episodes: number, time: number) {
         throw new Error("Method not implemented.");
     }
     public drawOptimalPath(): void {

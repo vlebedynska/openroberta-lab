@@ -113,7 +113,7 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                         case C.RUN_Q_LEARNER: {
                             var episodes = s.pop();
                             var time = s.pop();
-                            n.runQLearner();
+                            n.runQLearner(episodes, time);
                         }
                         case C.Q_LEARNING_DRAW_OPTIMAL_PATH: {
                             n.drawOptimalPath();

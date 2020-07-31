@@ -27,8 +27,8 @@ define(["require", "exports", "aiReinforcementLearningModule", "visualizer"], fu
     function setUpQLearningBehaviour(alpha, gamma, nu, rho) {
         qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
     }
-    function runQLearner() {
-        return qLearningAlgorithmModule.runQLearner();
+    function runQLearner(episodes, time) {
+        return qLearningAlgorithmModule.runQLearner(episodes, time);
     }
     function drawOptimalPath() {
         qLearningAlgorithmModule.drawOptimalPath();
@@ -55,7 +55,7 @@ define(["require", "exports", "aiReinforcementLearningModule", "visualizer"], fu
     });
     createQLearningEnvironment(qLearningParams.obstaclesList, qLearningParams.startNode, qLearningParams.finishNode).then(r => {
         setUpQLearningBehaviour(qLearningParams.alpha, qLearningParams.gamma, qLearningParams.nu, qLearningParams.rho);
-        runQLearner();
+        runQLearner(qLearningParams.episodes, qLearningParams.totalTime);
         drawOptimalPath();
     });
 });

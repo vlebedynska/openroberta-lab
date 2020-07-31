@@ -2313,6 +2313,11 @@ pre code {
 #test{
     /*width: 500px;*/
     padding: 15px;
+
+}
+
+#test img {
+    margin-top: -28px;
 }
 
 #simConfigNeuralNetworkModal .modal-dialog{

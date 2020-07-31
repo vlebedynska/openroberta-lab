@@ -34,7 +34,7 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
         setUpQLearningBehaviour(alpha, gamma, nu, rho) {
             throw new Error("Method not implemented.");
         }
-        runQLearner() {
+        runQLearner(episodes, time) {
             throw new Error("Method not implemented.");
         }
         drawOptimalPath() {

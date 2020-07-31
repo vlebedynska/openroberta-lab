@@ -53,7 +53,7 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup", "qValueLookup"],
         }
         getActions() {
             let listOfPaths = new Array();
-            let allPaths = this._svg.find('g[id^="path-"]');
+            let allPaths = this._svg.find('[id^="path-"]');
             allPaths.each(function (item) {
                 let idName = item.attr("id");
                 let tokens = idName.split("-");
@@ -365,7 +365,7 @@ define(["require", "exports", "svgdotjs", "utils", "svglookup", "qValueLookup"],
          * @return foundPath in {@link _svg} or null if not found
          */
         findPathWithID(firstValue, secondValue) {
-            let selector = "#path-" + firstValue + "-" + secondValue + " path ";
+            let selector = "#path-" + firstValue + "-" + secondValue;
             var foundPath = this.svgLookup.getPathElement(selector);
             return foundPath;
         }

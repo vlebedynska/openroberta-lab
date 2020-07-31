@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 public class AiColorUtils {
     private static class AiColorConstants {
-        private static final String RED_CHANNEL = "#DC143C";
+        private static final String RED_CHANNEL = "#FF0000";
         private static final String GREEN_CHANNEL = "#00FF00";
-        private static final String BLUE_CHANNEL = "#0057A6";
+        private static final String BLUE_CHANNEL = "#0000FF";
         private static final String YELLOW = "#f7d117";
         private static final String BLACK = "#000000";
         private static final String GREEN = "#00642e";

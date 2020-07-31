@@ -111,7 +111,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
     public getActions(): Array<Action> {
         let listOfPaths: Array<Action> = new Array<Action>();
 
-        let allPaths: List<Element> = this._svg.find('g[id^="path-"]');
+        let allPaths: List<Element> = this._svg.find('[id^="path-"]');
         allPaths.each(function (item) {
             let idName: string = item.attr("id");
             let tokens: string[] = idName.split("-");
@@ -514,7 +514,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
      * @return foundPath in {@link _svg} or null if not found
      */
     private findPathWithID(firstValue, secondValue): Path{
-        let selector: string = "#path-" + firstValue + "-" + secondValue + " path "
+        let selector: string = "#path-" + firstValue + "-" + secondValue;
         var foundPath: Path = this.svgLookup.getPathElement(selector)
         return foundPath;
     }

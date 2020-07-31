@@ -575,10 +575,13 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		let path = null;
 		switch (map) {
 			case "MAP_RAILWAY":
-				path = "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg"
+				path = "/js/app/simulation/simBackgrounds/Eisenbahn_Design_End.svg";
 				break
 			case "MAP_FOREST" :
-				path = "/js/app/simulation/simBackgrounds/_Wald_Labyrinth_End.svg"
+				path = "/js/app/simulation/simBackgrounds/_Wald_Labyrinth_End.svg";
+				break;
+			case "MAP_CITY":
+				path = "/js/app/simulation/simBackgrounds/_Stadt_End.svg";
 				break;
 		}
 
@@ -603,8 +606,8 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		// });
 	}
 
-	runQLearner() {
-		this.promise = this.qLearningAlgorithmModule.runQLearner();
+	runQLearner(episodes: number, time: number) {
+		this.promise = this.qLearningAlgorithmModule.runQLearner(episodes, time);
 		this.setBlocking(true)
 
 		// 	this.promise.then( resolve => {

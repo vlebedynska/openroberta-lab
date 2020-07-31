@@ -9,8 +9,8 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
             this.size = size;
             this.pathToSvg = pathToSvg;
             this.problem = undefined;
-            this.episodes = 500;
-            this.totalTime = 300;
+            this.episodes = 0;
+            this.totalTime = 0;
             this.startFinishStates = undefined;
             this.player = undefined;
             this.qLearner = undefined;
@@ -38,7 +38,9 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
             this.nu = nu;
             this.rho = rho;
         }
-        async runQLearner() {
+        async runQLearner(episodes, time) {
+            this.episodes = episodes;
+            this.totalTime = time;
             this.qLearner = new qLearner_1.QLearningAlgorithm(this.problem, this.alpha, this.gamma, this.rho, this.nu);
             let qLearningSteps = new Array();
             for (let i = 0; i < this.episodes; i++) {

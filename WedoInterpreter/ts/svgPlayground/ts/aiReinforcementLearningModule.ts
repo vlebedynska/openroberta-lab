@@ -37,8 +37,8 @@ export class QLearningAlgorithmModule {
         this.size = size;
         this.pathToSvg = pathToSvg;
         this.problem = undefined;
-        this.episodes = 500;
-        this.totalTime = 300;
+        this.episodes = 0;
+        this.totalTime = 0;
         this.startFinishStates = undefined;
         this.player = undefined;
         this.qLearner = undefined;
@@ -79,7 +79,9 @@ export class QLearningAlgorithmModule {
     }
 
 
-    async runQLearner() {
+    async runQLearner(episodes: number, time: number) {
+        this.episodes = episodes;
+        this.totalTime = time;
         this.qLearner = new QLearningAlgorithm(this.problem,this.alpha, this.gamma, this.rho, this.nu);
         let qLearningSteps: Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}> = new Array<{qLearnerStepData: QLearningStep, optimalPath: Array<number>}>();
         for (let i=0; i < this.episodes; i++) {

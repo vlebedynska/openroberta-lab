@@ -90,17 +90,22 @@
 
 
 .inputNodeName {
-    font-style: italic;
+    font-size: 10pt;
+    font-family: Kohinoor Bangla;
 }
 
 
 .outputNodeName {
-    font-style: italic;
+    font-size: 10pt;
+    font-family: Kohinoor Bangla;
+
 }
 
 
 .activeNodeValue {
-
+    font-size: 10pt;
+    font-family: Kohinoor Bangla;
+    font-weight: bold;
 }
 
 .backgroundPlayerButtonsNNModule {

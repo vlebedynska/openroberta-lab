@@ -505,6 +505,9 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
                 case "MAP_FOREST":
                     path = "/js/app/simulation/simBackgrounds/_Wald_Labyrinth_End.svg";
                     break;
+                case "MAP_CITY":
+                    path = "/js/app/simulation/simBackgrounds/_Stadt_End.svg";
+                    break;
             }
             this.qLearningAlgorithmModule =
                 new aiReinforcementLearningModule_1.QLearningAlgorithmModule(this.updateBackground, "#qLearningBackgroundArea", $('#simConfigRLQLearningModal'), { width: 800, height: 800 }, path);
@@ -517,8 +520,8 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             // 	this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
             // });
         }
-        runQLearner() {
-            this.promise = this.qLearningAlgorithmModule.runQLearner();
+        runQLearner(episodes, time) {
+            this.promise = this.qLearningAlgorithmModule.runQLearner(episodes, time);
             this.setBlocking(true);
             // 	this.promise.then( resolve => {
             // 	this.qLearningAlgorithmModule.runQLearner();

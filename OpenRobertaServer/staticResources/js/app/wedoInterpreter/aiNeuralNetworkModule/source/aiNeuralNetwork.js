@@ -54,7 +54,9 @@ define(["require", "exports", "interpreter.aiNeuralNetworkModule/source/link"], 
         }
         static addNodesName(layer) {
             for (let node of layer) {
-                node.name = node.name + " Port " + node.port;
+                if (node.port != undefined && node.port != "NO_PORT") {
+                    node.name = node.name + " Port " + node.port;
+                }
             }
         }
         getInputLayer() {

@@ -79,10 +79,11 @@ define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], 
                             }
                         });
                         let point0 = copyOfSVG.findOne(".finalPath-outline").pointAt(0);
-                        let point1 = copyOfSVG.findOne(".finalPath-outline").pointAt(20);
+                        let point1 = copyOfSVG.findOne(".finalPath-outline").pointAt(60);
                         // let rect = copyOfSVG.rect(50, 50).cx(point0.x).cy(point0.y).attr({ fill: '#f06' });
                         //Berechnung der Steigung
                         copyOfSVG.line(point0.x, point0.y, point1.x, point1.y).stroke({ width: 10, color: "red" });
+                        copyOfSVG.circle(100).cx(point1.x).cy(point1.y);
                         //Berechung der Drehung des Roboters
                         let m = (point1.y - point0.y) / (point1.x - point0.x);
                         let theta = Math.atan(m) * (-1);

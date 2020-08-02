@@ -66,7 +66,9 @@ export class AiNeuralNetworkImpl implements AiNeuralNetwork{
 
     public static addNodesName(layer: Array<Node>) {
         for ( let node of layer) {
-            node.name = node.name + " Port " + node.port;
+            if (node.port != undefined && node.port != "NO_PORT") {
+                node.name = node.name + " Port " + node.port;
+            }
         }
     }
 

@@ -2343,6 +2343,15 @@ pre code {
     background: #fcfaec;
 }
 
+#simConfigRLQLearningModal .modal-header{
+    cursor: move;
+}
+
+#simConfigRLQLearningModal .modal-dialog{
+    cursor: default;
+}
+
 #simConfigRLQLearningModal {
     border: 2px solid rgba(107, 134, 14, 0.5);
 }
+

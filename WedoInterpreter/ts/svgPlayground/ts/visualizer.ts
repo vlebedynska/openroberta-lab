@@ -328,7 +328,7 @@ export class Visualizer extends EventTarget implements ProblemSource {
 
         setTimeout(function () {
             pathClone.remove();
-            path.stroke({opacity: -(1 / maxQValue) * qValue + 1});
+            path.stroke({opacity: Math.max(0, 1 - (qValue / maxQValue) * 50)});
         }, timeout);
     }
 

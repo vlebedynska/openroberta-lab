@@ -126,7 +126,7 @@
       </block>
       <block type="ai_q_learner_config" id="v8i0{.)T78+7Jdh:v;z4" intask="false">
         <field name="ALPHA">0.1</field>
-        <field name="GAMMA">0.2</field>
+        <field name="GAMMA">0.8</field>
         <field name="NU">0.1</field>
         <field name="RHO">0.1</field>
       </block>

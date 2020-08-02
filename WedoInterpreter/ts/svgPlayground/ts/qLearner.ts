@@ -57,8 +57,8 @@ export class QLearningAlgorithm extends EventTarget {
         let maxQ: number = this.qValueStore.getQValue(newState, this.qValueStore.getBestAction(newState, newStateActions));
         qValueNew = (1 - this.alpha) * qValueOld + this.alpha * (reward + this.gamma * maxQ);
         this.qValueStore.storeQValue(this.state, action, qValueNew);
-        console.log(this.qValueStore)
-        console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
+        // console.log(this.qValueStore)
+        // console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
         this.state = newState;
         duration = Date.now() - startTime;
 
@@ -160,7 +160,7 @@ class QValueStore {
             let nextState: number = this.getBestAction(currentState, problem.getAvailableActions(currentState));
             if (optimalPath.includes(nextState)) {
                 optimalPath.push(nextState);
-                console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
+                // console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
                 resultState = ResultState.ERROR;
                 break;
             }

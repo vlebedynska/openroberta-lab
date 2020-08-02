@@ -4,7 +4,6 @@ require.config({
     paths: {
         'aiReinforcementLearningModule': 'src/aiReinforcementLearningModule',
         'svgdotjs': './node_modules/svgdotjs/dist/svg.min',
-        'index_2':'src/index_2',
         'visualizer': 'src/visualizer',
         'utils':'src/utils',
         'playerImpl':'src/playerImpl',
@@ -12,7 +11,10 @@ require.config({
         'qLearner':'src/qLearner',
         'timerImpl':'src/timerImpl',
         'svglookup': 'src/svglookup',
-        'qValueLookup': 'src/qValueLookup'
+        'hyperparameterTuning': 'src/hyperparameterTuning',
+        'hyperparametherTuningTest': 'src/hyperparametherTuningTest',
+        'qValueLookup': 'src/qValueLookup',
+        'svglookup': 'src/svglookup',
     },
     shim : {
         'svgdotjs': {
@@ -22,6 +24,6 @@ require.config({
 });
 
 // load the modules defined above
-requirejs(['index_2'], function(index_2) {
-    index_2
+requirejs(['hyperparametherTuningTest'], function(hyperparametherTuningTest) {
+    hyperparametherTuningTest
 });

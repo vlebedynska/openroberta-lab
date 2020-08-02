@@ -515,17 +515,17 @@ define(["require", "exports", "interpreter.aRobotBehaviour", "interpreter.consta
             return 0;
         }
         setUpQLearningBehaviour(alpha, gamma, nu, rho) {
-            this.promise = this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
-            // this.promise = this.promise.then(r => {
-            // 	this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
-            // });
+            // this.promise = this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho)
+            this.promise = this.promise.then(r => {
+                return this.qLearningAlgorithmModule.setUpQLearningBehaviour(alpha, gamma, nu, rho);
+            });
         }
         runQLearner(episodes, time) {
-            this.promise = this.qLearningAlgorithmModule.runQLearner(episodes, time);
+            // this.promise = this.qLearningAlgorithmModule.runQLearner(episodes, time);
             this.setBlocking(true);
-            // 	this.promise.then( resolve => {
-            // 	this.qLearningAlgorithmModule.runQLearner();
-            // });
+            this.promise = this.promise.then(resolve => {
+                return this.qLearningAlgorithmModule.runQLearner(episodes, time);
+            });
             // this.promise.then(resolve => {this.setBlocking(true);} )
             // this.setBlocking(true);
             // .then(resolve => )

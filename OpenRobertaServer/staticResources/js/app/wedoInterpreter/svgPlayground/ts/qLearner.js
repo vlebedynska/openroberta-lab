@@ -43,8 +43,8 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
             let maxQ = this.qValueStore.getQValue(newState, this.qValueStore.getBestAction(newState, newStateActions));
             qValueNew = (1 - this.alpha) * qValueOld + this.alpha * (reward + this.gamma * maxQ);
             this.qValueStore.storeQValue(this.state, action, qValueNew);
-            console.log(this.qValueStore);
-            console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
+            // console.log(this.qValueStore)
+            // console.log("state " + this.state + " > " + newState + "; reward " + reward + "; q " + qValueNew + "; maxQ " + maxQ);
             this.state = newState;
             duration = Date.now() - startTime;
             let qLearningStep = {
@@ -113,7 +113,7 @@ define(["require", "exports", "models"], function (require, exports, models_1) {
                 let nextState = this.getBestAction(currentState, problem.getAvailableActions(currentState));
                 if (optimalPath.includes(nextState)) {
                     optimalPath.push(nextState);
-                    console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
+                    // console.log("Keinen optimalen Pfad von " + startState + " nach " + endState + " gefunden. Zyklus geschlossen bei: " + currentState);
                     resultState = models_1.ResultState.ERROR;
                     break;
                 }

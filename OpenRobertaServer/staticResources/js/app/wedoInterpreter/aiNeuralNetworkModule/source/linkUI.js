@@ -60,7 +60,7 @@ define(["require", "exports", "interpreter.aiNeuralNetworkModule/source/svgSlide
             });
         }
         updateSliderPathOnWeightChange(weight) {
-            let width = weight * 4 + 2;
+            let width = weight * 5 + 10;
             this.slider.path.stroke({ width: width });
         }
         activateLink() {
@@ -78,9 +78,9 @@ define(["require", "exports", "interpreter.aiNeuralNetworkModule/source/svgSlide
         }
     }
     exports.LinkUI = LinkUI;
-    LinkUI.COLOR_ACTIVE = 'black';
-    LinkUI.COLOR_INACTIVE = '#b5cb5f';
-    LinkUI.COLOR_DEFAULT = '#b5cb5f';
+    LinkUI.COLOR_ACTIVE = '#f7ba61';
+    LinkUI.COLOR_INACTIVE = '#f7ba61';
+    LinkUI.COLOR_DEFAULT = '#f7ba61';
     LinkUI.RANGE_MIN = 0;
     LinkUI.RANGE_MAX = 1;
     LinkUI.SLIDER_SHAPE_RADIUS = 8;

@@ -121,7 +121,7 @@ define(["require", "exports", "interpreter.aiNeuralNetworkModule/source/draggabl
         ["BLUE", "#95c9fa"],
         ["NONE", "#bfbfbf"],
         ["ORANGE", "#F7D118"],
-        ["default", "#bfbfbf"]
+        ["default", "#69b0bb"]
     ]);
     AiNeuralNetworkUI.LAYER_OFFSET_TOP = 90;
     AiNeuralNetworkUI.LAYER_OFFSET_LEFT = 200;

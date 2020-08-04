@@ -111,8 +111,8 @@ define(["require", "exports", "interpreter.state", "interpreter.constants", "int
                             break;
                         }
                         case C.RUN_Q_LEARNER: {
-                            var episodes = s.pop();
                             var time = s.pop();
+                            var episodes = s.pop();
                             n.runQLearner(episodes, time);
                         }
                         case C.Q_LEARNING_DRAW_OPTIMAL_PATH: {

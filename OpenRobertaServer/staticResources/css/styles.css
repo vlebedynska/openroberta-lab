@@ -110,7 +110,7 @@
 }
 
 .backgroundPlayerButtonsNNModule {
-    fill: #aaaaa9;
+    fill: #69b0bb;
 }
 
 .buttonNNModule {
@@ -118,12 +118,12 @@
 }
 
 .buttonPressed.buttonNNModule{
-    fill: olivedrab;
+    fill: #f7ba61;
 }
 
 .buttonHovered {
     cursor: pointer;
-    fill: #d52b2b;
+    fill: #f7ba61;
     stroke-width: 3;
     stroke-linejoin: round;
     -webkit-filter: drop-shadow(16px 16px 20px);

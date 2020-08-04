@@ -6,9 +6,9 @@ import {AiNeuralNetworkUI} from "interpreter.aiNeuralNetworkModule/source/aiNeur
 import {SVGUtils} from "interpreter.aiNeuralNetworkModule/source/svgUtils";
 
 export class LinkUI extends EventTarget {
-    private static readonly COLOR_ACTIVE = 'black';
-    private static readonly COLOR_INACTIVE = '#b5cb5f';
-    private static readonly COLOR_DEFAULT = '#b5cb5f';
+    private static readonly COLOR_ACTIVE = '#f7ba61';
+    private static readonly COLOR_INACTIVE = '#f7ba61';
+    private static readonly COLOR_DEFAULT = '#f7ba61';
     private static readonly RANGE_MIN = 0;
     private static readonly RANGE_MAX = 1;
     private static readonly SLIDER_SHAPE_RADIUS: number = 8;
@@ -87,7 +87,7 @@ export class LinkUI extends EventTarget {
 
 
     private updateSliderPathOnWeightChange(weight: number) {
-        let width = weight * 4 + 2;
+        let width = weight * 5 + 10;
         this.slider.path.stroke({width: width});
     }
 

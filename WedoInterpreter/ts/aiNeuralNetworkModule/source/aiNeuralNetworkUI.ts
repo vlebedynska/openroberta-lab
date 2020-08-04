@@ -20,7 +20,7 @@ export class AiNeuralNetworkUI extends EventTarget{
             ["BLUE","#95c9fa"],
             ["NONE","#bfbfbf"],
             ["ORANGE","#F7D118"],
-            ["default", "#bfbfbf" ]
+            ["default", "#69b0bb" ]
         ]
     );
 

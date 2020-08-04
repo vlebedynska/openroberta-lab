@@ -429,7 +429,7 @@
   <g id="pathes">
     <path id="path-0-1" d="M361.61,554.77l-.88,68.75L167,623.78a12.65,12.65,0,0,0-12.63,12.65V820.17" fill="none" stroke="#449187" stroke-miterlimit="10" stroke-width="32"/>
     <path id="path-1-0" d="M180.3,820.17v-133a38.64,38.64,0,0,1,38.59-38.64l167.77-.23,1.21-89.5" fill="none" stroke="#449187" stroke-miterlimit="10" stroke-width="32"/>
-    <path id="path-0-2" d="M761.57,648.54H360.73V553.11" fill="none" stroke="#449187" stroke-miterlimit="10" stroke-width="32"/>
+    <path id="path-0-2" d="M360.73,553.11v95.43H761.57" fill="none" stroke="#449187" stroke-miterlimit="10" stroke-width="32"/>
     <path id="path-2-0" d="M761.57,622.83H387.07v-69.7" fill="none" stroke="#449187" stroke-linejoin="round" stroke-width="32"/>
     <path id="path-1-8" d="M168.22,830.65H494.86a23.78,23.78,0,0,1,23.77,23.78v69.83A23.78,23.78,0,0,0,542.41,948H761.57" fill="none" stroke="#449187" stroke-linejoin="round" stroke-width="32"/>
     <path id="path-8-1" d="M761.57,921.38H577.82A34.8,34.8,0,0,1,543,886.59V841.28a34.78,34.78,0,0,0-34.78-34.78h-340" fill="none" stroke="#449187" stroke-linejoin="round" stroke-width="32"/>

@@ -1,3 +1,22 @@
+
+
+Introduction to Machine Learning with Robots and Playful Learning
+================
+V. Olari, K. Cvejoski, Ø. Eide: Introduction to machine learning with robots and playful learning. AAAI, 2021.
+
+If you would like to observe the Neural Network Playground and the Q-Learning-Playground in use, please follow this link: www.figshare.com/s/9bf7608f9408ea2f8da8
+
+If you would like to test the extensions, you can install the Open Roberta Lab locally on a Raspberry Pi by downloading the prepared image: www.figshare.com/s/e92bb50916b8556eb603
+
+A detailed feature description and documentation of the Neural Network Playground and Q-Learning-Playground, is available in Chapter 5 of my master’s thesis: https://kups.ub.uni-koeln.de/30727/
+
+The learning materials are available here:
+
+If you want to get the Neural Network Playground and Q-Learning-Playground up and running, please checkout the Open Roberta Lab source code and then change the branch `master` to the `feature/neuralnetworks` branch. The installation procedure for the Open Roberta Lab is described below.
+
+If you need help, do not hesitate to drop me a line: contact(at)viktoriya-olari.com
+
+
 Open Roberta Lab
 ================
 

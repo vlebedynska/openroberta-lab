@@ -10,7 +10,7 @@ If you would like to test the extensions, you can install the Open Roberta Lab l
 
 A detailed feature description and documentation of the Neural Network Playground and Q-Learning-Playground, is available in Chapter 5 of my master’s thesis: https://kups.ub.uni-koeln.de/30727/
 
-The learning materials are available here:
+The learning materials can be found in the Appendix of the master's thesis.
 
 If you want to get the Neural Network Playground and Q-Learning-Playground up and running, please checkout the Open Roberta Lab source code and then change the branch `master` to the `feature/neuralnetworks` branch. The installation procedure for the Open Roberta Lab is described below.
 

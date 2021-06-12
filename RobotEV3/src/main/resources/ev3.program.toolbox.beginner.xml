@@ -146,12 +146,12 @@
 
 
       <block type="robProcedures_callnoreturn" id="2#eKuIxKgQL^|W_h%{vR" intask="true">
-        <mutation name="fahre_den_optimalen_Weg"></mutation>
+        <mutation name="drive_the_best_way"></mutation>
       </block>
 
       <block type="robProcedures_defnoreturn" id="R6C!;SvLmoOoPW!}%hrY" intask="true">
         <mutation declare="false"></mutation>
-        <field name="NAME">fahre_den_optimalen_Weg</field>
+        <field name="NAME">drive_the_best_way</field>
         <statement name="STACK">
           <block type="robControls_loopForever" id="F].Bn/w,ns:=5g#|RpQN" intask="true">
             <statement name="DO">

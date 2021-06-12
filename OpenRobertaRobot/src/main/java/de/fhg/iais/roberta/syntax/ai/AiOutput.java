@@ -84,7 +84,7 @@ public class AiOutput<V> extends AiNode<V> {
                 outputNodeStream.put("frequency", 300); //TODO VO edit init value, use constants
                 outputNodeStream.put("duration", 100); //TODO VO edit init value, use constants
                 outputNodeStream.put("type", "sound");
-                outputNodeStream.put("name", "Ton");
+                outputNodeStream.put("name", "Sound");
                 return outputNodeStream;
             case "ai_nn_output_node_led":
                 AiColorUtils.Colour color = AiColorUtils.Colour.byColourString(actorInfo.toUpperCase()); //throws exeption

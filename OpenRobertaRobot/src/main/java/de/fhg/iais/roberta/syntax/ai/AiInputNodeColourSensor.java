@@ -92,7 +92,7 @@ public class AiInputNodeColourSensor<V> extends AiInputNode<V>{
             .put("mode", externalSensor.getMode())
             .put("slot", externalSensor.getSlot())
             .put("color", colour)
-            .put("name", "Farbsensor"); //TODO VO extract sensor name to const
+            .put("name", "Coloursensor"); //TODO VO extract sensor name to const
 
         return AiInputNodeColourSensor.make(externalSensor, threshold, colour, helper.extractBlockProperties(block), helper.extractComment(block), nodeData);
     }

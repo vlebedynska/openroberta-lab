@@ -256,7 +256,6 @@ public class Ev3StackMachineVisitor<V> extends AbstractStackMachineVisitor<V> im
         aiNeuralNetwork.getListNNInput().accept(this);
         aiNeuralNetwork.getListNNOutput().accept(this);
         // aiNeuralNetwork.getListNNLinks(); //TODO
-
         JSONObject o = mk(C.PROCESS_NEURAL_NETWORK);
         return app(o);
     }

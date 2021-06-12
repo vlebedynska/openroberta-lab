@@ -564,11 +564,10 @@ export class RobotMbedBehaviour extends ARobotBehaviour {
 		}
 	}
 
+
+
+
 	//Reinforcement Learning
-
-
-
-
 
 	createQLearningEnvironment(obstaclesList, startNode, finishNode, map) {
 

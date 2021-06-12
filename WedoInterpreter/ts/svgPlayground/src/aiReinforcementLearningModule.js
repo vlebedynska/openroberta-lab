@@ -1,7 +1,19 @@
 define(["require", "exports", "visualizer", "utils", "playerImpl", "qLearner"], function (require, exports, visualizer_1, utils_1, playerImpl_1, qLearner_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+
+    /**
+     *
+     */
     class QLearningAlgorithmModule {
+        /**
+         *ghhhhsrtgh
+         * @param updateBackground
+         * @param htmlSelector
+         * @param popupSelector
+         * @param size
+         * @param pathToSvg
+         */
         constructor(updateBackground, htmlSelector, popupSelector, size, pathToSvg) {
             this.updateBackground = updateBackground;
             this.htmlSelector = htmlSelector;

@@ -29,7 +29,14 @@ export class QLearningAlgorithmModule {
     qLearner: QLearningAlgorithm;
     private _drawOptimalPathResult: boolean;
 
-
+    /**
+     *
+     * @param updateBackground
+     * @param htmlSelector
+     * @param popupSelector
+     * @param size
+     * @param pathToSvg
+     */
     constructor(updateBackground, htmlSelector: string, popupSelector: any, size: Size, pathToSvg: string) {
         this.updateBackground = updateBackground;
         this.htmlSelector = htmlSelector;

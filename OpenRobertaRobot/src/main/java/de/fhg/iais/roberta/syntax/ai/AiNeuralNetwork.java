@@ -17,7 +17,10 @@ import de.fhg.iais.roberta.visitor.IVisitor;
 import de.fhg.iais.roberta.visitor.ai.IAiVisitor;
 
 /**
- * TODO Doku
+ * This class represents <b>ai_neural_network</b> block from Blockly into the AST (abstract syntax tree). Object from this
+ * class will generate neural network including input and output layers.<br/>
+ * <br>
+ * To create an instance from this class use the method {@link #make(ListCreate, ListCreate, List, BlocklyBlockProperties, BlocklyComment)}.<br>
  */
 public class AiNeuralNetwork<V> extends Stmt<V> {
 
@@ -39,10 +42,12 @@ public class AiNeuralNetwork<V> extends Stmt<V> {
 
     /**
      * This constructor set the kind of the object used in the AST (abstract syntax tree). All possible kinds can be found in {@link BlockType}.
-     *
-     * @param kind of the the object used in AST,
+     * @param kind
+     * @param listNNInput
+     * @param listNNOutput
+     * @param listNNLinks
      * @param property
-     * @param comment that the user added to the block
+     * @param comment
      */
     private AiNeuralNetwork(
         BlockType kind,
@@ -59,7 +64,15 @@ public class AiNeuralNetwork<V> extends Stmt<V> {
     }
 
     /**
-     * TODO Doku
+     * creates a new {@link #AiNeuralNetwork} instance;
+     *
+     * @param listNNInput
+     * @param listNNOutput
+     * @param listNNLinks
+     * @param properties
+     * @param comment
+     * @param <V>
+     * @return
      */
     public static <V> AiNeuralNetwork<V> make(
         ListCreate<V> listNNInput,
@@ -70,6 +83,11 @@ public class AiNeuralNetwork<V> extends Stmt<V> {
         return new AiNeuralNetwork<V>(BlockTypeContainer.getByName("AI_NEURAL_NETWORK"), listNNInput, listNNOutput, listNNLinks, properties, comment);
     }
 
+    /**
+     * implements
+     * @param visitor
+     * @return
+     */
     @Override
     protected V acceptImpl(IVisitor<V> visitor) {
         return ((IAiVisitor<V>) visitor).visitAiNeuralNetwork(this);

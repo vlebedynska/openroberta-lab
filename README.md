@@ -2,7 +2,7 @@
 
 Introduction to Machine Learning with Robots and Playful Learning
 ================
-V. Olari, K. Cvejoski, Ø. Eide: Introduction to machine learning with robots and playful learning. AAAI, 2021.
+Olari, V., Cvejoski, K., & Eide, Øyvind. (2021). Introduction to Machine Learning with Robots and Playful Learning. Proceedings of the AAAI Conference on Artificial Intelligence, 35(17), 15630-15639. Retrieved from https://ojs.aaai.org/index.php/AAAI/article/view/17841
 
 If you would like to observe the Neural Network Playground and the Q-Learning-Playground in use, please follow this link: www.figshare.com/s/9bf7608f9408ea2f8da8
 
